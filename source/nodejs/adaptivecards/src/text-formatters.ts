@@ -41,6 +41,9 @@ class TimeFormatter extends AbstractTextFormatter {
     }
 }
 
+// Retrieve full field binding definitions, e.g. abc.def[0].ghi
+// {{2}BINDING\(((?:\.?(?:[a-zA-Z0-9_]+(?:\[[0-9]+\])?))+)\)}{2}
+
 export function formatText(text: string): string {
     const formatters: Array<AbstractTextFormatter> = [
         new DateFormatter(/\{{2}DATE\((\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|(?:(?:-|\+)\d{2}:\d{2})))(?:, ?(COMPACT|LONG|SHORT))?\)\}{2}/g),
