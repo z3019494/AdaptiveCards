@@ -1,4 +1,6 @@
-﻿import * as Enums from "./enums";
+import * as ST from "stjs";
+
+import * as Enums from "./enums";
 import * as Utils from "./utils";
 import * as HostConfig from "./host-config";
 import * as TextFormatters from "./text-formatters";
@@ -4083,6 +4085,7 @@ export class AdaptiveCard extends ContainerWithActions {
 
         this.fallbackText = json["fallbackText"];
 
+        json["body"] = ST.select(json["$sampleData"]).transformWith(json["body"]).root();
         super.parse(json, "body");
     }
 

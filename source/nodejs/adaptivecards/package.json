@@ -63,5 +63,8 @@
       "jsx",
       "json"
     ]
+  },
+  "dependencies": {
+    "stjs": "0.0.5"
   }
 }
