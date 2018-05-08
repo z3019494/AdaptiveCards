@@ -1,6 +1,6 @@
 {
   "name": "adaptivecards-site",
-  "version": "0.2.0",
+  "version": "1.0.1",
   "private": true,
   "scripts": {
     "build": "hexo generate",
@@ -11,8 +11,8 @@
     "version": "3.4.4"
   },
   "dependencies": {
-    "adaptivecards": "~1.0.0-0",
-    "adaptivecards-visualizer": "~1.0.0-0",
+    "adaptivecards": ">1.0.0-0 <1.1.0",
+    "adaptivecards-visualizer": ">1.0.0-0 <1.1.0",
     "change-case": "^3.0.1",
     "glob": "^7.1.2",
     "hexo": "^3.4.4",
