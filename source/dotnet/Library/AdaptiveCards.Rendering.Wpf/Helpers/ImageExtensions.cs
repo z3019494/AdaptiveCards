@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -41,7 +42,7 @@ namespace AdaptiveCards.Rendering.Wpf
             return stream;
         }
 
-        public static async void SetSource(this Image image, Uri url, AdaptiveRenderContext context)
+        public static async Task SetSource(this Image image, Uri url, AdaptiveRenderContext context)
         {
             if (url == null)
                 return;
