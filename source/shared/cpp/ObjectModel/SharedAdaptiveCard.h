@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BackgroundImage.h"
 #include "BaseCardElement.h"
 #include "BaseActionElement.h"
 #include "Enums.h"
@@ -14,17 +15,39 @@ namespace AdaptiveSharedNamespace
     {
     public:
         AdaptiveCard();
+
         AdaptiveCard(std::string const& version,
                      std::string const& fallbackText,
-                     std::string const& backgroundImage,
+                     std::string const& backgroundImageUrl,
                      ContainerStyle style,
                      std::string const& speak,
                      std::string const& language,
                      VerticalContentAlignment verticalContentAlignment,
                      HeightType height);
+
         AdaptiveCard(std::string const& version,
                      std::string const& fallbackText,
-                     std::string const& backgroundImage,
+                     std::string const& backgroundImageUrl,
+                     ContainerStyle style,
+                     std::string const& speak,
+                     std::string const& language,
+                     VerticalContentAlignment verticalContentAlignment,
+                     HeightType height,
+                     std::vector<std::shared_ptr<BaseCardElement>>& body,
+                     std::vector<std::shared_ptr<BaseActionElement>>& actions);
+
+        AdaptiveCard(std::string const& version,
+                     std::string const& fallbackText,
+                     std::shared_ptr<BackgroundImage> backgroundImage,
+                     ContainerStyle style,
+                     std::string const& speak,
+                     std::string const& language,
+                     VerticalContentAlignment verticalContentAlignment,
+                     HeightType height);
+
+        AdaptiveCard(std::string const& version,
+                     std::string const& fallbackText,
+                     std::shared_ptr<BackgroundImage> backgroundImage,
                      ContainerStyle style,
                      std::string const& speak,
                      std::string const& language,
@@ -37,8 +60,8 @@ namespace AdaptiveSharedNamespace
         void SetVersion(const std::string& value);
         std::string GetFallbackText() const;
         void SetFallbackText(const std::string& value);
-        std::string GetBackgroundImage() const;
-        void SetBackgroundImage(const std::string& value);
+        std::shared_ptr<BackgroundImage> GetBackgroundImage() const;
+        void SetBackgroundImage(const std::shared_ptr<BackgroundImage> value);
         std::string GetSpeak() const;
         void SetSpeak(const std::string& value);
         ContainerStyle GetStyle() const;
@@ -109,7 +132,7 @@ namespace AdaptiveSharedNamespace
     private:
         std::string m_version;
         std::string m_fallbackText;
-        std::string m_backgroundImage;
+        std::shared_ptr<BackgroundImage> m_backgroundImage;
         std::string m_speak;
         ContainerStyle m_style;
         std::string m_language;

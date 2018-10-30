@@ -73,6 +73,11 @@ Json::Value Container::SerializeToJsonValue() const
             VerticalContentAlignmentToString(m_verticalContentAlignment);
     }
 
+    if (m_backgroundImage != nullptr)
+    {
+        root[AdaptiveCardSchemaKeyToString(AdaptiveCardSchemaKey::BackgroundImage)] = m_backgroundImage->SerializeToJsonValue();
+    }
+
     std::string const& itemsPropertyName = AdaptiveCardSchemaKeyToString(AdaptiveCardSchemaKey::Items);
     root[itemsPropertyName] = Json::Value(Json::arrayValue);
     for (const auto& cardElement : m_items)

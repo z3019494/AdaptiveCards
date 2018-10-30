@@ -2,6 +2,7 @@
 
 #include "Enums.h"
 #include "pch.h"
+#include "BackgroundImage.h"
 #include "BaseActionElement.h"
 #include "BaseCardElement.h"
 #include "ElementParserRegistration.h"
@@ -37,6 +38,7 @@ namespace AdaptiveSharedNamespace
         void PopulateKnownPropertiesSet() override;
 
         ContainerStyle m_style;
+        std::shared_ptr<BackgroundImage> m_backgroundImage;
         VerticalContentAlignment m_verticalContentAlignment;
         std::vector<std::shared_ptr<AdaptiveSharedNamespace::BaseCardElement>> m_items;
         std::shared_ptr<BaseActionElement> m_selectAction;

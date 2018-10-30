@@ -27,9 +27,17 @@ using namespace AdaptiveCards;
 
 namespace AdaptiveCardsSharedModelUnitTest
 {
+    void ValidateBackgroundImage(const BackgroundImage& backImage, std::string url)
+    {
+        Assert::AreEqual(url, backImage.GetUrl());
+        Assert::IsTrue(BackgroundImageMode::Stretch == backImage.GetMode());
+        Assert::IsTrue(HorizontalAlignment::Left == backImage.GetHorizontalAlignment());
+        Assert::IsTrue(VerticalAlignment::Top == backImage.GetVerticalAlignment());
+    }
+
     void ValidateTopLevelProperties(const AdaptiveCard &everythingBagel)
     {
-        Assert::AreEqual("https://adaptivecards.io/content/cats/1.png"s, everythingBagel.GetBackgroundImage());
+        ValidateBackgroundImage(*everythingBagel.GetBackgroundImage(), "https://adaptivecards.io/content/cats/1.png"s);
         Assert::IsTrue(CardElementType::AdaptiveCard == everythingBagel.GetElementType());
         Assert::AreEqual("fallbackText"s, everythingBagel.GetFallbackText());
         Assert::IsTrue(HeightType::Auto == everythingBagel.GetHeight());
@@ -413,7 +421,7 @@ namespace AdaptiveCardsSharedModelUnitTest
             {
                 auto subCard = std::static_pointer_cast<AdaptiveCard>(showCardAction->GetCard());
                 Assert::AreEqual(size_t{ 0 }, subCard->GetActions().size());
-                Assert::AreEqual(""s, subCard->GetBackgroundImage());
+                ValidateBackgroundImage(*subCard->GetBackgroundImage(), ""s);
                 Assert::IsTrue(CardElementType::AdaptiveCard == subCard->GetElementType());
                 Assert::AreEqual(""s, subCard->GetFallbackText());
                 Assert::IsTrue(HeightType::Auto == subCard->GetHeight());

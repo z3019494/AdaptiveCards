@@ -31,7 +31,7 @@ namespace AdaptiveSharedNamespace
             {AdaptiveCardSchemaKey::Attention, "attention"},
             {AdaptiveCardSchemaKey::BackgroundColor, "backgroundColor"},
             {AdaptiveCardSchemaKey::BackgroundImage, "backgroundImage"},
-            {AdaptiveCardSchemaKey::BackgroundImageUrl, "backgroundImageUrl"},
+            {AdaptiveCardSchemaKey::BackgroundImageUrl, "url"},
             {AdaptiveCardSchemaKey::BaseCardElement, "baseCardElement"},
             {AdaptiveCardSchemaKey::Body, "body"},
             {AdaptiveCardSchemaKey::Bolder, "bolder"},
@@ -308,6 +308,51 @@ namespace AdaptiveSharedNamespace
         if (imageStyleNameToEnumOut != nullptr)
         {
             *imageStyleNameToEnumOut = imageStyleNameToEnum;
+        }
+    }
+
+     void GetVerticalAlignmentEnumMappings(std::unordered_map<VerticalAlignment, std::string, EnumHash>* verticalAlignmentEnumToNameOut,
+                                          std::unordered_map<std::string, VerticalAlignment, CaseInsensitiveHash, CaseInsensitiveEqualTo>* verticalAlignmentNameToEnumOut)
+    {
+         static std::unordered_map<VerticalAlignment, std::string, EnumHash> verticalAlignmentEnumToName = {
+            {VerticalAlignment::Top, "top"},
+            {VerticalAlignment::Center, "center"},
+            {VerticalAlignment::Bottom, "bottom"}};
+
+        static std::unordered_map<std::string, VerticalAlignment, CaseInsensitiveHash, CaseInsensitiveEqualTo> imageModeNameToEnum =
+             GenerateStringToEnumMap<VerticalAlignment>(verticalAlignmentEnumToName);
+
+        if (verticalAlignmentEnumToNameOut != nullptr)
+        {
+            *verticalAlignmentEnumToNameOut = verticalAlignmentEnumToName;
+        }
+
+        if (verticalAlignmentNameToEnumOut != nullptr)
+        {
+            *verticalAlignmentNameToEnumOut = imageModeNameToEnum;
+        }
+    }
+
+    void GetBackgroundImageModeEnumMappings(std::unordered_map<BackgroundImageMode, std::string, EnumHash>* imageModeEnumToNameOut,
+        std::unordered_map<std::string, BackgroundImageMode, CaseInsensitiveHash, CaseInsensitiveEqualTo>* imageModeNameToEnumOut)
+    {
+        static std::unordered_map<BackgroundImageMode, std::string, EnumHash> imageModeEnumToName = {
+            {BackgroundImageMode::Stretch, "stretch"},
+            {BackgroundImageMode::RepeatHorizontally, "repeatHorizontally"},
+            {BackgroundImageMode::RepeatVertically, "repeatVertically"},
+            {BackgroundImageMode::Repeat, "repeat"}};
+
+        static std::unordered_map<std::string, BackgroundImageMode, CaseInsensitiveHash, CaseInsensitiveEqualTo> imageModeNameToEnum =
+            GenerateStringToEnumMap<BackgroundImageMode>(imageModeEnumToName);
+
+        if (imageModeEnumToNameOut != nullptr)
+        {
+            *imageModeEnumToNameOut = imageModeEnumToName;
+        }
+
+        if (imageModeNameToEnumOut != nullptr)
+        {
+            *imageModeNameToEnumOut = imageModeNameToEnum;
         }
     }
 
@@ -933,6 +978,56 @@ namespace AdaptiveSharedNamespace
         }
 
         return imageStyleNameToEnum[style];
+    }
+
+    const std::string VerticalAlignmentToString(VerticalAlignment alignment)
+    {
+        std::unordered_map<VerticalAlignment, std::string, EnumHash> imageAlignmentEnumToName;
+        GetVerticalAlignmentEnumMappings(&imageAlignmentEnumToName, nullptr);
+
+        if (imageAlignmentEnumToName.find(alignment) == imageAlignmentEnumToName.end())
+        {
+            throw std::out_of_range("Invalid VerticalAlignment type");
+        }
+        return imageAlignmentEnumToName[alignment];
+    }
+
+    VerticalAlignment VerticalAlignmentFromString(const std::string& alignment)
+    {
+        std::unordered_map<std::string, VerticalAlignment, CaseInsensitiveHash, CaseInsensitiveEqualTo> verticalAlignmentNameToEnum;
+        GetVerticalAlignmentEnumMappings(nullptr, &verticalAlignmentNameToEnum);
+
+        if (verticalAlignmentNameToEnum.find(alignment) == verticalAlignmentNameToEnum.end())
+        {
+            return VerticalAlignment::Top;
+        }
+
+        return verticalAlignmentNameToEnum[alignment];
+    }
+
+    const std::string BackgroundImageModeToString(BackgroundImageMode mode)
+    {
+        std::unordered_map<BackgroundImageMode, std::string, EnumHash> imageModeEnumToName;
+        GetBackgroundImageModeEnumMappings(&imageModeEnumToName, nullptr);
+
+        if (imageModeEnumToName.find(mode) == imageModeEnumToName.end())
+        {
+            throw std::out_of_range("Invalid BackgroundImageMode type");
+        }
+        return imageModeEnumToName[mode];
+    }
+
+    BackgroundImageMode BackgroundImageModeFromString(const std::string& mode)
+    {
+        std::unordered_map<std::string, BackgroundImageMode, CaseInsensitiveHash, CaseInsensitiveEqualTo> imageModeNameToEnum;
+        GetBackgroundImageModeEnumMappings(nullptr, &imageModeNameToEnum);
+
+        if (imageModeNameToEnum.find(mode) == imageModeNameToEnum.end())
+        {
+            return BackgroundImageMode::Stretch;
+        }
+
+        return imageModeNameToEnum[mode];
     }
 
     const std::string ActionsOrientationToString(ActionsOrientation orientation)

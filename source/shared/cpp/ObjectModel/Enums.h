@@ -49,6 +49,7 @@ namespace AdaptiveSharedNamespace
         Attention,
         BackgroundColor,
         BackgroundImage,
+        BackgroundImageMode,
         BackgroundImageUrl,
         BaseCardElement,
         Body,
@@ -126,6 +127,9 @@ namespace AdaptiveSharedNamespace
         Placeholder,
         PlayButton,
         Poster,
+        Repeat,
+        RepeatHorizontally,
+        RepeatVertically,
         Right,
         SelectAction,
         Sentiment,
@@ -160,6 +164,7 @@ namespace AdaptiveSharedNamespace
         ValueOff,
         ValueOn,
         Version,
+        VerticalAlignment,
         VerticalContentAlignment,
         Warning,
         Weight,
@@ -199,6 +204,21 @@ namespace AdaptiveSharedNamespace
         Left = 0,
         Center,
         Right
+    };
+
+    enum class VerticalAlignment
+    {
+        Top = 0,
+        Center,
+        Bottom
+    };
+
+    enum class BackgroundImageMode
+    {
+        Stretch = 0,
+        RepeatHorizontally,
+        RepeatVertically,
+        Repeat
     };
 
     enum class ImageStyle
@@ -404,6 +424,12 @@ namespace AdaptiveSharedNamespace
 
     const std::string ImageStyleToString(ImageStyle style);
     ImageStyle ImageStyleFromString(const std::string& style);
+
+    const std::string VerticalAlignmentToString(VerticalAlignment alignment);
+    VerticalAlignment VerticalAlignmentFromString(const std::string& alignment);
+
+    const std::string BackgroundImageModeToString(BackgroundImageMode mode);
+    BackgroundImageMode BackgroundImageModeFromString(const std::string& mode);
 
     const std::string ActionsOrientationToString(ActionsOrientation orientation);
     ActionsOrientation ActionsOrientationFromString(const std::string& orientation);

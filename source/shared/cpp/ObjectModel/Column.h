@@ -2,6 +2,7 @@
 
 #include "pch.h"
 #include "Enums.h"
+#include "BackgroundImage.h"
 #include "BaseActionElement.h"
 #include "BaseCardElement.h"
 
@@ -53,6 +54,7 @@ namespace AdaptiveSharedNamespace
 
         std::string m_width;
         unsigned int m_pixelWidth;
+        std::shared_ptr<BackgroundImage> m_backgroundImage;
         std::vector<std::shared_ptr<AdaptiveSharedNamespace::BaseCardElement>> m_items;
         std::shared_ptr<BaseActionElement> m_selectAction;
         ContainerStyle m_style;
