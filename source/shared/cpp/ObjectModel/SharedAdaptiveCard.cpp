@@ -6,6 +6,7 @@
 #include "TextBlock.h"
 #include "AdaptiveCardParseWarning.h"
 #include "SemanticVersion.h"
+#include "BackgroundImage.h"
 
 using namespace AdaptiveSharedNamespace;
 
@@ -166,9 +167,8 @@ std::shared_ptr<ParseResult> AdaptiveCard::Deserialize(const Json::Value& json,
         }
     }
 
-    std::string backgroundImageUrl = ParseUtil::GetString(json, AdaptiveCardSchemaKey::BackgroundImageUrl);
-    std::string backgroundImage =
-        backgroundImageUrl != "" ? backgroundImageUrl : ParseUtil::GetString(json, AdaptiveCardSchemaKey::BackgroundImage);
+    auto backgroundImage = ParseUtil::ExtractBackgroundImage(json);
+
     ContainerStyle style =
         ParseUtil::GetEnumValue<ContainerStyle>(json, AdaptiveCardSchemaKey::Style, ContainerStyle::None, ContainerStyleFromString);
     VerticalContentAlignment verticalContentAlignment =

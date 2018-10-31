@@ -6,11 +6,13 @@
 #include "json/json.h"
 #include "ElementParserRegistration.h"
 #include "ActionParserRegistration.h"
+#include "BackgroundImage.h"
 
 namespace AdaptiveSharedNamespace
 {
     class BaseCardElement;
     class BaseActionElement;
+    class BackgroundImage;
 
     namespace ParseUtil
     {
@@ -28,6 +30,8 @@ namespace AdaptiveSharedNamespace
         std::string GetJsonString(const Json::Value& json, AdaptiveCardSchemaKey key, bool isRequired = false);
 
         std::string GetValueAsString(const Json::Value& json, AdaptiveCardSchemaKey key, bool isRequired = false);
+
+        std::shared_ptr<BackgroundImage> ExtractBackgroundImage(const Json::Value& json);
 
         bool GetBool(const Json::Value& json, AdaptiveCardSchemaKey key, bool defaultValue, bool isRequired = false);
 

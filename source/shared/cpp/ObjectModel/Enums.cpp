@@ -31,7 +31,8 @@ namespace AdaptiveSharedNamespace
             {AdaptiveCardSchemaKey::Attention, "attention"},
             {AdaptiveCardSchemaKey::BackgroundColor, "backgroundColor"},
             {AdaptiveCardSchemaKey::BackgroundImage, "backgroundImage"},
-            {AdaptiveCardSchemaKey::BackgroundImageUrl, "url"},
+            {AdaptiveCardSchemaKey::BackgroundImageMode, "mode"},
+            {AdaptiveCardSchemaKey::BackgroundImageUrl, "backgroundImageUrl"},
             {AdaptiveCardSchemaKey::BaseCardElement, "baseCardElement"},
             {AdaptiveCardSchemaKey::Body, "body"},
             {AdaptiveCardSchemaKey::Bolder, "bolder"},
@@ -143,6 +144,7 @@ namespace AdaptiveSharedNamespace
             {AdaptiveCardSchemaKey::ValueOff, "valueOff"},
             {AdaptiveCardSchemaKey::ValueOn, "valueOn"},
             {AdaptiveCardSchemaKey::Version, "version"},
+            {AdaptiveCardSchemaKey::VerticalAlignment, "verticalAlignment"},
             {AdaptiveCardSchemaKey::VerticalContentAlignment, "verticalContentAlignment"},
             {AdaptiveCardSchemaKey::Warning, "warning"},
             {AdaptiveCardSchemaKey::Weight, "weight"},
@@ -385,7 +387,7 @@ namespace AdaptiveSharedNamespace
         std::unordered_map<std::string, HorizontalAlignment, CaseInsensitiveHash, CaseInsensitiveEqualTo>* horizontalAlignmentNameToEnumOut)
     {
         static std::unordered_map<HorizontalAlignment, std::string, EnumHash> horizontalAlignmentEnumToName = {
-            {HorizontalAlignment::Center, "Center"}, {HorizontalAlignment::Left, "Left"}, {HorizontalAlignment::Right, "Right"}};
+            {HorizontalAlignment::Center, "center"}, {HorizontalAlignment::Left, "left"}, {HorizontalAlignment::Right, "right"}};
         static std::unordered_map<std::string, HorizontalAlignment, CaseInsensitiveHash, CaseInsensitiveEqualTo> horizontalAlignmentNameToEnum =
             GenerateStringToEnumMap<HorizontalAlignment>(horizontalAlignmentEnumToName);
 

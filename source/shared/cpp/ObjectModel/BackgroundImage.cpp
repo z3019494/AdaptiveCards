@@ -5,84 +5,79 @@
 #include "BaseActionElement.h"
 #include "ParseResult.h"
 
-using namespace AdaptiveSharedNamespace;
-
-std::string BackgroundImage::GetUrl() const
+namespace AdaptiveSharedNamespace
 {
-    return m_url;
-}
+    std::string BackgroundImage::GetUrl() const { return m_url; }
 
-void BackgroundImage::SetUrl(const std::string& value)
-{
-    m_url = value;
-}
+    void BackgroundImage::SetUrl(const std::string& value) { m_url = value; }
 
-BackgroundImageMode BackgroundImage::GetMode() const
-{
-    return m_mode;
-}
+    BackgroundImageMode BackgroundImage::GetMode() const { return m_mode; }
 
-void BackgroundImage::SetMode(const BackgroundImageMode& value)
-{
-    m_mode = value;
-}
+    void BackgroundImage::SetMode(const BackgroundImageMode& value) { m_mode = value; }
 
-HorizontalAlignment BackgroundImage::GetHorizontalAlignment() const
-{
-    return m_hAlignment;
-}
+    HorizontalAlignment BackgroundImage::GetHorizontalAlignment() const { return m_hAlignment; }
 
-void BackgroundImage::SetHorizontalAlignment(const HorizontalAlignment& value)
-{
-    m_hAlignment = value;
-}
+    void BackgroundImage::SetHorizontalAlignment(const HorizontalAlignment& value) { m_hAlignment = value; }
 
-VerticalAlignment BackgroundImage::GetVerticalAlignment() const
-{
-    return m_vAlignment;
-}
+    VerticalAlignment BackgroundImage::GetVerticalAlignment() const { return m_vAlignment; }
 
-void BackgroundImage::SetVerticalAlignment(const VerticalAlignment& value)
-{
-    m_vAlignment = value;
-}
+    void BackgroundImage::SetVerticalAlignment(const VerticalAlignment& value) { m_vAlignment = value; }
 
-Json::Value BackgroundImage::SerializeToJsonValue() const
-{
-    Json::Value root;
-    if (!m_url.empty())
+    Json::Value BackgroundImage::SerializeToJsonValue() const
     {
-        root[AdaptiveCardSchemaKeyToString(AdaptiveCardSchemaKey::BackgroundImageUrl)] = m_url;
+        Json::Value root;
+
+        // if BackgroundImage has a url and the rest as default values
+        if (!m_url.empty() && m_mode == BackgroundImageMode::Stretch && m_hAlignment == HorizontalAlignment::Left &&
+            m_vAlignment == VerticalAlignment::Top)
+        {
+            root = m_url;
+        }
+
+        // standard serialization process
+        else
+        {
+            if (!m_url.empty())
+            {
+                root[AdaptiveCardSchemaKeyToString(AdaptiveCardSchemaKey::Url)] = m_url;
+            }
+
+            if (m_mode != BackgroundImageMode::Stretch)
+            {
+                root[AdaptiveCardSchemaKeyToString(AdaptiveCardSchemaKey::BackgroundImageMode)] =
+                    BackgroundImageModeToString(m_mode);
+            }
+
+            if (m_hAlignment != HorizontalAlignment::Left)
+            {
+                root[AdaptiveCardSchemaKeyToString(AdaptiveCardSchemaKey::HorizontalAlignment)] =
+                    HorizontalAlignmentToString(m_hAlignment);
+            }
+
+            if (m_vAlignment != VerticalAlignment::Top)
+            {
+                root[AdaptiveCardSchemaKeyToString(AdaptiveCardSchemaKey::VerticalAlignment)] =
+                    VerticalAlignmentToString(m_vAlignment);
+            }
+        }
+        return root;
     }
 
-    if (m_mode != BackgroundImageMode::Stretch)
+    std::shared_ptr<BackgroundImage> BackgroundImage::Deserialize(const Json::Value& json)
     {
-        root[AdaptiveCardSchemaKeyToString(AdaptiveCardSchemaKey::BackgroundImageMode)] = BackgroundImageModeToString(m_mode);
+        std::shared_ptr<BackgroundImage> image = std::shared_ptr<BackgroundImage>(new BackgroundImage());
+
+        image->SetUrl(ParseUtil::GetString(json, AdaptiveCardSchemaKey::Url, true));
+
+        image->SetMode(ParseUtil::GetEnumValue<BackgroundImageMode>(
+            json, AdaptiveCardSchemaKey::BackgroundImageMode, BackgroundImageMode::Stretch, BackgroundImageModeFromString));
+
+        image->SetHorizontalAlignment(ParseUtil::GetEnumValue<HorizontalAlignment>(
+            json, AdaptiveCardSchemaKey::HorizontalAlignment, HorizontalAlignment::Left, HorizontalAlignmentFromString));
+
+        image->SetVerticalAlignment(ParseUtil::GetEnumValue<VerticalAlignment>(
+            json, AdaptiveCardSchemaKey::VerticalAlignment, VerticalAlignment::Top, VerticalAlignmentFromString));
+
+        return image;
     }
-
-    if (m_hAlignment != HorizontalAlignment::Left)
-    {
-        root[AdaptiveCardSchemaKeyToString(AdaptiveCardSchemaKey::HorizontalAlignment)] = HorizontalAlignmentToString(m_hAlignment);
-    }
-
-    if (m_vAlignment != VerticalAlignment::Top)
-    {
-        root[AdaptiveCardSchemaKeyToString(AdaptiveCardSchemaKey::VerticalAlignment)] = VerticalAlignmentToString(m_vAlignment);
-    }
-    return root;
-}
-
-std::shared_ptr<BackgroundImage> BackgroundImage::Deserialize(const Json::Value& json)
-{
-    std::shared_ptr<BackgroundImage> image;
-
-    image->SetUrl(ParseUtil::GetString(json, AdaptiveCardSchemaKey::BackgroundImageUrl, true));
-    image->SetMode(ParseUtil::GetEnumValue<BackgroundImageMode>(
-        json, AdaptiveCardSchemaKey::BackgroundImageMode, BackgroundImageMode::Stretch, BackgroundImageModeFromString));
-    image->SetHorizontalAlignment(ParseUtil::GetEnumValue<HorizontalAlignment>(
-        json, AdaptiveCardSchemaKey::HorizontalAlignment, HorizontalAlignment::Left, HorizontalAlignmentFromString));
-    image->SetVerticalAlignment(ParseUtil::GetEnumValue<VerticalAlignment>(
-        json, AdaptiveCardSchemaKey::VerticalAlignment, VerticalAlignment::Top, VerticalAlignmentFromString));
-
-    return image;
 }
