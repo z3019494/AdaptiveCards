@@ -2,6 +2,7 @@
 
 #include "AdaptiveCards.Rendering.Uwp.h"
 #include "SharedAdaptiveCard.h"
+#include "AdaptiveBackgroundImage.h"
 
 namespace AdaptiveNamespace
 {
@@ -23,8 +24,8 @@ namespace AdaptiveNamespace
         IFACEMETHODIMP get_FallbackText(_Out_ HSTRING* fallbackText);
         IFACEMETHODIMP put_FallbackText(_In_ HSTRING fallbackText);
 
-        IFACEMETHODIMP get_BackgroundImage(_Out_ HSTRING* backgroundImage);
-        IFACEMETHODIMP put_BackgroundImage(_In_ HSTRING backgroundImage);
+        IFACEMETHODIMP get_BackgroundImage(_Out_ IAdaptiveBackgroundImage** backgroundImage);
+        IFACEMETHODIMP put_BackgroundImage(_In_ IAdaptiveBackgroundImage* backgroundImage);
 
         IFACEMETHODIMP get_Language(_Out_ HSTRING* language);
         IFACEMETHODIMP put_Language(_In_ HSTRING language);
@@ -72,7 +73,7 @@ namespace AdaptiveNamespace
         ABI::AdaptiveNamespace::HeightType m_height;
         Microsoft::WRL::Wrappers::HString m_language;
 
-        Microsoft::WRL::Wrappers::HString m_backgroundImage;
+        ABI::AdaptiveNamespace::IAdaptiveBackgroundImage m_backgroundImage;
 
         Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveActionElement> m_selectAction;
         ABI::AdaptiveNamespace::ContainerStyle m_style;

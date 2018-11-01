@@ -204,14 +204,14 @@ namespace AdaptiveNamespace
         return S_OK;
     }
 
-    _Use_decl_annotations_ HRESULT AdaptiveCard::get_BackgroundImage(HSTRING* backgroundImage)
+    _Use_decl_annotations_ HRESULT AdaptiveCard::get_BackgroundImage(IAdaptiveBackgroundImage** backgroundImage)
     {
         return m_backgroundImage.CopyTo(backgroundImage);
     }
 
-    _Use_decl_annotations_ HRESULT AdaptiveCard::put_BackgroundImage(HSTRING backgroundImage)
+    _Use_decl_annotations_ HRESULT AdaptiveCard::put_BackgroundImage(IAdaptiveBackgroundImage* backgroundImage)
     {
-        return m_backgroundImage.Set(backgroundImage);
+        m_backgroundImage = backgroundImage;
     }
 
     _Use_decl_annotations_ IFACEMETHODIMP AdaptiveCard::get_SelectAction(IAdaptiveActionElement** action)
