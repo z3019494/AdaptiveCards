@@ -21,14 +21,16 @@ namespace AdaptiveNamespace
         IFACEMETHODIMP get_Url(_Out_ HSTRING* url);
         IFACEMETHODIMP put_Url(_In_ HSTRING url);
 
-        IFACEMETHODIMP get_Mode(_Out_ BackgroundImageMode* mode);
-        IFACEMETHODIMP put_Mode(_In_ BackgroundImageMode mode);
+        IFACEMETHODIMP get_Mode(_Out_ ABI::AdaptiveNamespace::BackgroundImageMode* mode);
+        IFACEMETHODIMP put_Mode(_In_ ABI::AdaptiveNamespace::BackgroundImageMode mode);
 
-        IFACEMETHODIMP get_HorizontalAlignment(_Out_ HAlignment* hAlignment);
-        IFACEMETHODIMP put_HorizontalAlignment(_In_ HAlignment hAlignment);
+        IFACEMETHODIMP get_HorizontalAlignment(_Out_ ABI::AdaptiveNamespace::HAlignment* hAlignment);
+        IFACEMETHODIMP put_HorizontalAlignment(_In_ ABI::AdaptiveNamespace::HAlignment hAlignment);
 
-        IFACEMETHODIMP get_VerticalAlignment(_Out_ VAlignment* vAlignment);
-        IFACEMETHODIMP put_VerticalAlignment(_In_ VAlignment vAlignment);
+        IFACEMETHODIMP get_VerticalAlignment(_Out_ ABI::AdaptiveNamespace::VAlignment* vAlignment);
+        IFACEMETHODIMP put_VerticalAlignment(_In_ ABI::AdaptiveNamespace::VAlignment vAlignment);
+
+        virtual HRESULT GetSharedModel(std::shared_ptr<AdaptiveSharedNamespace::BackgroundImage>& sharedModel);
 
     private:
         Microsoft::WRL::Wrappers::HString m_url;

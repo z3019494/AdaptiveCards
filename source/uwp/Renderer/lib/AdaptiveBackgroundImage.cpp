@@ -44,37 +44,37 @@ namespace AdaptiveNamespace
 
     _Use_decl_annotations_ HRESULT AdaptiveBackgroundImage::put_Url(HSTRING url) { return m_url.Set(url); }
 
-    _Use_decl_annotations_ HRESULT AdaptiveBackgroundImage::get_Mode(BackgroundImageMode* mode)
+    _Use_decl_annotations_ HRESULT AdaptiveBackgroundImage::get_Mode(ABI::AdaptiveNamespace::BackgroundImageMode* mode)
     {
         *mode = m_mode;
         return S_OK;
     }
 
-    _Use_decl_annotations_ HRESULT AdaptiveBackgroundImage::put_Mode(BackgroundImageMode mode)
+    _Use_decl_annotations_ HRESULT AdaptiveBackgroundImage::put_Mode(ABI::AdaptiveNamespace::BackgroundImageMode mode)
     {
         m_mode = mode;
         return S_OK;
     }
 
-    _Use_decl_annotations_ HRESULT AdaptiveBackgroundImage::get_HorizontalAlignment(HAlignment* hAlignment)
+    _Use_decl_annotations_ HRESULT AdaptiveBackgroundImage::get_HorizontalAlignment(ABI::AdaptiveNamespace::HAlignment* hAlignment)
     {
         *hAlignment = m_horizontalAlignment;
         return S_OK;
     }
 
-    _Use_decl_annotations_ HRESULT AdaptiveBackgroundImage::put_HorizontalAlignment(HAlignment hAlignment)
+    _Use_decl_annotations_ HRESULT AdaptiveBackgroundImage::put_HorizontalAlignment(ABI::AdaptiveNamespace::HAlignment hAlignment)
     {
         m_horizontalAlignment = hAlignment;
         return S_OK;
     }
 
-    _Use_decl_annotations_ HRESULT AdaptiveBackgroundImage::get_VerticalAlignment(VAlignment* vAlignment)
+    _Use_decl_annotations_ HRESULT AdaptiveBackgroundImage::get_VerticalAlignment(ABI::AdaptiveNamespace::VAlignment* vAlignment)
     {
         *vAlignment = m_verticalAlignment;
         return S_OK;
     }
 
-    _Use_decl_annotations_ HRESULT AdaptiveBackgroundImage::put_VerticalAlignment(VAlignment vAlignment)
+    _Use_decl_annotations_ HRESULT AdaptiveBackgroundImage::put_VerticalAlignment(ABI::AdaptiveNamespace::VAlignment vAlignment)
     {
         m_verticalAlignment = vAlignment;
         return S_OK;
