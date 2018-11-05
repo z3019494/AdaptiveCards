@@ -393,12 +393,14 @@ namespace AdaptiveNamespace
             THROW_IF_FAILED(rootAsPanel->put_Background(backgroundColorBrush.Get()));
         }
 
-        HSTRING backgroundImage;
-        THROW_IF_FAILED(adaptiveCard->get_BackgroundImage(&backgroundImage));
-        if (backgroundImage != nullptr)
-        {
-            ApplyBackgroundToRoot(rootAsPanel.Get(), backgroundImage, renderContext, renderArgs);
-        }
+        HSTRING backgroundImageUrl;
+        //AdaptiveBackgroundImage* backgroundImage;
+        //adaptiveCard->get_BackgroundImage(backgroundImage);
+        //THROW_IF_FAILED(adaptiveCard->get_BackgroundImage(&backgroundImage));
+        //if (backgroundImage != nullptr)
+        //{
+        //    ApplyBackgroundToRoot(rootAsPanel.Get(), backgroundImage, renderContext, renderArgs);
+        //}
 
         // Outer panel that contains the main body and any inline show cards
         ComPtr<WholeItemsPanel> outerPanel;
@@ -440,7 +442,7 @@ namespace AdaptiveNamespace
         {
             ComPtr<IFrameworkElement> rootAsFrameworkElement;
             THROW_IF_FAILED(rootElement.As(&rootAsFrameworkElement));
-            rootAsFrameworkElement->put_VerticalAlignment(VerticalAlignment::VerticalAlignment_Stretch);
+            rootAsFrameworkElement->put_VerticalAlignment(ABI::Windows::UI::Xaml::VerticalAlignment::VerticalAlignment_Stretch);
         }
 
         ComPtr<IUIElement> rootAsUIElement;
@@ -461,6 +463,7 @@ namespace AdaptiveNamespace
 
         ComPtr<IAdaptiveCardElement> adaptiveCardElement;
         THROW_IF_FAILED(adaptiveImage.As(&adaptiveCardElement));
+
         ComPtr<IUIElement> backgroundImage;
         BuildImage(adaptiveCardElement.Get(), renderContext, renderArgs, &backgroundImage);
         if (backgroundImage == nullptr)
@@ -849,7 +852,7 @@ namespace AdaptiveNamespace
             THROW_IF_FAILED(MakeAndInitialize<AdaptiveImage>(&adaptiveImage));
 
             adaptiveImage->put_Url(iconUrl);
-            adaptiveImage->put_HorizontalAlignment(HAlignment_Center);
+            adaptiveImage->put_HorizontalAlignment(ABI::AdaptiveNamespace::HorizontalAlignment::Center);
 
             ComPtr<IAdaptiveCardElement> adaptiveCardElement;
             THROW_IF_FAILED(adaptiveImage.As(&adaptiveCardElement));
@@ -1532,19 +1535,19 @@ namespace AdaptiveNamespace
         THROW_IF_FAILED(adaptiveTextBlock->get_MaxLines(&maxLines));
         THROW_IF_FAILED(xamlTextBlock2->put_MaxLines(maxLines));
 
-        ABI::AdaptiveNamespace::HAlignment adaptiveHorizontalAlignment;
+        ABI::AdaptiveNamespace::HorizontalAlignment adaptiveHorizontalAlignment;
         THROW_IF_FAILED(adaptiveTextBlock->get_HorizontalAlignment(&adaptiveHorizontalAlignment));
 
         // Set the horizontal alignment of the text
         switch (adaptiveHorizontalAlignment)
         {
-        case ABI::AdaptiveNamespace::HAlignment::Left:
+        case ABI::AdaptiveNamespace::HorizontalAlignment::Left:
             THROW_IF_FAILED(xamlTextBlock->put_TextAlignment(TextAlignment::TextAlignment_Left));
             break;
-        case ABI::AdaptiveNamespace::HAlignment::Right:
+        case ABI::AdaptiveNamespace::HorizontalAlignment::Right:
             THROW_IF_FAILED(xamlTextBlock->put_TextAlignment(TextAlignment::TextAlignment_Right));
             break;
-        case ABI::AdaptiveNamespace::HAlignment::Center:
+        case ABI::AdaptiveNamespace::HorizontalAlignment::Center:
             THROW_IF_FAILED(xamlTextBlock->put_TextAlignment(TextAlignment::TextAlignment_Center));
             break;
         }
@@ -1887,18 +1890,18 @@ namespace AdaptiveNamespace
             }
         }
 
-        ABI::AdaptiveNamespace::HAlignment adaptiveHorizontalAlignment;
+        ABI::AdaptiveNamespace::HorizontalAlignment adaptiveHorizontalAlignment;
         THROW_IF_FAILED(adaptiveImage->get_HorizontalAlignment(&adaptiveHorizontalAlignment));
 
         switch (adaptiveHorizontalAlignment)
         {
-        case ABI::AdaptiveNamespace::HAlignment::Left:
+        case ABI::AdaptiveNamespace::HorizontalAlignment::Left:
             THROW_IF_FAILED(frameworkElement->put_HorizontalAlignment(HorizontalAlignment_Left));
             break;
-        case ABI::AdaptiveNamespace::HAlignment::Right:
+        case ABI::AdaptiveNamespace::HorizontalAlignment::Right:
             THROW_IF_FAILED(frameworkElement->put_HorizontalAlignment(HorizontalAlignment_Right));
             break;
-        case ABI::AdaptiveNamespace::HAlignment::Center:
+        case ABI::AdaptiveNamespace::HorizontalAlignment::Center:
             THROW_IF_FAILED(frameworkElement->put_HorizontalAlignment(HorizontalAlignment_Center));
             break;
         }
@@ -3119,7 +3122,7 @@ namespace AdaptiveNamespace
 
         if (!isMultiLine)
         {
-            THROW_IF_FAILED(textBoxAsFrameworkElement->put_VerticalAlignment(VerticalAlignment::VerticalAlignment_Top));
+            THROW_IF_FAILED(textBoxAsFrameworkElement->put_VerticalAlignment(ABI::Windows::UI::Xaml::VerticalAlignment::VerticalAlignment_Top));
         }
 
         ComPtr<IUIElement> textBoxAsUIElement;

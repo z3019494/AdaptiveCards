@@ -217,31 +217,32 @@ AdaptiveNamespaceStart
     [contract(InternalContract, 1)]
     [internal]
 #endif
-    typedef [v1_enum] enum HAlignment
+    typedef [v1_enum] enum _HorizontalAlignment
     {
         Left = 0,
         Center,
         Right
-    } HAlignment;
+    } HorizontalAlignment;
 
     [version(NTDDI_WIN10_RS1)]
 #ifdef ADAPTIVE_CARDS_WINDOWS
         [contract(InternalContract, 1)]
         [internal]
 #endif
-        typedef [v1_enum] enum VAlignment
+        typedef [v1_enum] enum _VerticalAlignment
         {
             Top = 0,
             Center,
             Bottom
-        } VAlignment;
+        } VerticalAlignment;
 
         [version(NTDDI_WIN10_RS1)]
 #ifdef ADAPTIVE_CARDS_WINDOWS
         [contract(InternalContract, 1)]
         [internal]
 #endif
-        typedef [v1_enum] enum BackgroundImageMode
+        typedef [v1_enum] enum
+            Mode
         {
             Stretch = 0,
             RepeatHorizontally,
@@ -657,8 +658,8 @@ AdaptiveNamespaceStart
         [propget] HRESULT Wrap([out, retval] boolean* value);
         [propput] HRESULT Wrap([in] boolean value);
 
-        [propget] HRESULT HorizontalAlignment([out, retval] HAlignment* value);
-        [propput] HRESULT HorizontalAlignment([in] HAlignment value);
+        [propget] HRESULT HorizontalAlignment([out, retval] HorizontalAlignment* value);
+        [propput] HRESULT HorizontalAlignment([in] HorizontalAlignment value);
 
         [propget] HRESULT MaxLines([out, retval] UINT32* value);
         [propput] HRESULT MaxLines([in] UINT32 value);
@@ -770,14 +771,14 @@ AdaptiveNamespaceStart
         [propget] HRESULT Url([out, retval] HSTRING * value);
         [propput] HRESULT Url([in] HSTRING value);
 
-        [propget] HRESULT Mode([out, retval] HSTRING * value);
-        [propput] HRESULT Mode([in] HSTRING value);
+        [propget] HRESULT Mode([out, retval] BackgroundImageMode * value);
+        [propput] HRESULT Mode([in] BackgroundImageMode value);
 
-        [propget] HRESULT HorizontalAlignment([out, retval] HAlignment * value);
-        [propput] HRESULT HorizontalAlignment([in] HAlignment value);
+        [propget] HRESULT HorizontalAlignment([out, retval] HorizontalAlignment * value);
+        [propput] HRESULT HorizontalAlignment([in] HorizontalAlignment value);
 
-        [propget] HRESULT VerticalAlignment([out, retval] VAlignment * value);
-        [propput] HRESULT VerticalAlignment([in] VAlignment value);
+        [propget] HRESULT VerticalAlignment([out, retval] VerticalAlignment * value);
+        [propput] HRESULT VerticalAlignment([in] VerticalAlignment value);
 
     };
 
@@ -796,11 +797,11 @@ AdaptiveNamespaceStart
         version(NTDDI_WIN10_RS1),
         exclusiveto(AdaptiveCard),
 #ifdef ADAPTIVE_CARDS_WINDOWS
-        uuid(a373da1b-6d07-4269-bead-2f5bb5cf4975),
+        uuid(932119A6-266B-4AC9-8A19-DBED6261BA9F),
         contract(InternalContract, 1),
         internal
 #else
-        uuid(1fbf16f2-7c70-4b19-9d76-fb107fc33821)
+        uuid(9D76D8E1-03E4-49F4-8BC2-E7711F1ED3DA)
 #endif
     ]
     interface IAdaptiveCard : IInspectable
@@ -959,8 +960,8 @@ AdaptiveNamespaceStart
         [propget] HRESULT PixelHeight([out, retval] UINT32* value);
         [propput] HRESULT PixelHeight([in] UINT32 value);
 
-        [propget] HRESULT HorizontalAlignment([out, retval] HAlignment* value);
-        [propput] HRESULT HorizontalAlignment([in] HAlignment value);
+        [propget] HRESULT HorizontalAlignment([out, retval] HorizontalAlignment * value);
+        [propput] HRESULT HorizontalAlignment([in] HorizontalAlignment value);
 
         [propget] HRESULT AltText([out, retval] HSTRING* value);
         [propput] HRESULT AltText([in] HSTRING value);
