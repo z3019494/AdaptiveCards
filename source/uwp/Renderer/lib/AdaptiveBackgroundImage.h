@@ -9,7 +9,8 @@ namespace AdaptiveNamespace
 {
     class DECLSPEC_UUID("60F8A683-A7A3-4E34-BE86-C809F61BD5B6") AdaptiveBackgroundImage
         : public Microsoft::WRL::RuntimeClass<Microsoft::WRL::RuntimeClassFlags<Microsoft::WRL::RuntimeClassType::WinRt>,
-                                              ABI::AdaptiveNamespace::IAdaptiveBackgroundImage>
+                                              ABI::AdaptiveNamespace::IAdaptiveBackgroundImage,
+                                              Microsoft::WRL::CloakedIid<ITypePeek>>
     {
         AdaptiveRuntime(AdaptiveBackgroundImage);
 
@@ -31,6 +32,9 @@ namespace AdaptiveNamespace
         IFACEMETHODIMP put_VerticalAlignment(_In_ ABI::AdaptiveNamespace::VerticalAlignment VerticalAlignment);
 
         HRESULT GetSharedModel(std::shared_ptr<AdaptiveSharedNamespace::BackgroundImage>& sharedModel);
+
+        // ITypePeek method
+        void* PeekAt(REFIID riid) override { return PeekHelper(riid, this); }
 
     private:
         Microsoft::WRL::Wrappers::HString m_url;

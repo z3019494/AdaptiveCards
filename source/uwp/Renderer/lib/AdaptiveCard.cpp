@@ -165,9 +165,8 @@ namespace AdaptiveNamespace
             static_cast<ABI::AdaptiveNamespace::VerticalContentAlignment>(sharedAdaptiveCard->GetVerticalContentAlignment());
         m_height = static_cast<ABI::AdaptiveNamespace::HeightType>(sharedAdaptiveCard->GetHeight());
 
-        //begin{TODO}: Initialize - why do I have to put AdaptiveBackgroundImage instead of ABI::AdaptiveNamespace::IAdaptiveBackgroundImage or ABI::AdaptiveNamespace::AdaptiveBackgroundImage
-        RETURN_IF_FAILED(MakeAndInitialize<AdaptiveBackgroundImage>(m_backgroundImage.GetAddressOf(), sharedAdaptiveCard->GetBackgroundImage()));
-        //end{TODO}
+        RETURN_IF_FAILED(MakeAndInitialize<AdaptiveBackgroundImage>(m_backgroundImage.GetAddressOf(),
+                                                                    sharedAdaptiveCard->GetBackgroundImage()));
 
         return S_OK;
     }
@@ -287,11 +286,10 @@ namespace AdaptiveNamespace
         adaptiveCard->SetHeight(static_cast<AdaptiveSharedNamespace::HeightType>(m_height));
         adaptiveCard->SetLanguage(HStringToUTF8(m_language.Get()));
 
-        // begin{TODO} - SharedModel of BackgroundImage
-        //std::shared_ptr<AdaptiveSharedNamespace::BackgroundImage> sharedBackgroundImage;
-        //m_backgroundImage->GetSharedModel(&sharedBackgroundImage);
-        //adaptiveCard->SetBackgroundImage(sharedBackgroundImage);
-        //end{TODO}
+        std::shared_ptr<AdaptiveSharedNamespace::BackgroundImage> sharedBackgroundImage;
+        auto backgroundImage = static_cast<AdaptiveNamespace::AdaptiveBackgroundImage*>(m_backgroundImage.Get());
+        RETURN_IF_FAILED(backgroundImage->GetSharedModel(sharedBackgroundImage));
+        adaptiveCard->SetBackgroundImage(sharedBackgroundImage);
 
         adaptiveCard->SetStyle(static_cast<AdaptiveSharedNamespace::ContainerStyle>(m_style));
         adaptiveCard->SetVerticalContentAlignment(static_cast<AdaptiveSharedNamespace::VerticalContentAlignment>(m_verticalAlignment));
