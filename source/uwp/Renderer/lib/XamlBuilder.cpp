@@ -399,7 +399,7 @@ namespace AdaptiveNamespace
         THROW_IF_FAILED(backgroundImage->get_Url(&backgroundImageUrl));
         if (backgroundImageUrl != nullptr)
         {
-            ApplyBackgroundToRoot(rootAsPanel.Get(), backgroundImageUrl, renderContext, renderArgs);
+            ApplyBackgroundToRoot(rootAsPanel.Get(), backgroundImage.Get(), renderContext, renderArgs);
         }
 
         // Outer panel that contains the main body and any inline show cards
@@ -451,36 +451,84 @@ namespace AdaptiveNamespace
     }
 
     _Use_decl_annotations_ void XamlBuilder::ApplyBackgroundToRoot(ABI::Windows::UI::Xaml::Controls::IPanel* rootPanel,
-                                                                   HSTRING url,
+                                                                   IAdaptiveBackgroundImage* backgroundImage,
                                                                    IAdaptiveRenderContext* renderContext,
                                                                    IAdaptiveRenderArgs* renderArgs)
     {
         // In order to reuse the image creation code paths, we simply create an adaptive card
         // image element and then build that into xaml and apply to the root.
         ComPtr<IAdaptiveImage> adaptiveImage;
+        HSTRING url;
         THROW_IF_FAILED(MakeAndInitialize<AdaptiveImage>(&adaptiveImage));
+        backgroundImage->get_Url(&url);
         adaptiveImage->put_Url(url);
 
         ComPtr<IAdaptiveCardElement> adaptiveCardElement;
         THROW_IF_FAILED(adaptiveImage.As(&adaptiveCardElement));
 
-        ComPtr<IUIElement> backgroundImage;
-        BuildImage(adaptiveCardElement.Get(), renderContext, renderArgs, &backgroundImage);
-        if (backgroundImage == nullptr)
+        ComPtr<IUIElement> background;
+        BuildImage(adaptiveCardElement.Get(), renderContext, renderArgs, &background);
+        if (background == nullptr)
         {
             return;
         }
 
-        // All background images should be stretched to fill the whole card.
         ComPtr<IImage> xamlImage;
-        THROW_IF_FAILED(backgroundImage.As(&xamlImage));
-        THROW_IF_FAILED(xamlImage->put_Stretch(Stretch::Stretch_UniformToFill));
+        THROW_IF_FAILED(background.As(&xamlImage));
 
+        // Import Background Alignment properties
+        ABI::AdaptiveNamespace::HorizontalAlignment adaptiveHorizontalAlignment;
+        ABI::Windows::UI::Xaml::HorizontalAlignment horizontalAlignment;
+        backgroundImage->get_HorizontalAlignment(&adaptiveHorizontalAlignment);
+        ConvertHorizontalAlignment(adaptiveHorizontalAlignment, horizontalAlignment);
+
+        ABI::AdaptiveNamespace::VerticalAlignment adaptiveVerticalAlignment;
+        ABI::Windows::UI::Xaml::VerticalAlignment verticalAlignment;
+        backgroundImage->get_VerticalAlignment(&adaptiveVerticalAlignment);
+        ConvertVerticalAlignment(adaptiveVerticalAlignment, verticalAlignment);
+
+
+        ABI::AdaptiveNamespace::BackgroundImageMode mode;
+        backgroundImage->get_Mode(&mode);
+
+        // Apply Background Image Mode
         ComPtr<IFrameworkElement> backgroundAsFrameworkElement;
-        THROW_IF_FAILED(xamlImage.As(&backgroundAsFrameworkElement));
-        THROW_IF_FAILED(backgroundAsFrameworkElement->put_VerticalAlignment(VerticalAlignment_Stretch));
+        switch (mode)
+        {
+        case ABI::AdaptiveNamespace::BackgroundImageMode::Repeat:
+            THROW_IF_FAILED(xamlImage.As(&backgroundAsFrameworkElement));
 
-        XamlHelpers::AppendXamlElementToPanel(backgroundImage.Get(), rootPanel);
+            // TODO: IMPLEMENT REPEAT
+
+            THROW_IF_FAILED(backgroundAsFrameworkElement->put_HorizontalAlignment(horizontalAlignment));
+            THROW_IF_FAILED(backgroundAsFrameworkElement->put_VerticalAlignment(verticalAlignment));
+            break;
+        case ABI::AdaptiveNamespace::BackgroundImageMode::RepeatHorizontally:
+
+            // TODO: IMPLEMENT REPEAT_HORIZONTALLY
+
+            // Ignore horizontalAlignment
+            THROW_IF_FAILED(backgroundAsFrameworkElement->put_VerticalAlignment(verticalAlignment));
+            break;
+        case ABI::AdaptiveNamespace::BackgroundImageMode::RepeatVertically:
+
+            // TODO: IMPLEMENT REPEAT_VERTICALLY
+
+            // Ignore verticalAlignment
+            THROW_IF_FAILED(backgroundAsFrameworkElement->put_HorizontalAlignment(horizontalAlignment));
+            break;
+
+        case ABI::AdaptiveNamespace::BackgroundImageMode::Stretch:
+        default:
+            // Ignored: horizontalAlignment, verticalAlignment
+            THROW_IF_FAILED(xamlImage->put_Stretch(Stretch::Stretch_UniformToFill));
+
+            THROW_IF_FAILED(xamlImage.As(&backgroundAsFrameworkElement));
+            THROW_IF_FAILED(backgroundAsFrameworkElement->put_VerticalAlignment(VerticalAlignment_Stretch));
+            break;
+        }
+
+        XamlHelpers::AppendXamlElementToPanel(background.Get(), rootPanel);
 
         // The overlay applied to the background image is determined by a resouce, so create
         // the overlay if that resources exists
