@@ -154,6 +154,15 @@ void Container::PopulateKnownPropertiesSet()
 
 void Container::GetResourceInformation(std::vector<RemoteResourceInformation>& resourceInfo)
 {
+    auto backgroundImage = GetBackgroundImage();
+    if (backgroundImage != nullptr)
+    {
+        RemoteResourceInformation backgroundImageInfo;
+        backgroundImageInfo.url = backgroundImage->GetUrl();
+        backgroundImageInfo.mimeType = "image";
+        resourceInfo.push_back(backgroundImageInfo);
+    }
+
     auto items = GetItems();
     for (auto item : items)
     {
