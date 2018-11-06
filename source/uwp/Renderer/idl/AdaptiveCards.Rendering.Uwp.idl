@@ -1347,6 +1347,9 @@ AdaptiveNamespaceStart
 
         [propget] HRESULT SelectAction([out, retval] IAdaptiveActionElement** value);
         [propput] HRESULT SelectAction([in] IAdaptiveActionElement* value);
+
+        [propget] HRESULT BackgroundImage([out, retval] IAdaptiveBackgroundImage * *value);
+        [propput] HRESULT BackgroundImage([in] IAdaptiveBackgroundImage * value);
     };
 
     [
@@ -1391,6 +1394,9 @@ AdaptiveNamespaceStart
         [propget] HRESULT Items([out, retval] Windows.Foundation.Collections.IVector<IAdaptiveCardElement*>** value);
         [propget] HRESULT SelectAction([out, retval] IAdaptiveActionElement** value);
         [propput] HRESULT SelectAction([in] IAdaptiveActionElement* value);
+
+        [propget] HRESULT BackgroundImage([out, retval] IAdaptiveBackgroundImage * *value);
+        [propput] HRESULT BackgroundImage([in] IAdaptiveBackgroundImage * value);
     };
 
     [
