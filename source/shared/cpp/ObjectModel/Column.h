@@ -47,6 +47,9 @@ namespace AdaptiveSharedNamespace
         VerticalContentAlignment GetVerticalContentAlignment() const;
         void SetVerticalContentAlignment(const VerticalContentAlignment value);
 
+        std::shared_ptr<BackgroundImage> GetBackgroundImage() const;
+        void SetBackgroundImage(const std::shared_ptr<BackgroundImage> value);
+
         void GetResourceInformation(std::vector<RemoteResourceInformation>& resourceInfo) override;
 
     private:

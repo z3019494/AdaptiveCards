@@ -394,13 +394,13 @@ namespace AdaptiveNamespace
         }
 
         HSTRING backgroundImageUrl;
-        //AdaptiveBackgroundImage* backgroundImage;
-        //adaptiveCard->get_BackgroundImage(backgroundImage);
-        //THROW_IF_FAILED(adaptiveCard->get_BackgroundImage(&backgroundImage));
-        //if (backgroundImage != nullptr)
-        //{
-        //    ApplyBackgroundToRoot(rootAsPanel.Get(), backgroundImage, renderContext, renderArgs);
-        //}
+        ComPtr<IAdaptiveBackgroundImage> backgroundImage;
+        THROW_IF_FAILED(adaptiveCard->get_BackgroundImage(&backgroundImage));
+        THROW_IF_FAILED(backgroundImage->get_Url(&backgroundImageUrl));
+        if (backgroundImageUrl != nullptr)
+        {
+            ApplyBackgroundToRoot(rootAsPanel.Get(), backgroundImageUrl, renderContext, renderArgs);
+        }
 
         // Outer panel that contains the main body and any inline show cards
         ComPtr<WholeItemsPanel> outerPanel;

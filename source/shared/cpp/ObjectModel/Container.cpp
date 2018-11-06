@@ -58,6 +58,16 @@ void Container::SetVerticalContentAlignment(const VerticalContentAlignment value
     m_verticalContentAlignment = value;
 }
 
+std::shared_ptr<BackgroundImage> Container::GetBackgroundImage() const
+{
+    return m_backgroundImage;
+}
+
+void Container::SetBackgroundImage(const std::shared_ptr<BackgroundImage> value)
+{
+    m_backgroundImage = value;
+}
+
 Json::Value Container::SerializeToJsonValue() const
 {
     Json::Value root = BaseCardElement::SerializeToJsonValue();
@@ -107,6 +117,9 @@ std::shared_ptr<BaseCardElement> ContainerParser::Deserialize(std::shared_ptr<El
 
     container->SetVerticalContentAlignment(ParseUtil::GetEnumValue<VerticalContentAlignment>(
         value, AdaptiveCardSchemaKey::VerticalContentAlignment, VerticalContentAlignment::Top, VerticalContentAlignmentFromString));
+
+    auto backgroundImage = ParseUtil::ExtractBackgroundImage(value);
+    container->SetBackgroundImage(backgroundImage);
 
     // Parse Items
     auto cardElements = ParseUtil::GetElementCollection(

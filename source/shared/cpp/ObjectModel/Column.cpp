@@ -63,6 +63,16 @@ void Column::SetVerticalContentAlignment(const VerticalContentAlignment value)
     m_verticalContentAlignment = value;
 }
 
+std::shared_ptr<BackgroundImage> Column::GetBackgroundImage() const
+{
+    return m_backgroundImage;
+}
+
+void Column::SetBackgroundImage(const std::shared_ptr<BackgroundImage> value)
+{
+    m_backgroundImage = value;
+}
+
 std::string Column::Serialize() const
 {
     Json::FastWriter writer;
@@ -141,6 +151,9 @@ std::shared_ptr<Column> Column::Deserialize(std::shared_ptr<ElementParserRegistr
 
     column->SetVerticalContentAlignment(ParseUtil::GetEnumValue<VerticalContentAlignment>(
         value, AdaptiveCardSchemaKey::VerticalContentAlignment, VerticalContentAlignment::Top, VerticalContentAlignmentFromString));
+
+    auto backgroundImage = ParseUtil::ExtractBackgroundImage(value);
+    column->SetBackgroundImage(backgroundImage);
 
     // Parse Items
     auto cardElements = ParseUtil::GetElementCollection(
