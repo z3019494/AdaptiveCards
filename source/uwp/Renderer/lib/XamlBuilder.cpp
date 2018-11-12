@@ -480,12 +480,12 @@ namespace AdaptiveNamespace
         ABI::AdaptiveNamespace::HorizontalAlignment adaptiveHorizontalAlignment;
         ABI::Windows::UI::Xaml::HorizontalAlignment horizontalAlignment;
         backgroundImage->get_HorizontalAlignment(&adaptiveHorizontalAlignment);
-        ConvertHorizontalAlignment(adaptiveHorizontalAlignment, horizontalAlignment);
+        ConvertHorizontalAlignment(adaptiveHorizontalAlignment, &horizontalAlignment);
 
         ABI::AdaptiveNamespace::VerticalAlignment adaptiveVerticalAlignment;
         ABI::Windows::UI::Xaml::VerticalAlignment verticalAlignment;
         backgroundImage->get_VerticalAlignment(&adaptiveVerticalAlignment);
-        ConvertVerticalAlignment(adaptiveVerticalAlignment, verticalAlignment);
+        ConvertVerticalAlignment(adaptiveVerticalAlignment, &verticalAlignment);
 
 
         ABI::AdaptiveNamespace::BackgroundImageMode mode;

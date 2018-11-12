@@ -88,36 +88,36 @@ bool Boolify(const boolean value)
     return value > 0 ? true : false;
 }
 
-HRESULT ConvertHorizontalAlignment(const ABI::AdaptiveNamespace::HorizontalAlignment in, ABI::Windows::UI::Xaml::HorizontalAlignment out)
+HRESULT ConvertHorizontalAlignment(const ABI::AdaptiveNamespace::HorizontalAlignment &in, ABI::Windows::UI::Xaml::HorizontalAlignment* out)
 {
     switch (in)
     {
     case ABI::AdaptiveNamespace::HorizontalAlignment::Right:
-        out = ABI::Windows::UI::Xaml::HorizontalAlignment::HorizontalAlignment_Right;
+        *out = ABI::Windows::UI::Xaml::HorizontalAlignment::HorizontalAlignment_Right;
         break;
     case ABI::AdaptiveNamespace::HorizontalAlignment::Center:
-        out = ABI::Windows::UI::Xaml::HorizontalAlignment::HorizontalAlignment_Center;
+        *out = ABI::Windows::UI::Xaml::HorizontalAlignment::HorizontalAlignment_Center;
         break;
     case ABI::AdaptiveNamespace::HorizontalAlignment::Left:
     default:
-        out = ABI::Windows::UI::Xaml::HorizontalAlignment::HorizontalAlignment_Left;
+        *out = ABI::Windows::UI::Xaml::HorizontalAlignment::HorizontalAlignment_Left;
         break;
     }
     return S_OK;
 }
-HRESULT ConvertVerticalAlignment(const ABI::AdaptiveNamespace::VerticalAlignment in, ABI::Windows::UI::Xaml::VerticalAlignment out)
+HRESULT ConvertVerticalAlignment(const ABI::AdaptiveNamespace::VerticalAlignment &in, ABI::Windows::UI::Xaml::VerticalAlignment* out)
 {
     switch (in)
     {
     case ABI::AdaptiveNamespace::VerticalAlignment::Bottom:
-        out = ABI::Windows::UI::Xaml::VerticalAlignment::VerticalAlignment_Bottom;
+        *out = ABI::Windows::UI::Xaml::VerticalAlignment::VerticalAlignment_Bottom;
         break;
     case ABI::AdaptiveNamespace::VerticalAlignment::Center:
-        out = ABI::Windows::UI::Xaml::VerticalAlignment::VerticalAlignment_Center;
+        *out = ABI::Windows::UI::Xaml::VerticalAlignment::VerticalAlignment_Center;
         break;
     case ABI::AdaptiveNamespace::VerticalAlignment::Top:
     default:
-        out = ABI::Windows::UI::Xaml::VerticalAlignment::VerticalAlignment_Top;
+        *out = ABI::Windows::UI::Xaml::VerticalAlignment::VerticalAlignment_Top;
         break;
     }
     return S_OK;
