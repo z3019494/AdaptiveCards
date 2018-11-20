@@ -476,18 +476,6 @@ namespace AdaptiveNamespace
         ComPtr<IImage> xamlImage;
         THROW_IF_FAILED(background.As(&xamlImage));
 
-        // Import Background Alignment properties
-        ABI::AdaptiveNamespace::HorizontalAlignment adaptiveHorizontalAlignment;
-        ABI::Windows::UI::Xaml::HorizontalAlignment horizontalAlignment;
-        backgroundImage->get_HorizontalAlignment(&adaptiveHorizontalAlignment);
-        ConvertHorizontalAlignment(adaptiveHorizontalAlignment, &horizontalAlignment);
-
-        ABI::AdaptiveNamespace::VerticalAlignment adaptiveVerticalAlignment;
-        ABI::Windows::UI::Xaml::VerticalAlignment verticalAlignment;
-        backgroundImage->get_VerticalAlignment(&adaptiveVerticalAlignment);
-        ConvertVerticalAlignment(adaptiveVerticalAlignment, &verticalAlignment);
-
-
         ABI::AdaptiveNamespace::BackgroundImageMode mode;
         backgroundImage->get_Mode(&mode);
 
@@ -500,22 +488,22 @@ namespace AdaptiveNamespace
 
             // TODO: IMPLEMENT REPEAT
 
-            THROW_IF_FAILED(backgroundAsFrameworkElement->put_HorizontalAlignment(horizontalAlignment));
-            THROW_IF_FAILED(backgroundAsFrameworkElement->put_VerticalAlignment(verticalAlignment));
+            //THROW_IF_FAILED(backgroundAsFrameworkElement->put_HorizontalAlignment(horizontalAlignment));
+            //THROW_IF_FAILED(backgroundAsFrameworkElement->put_VerticalAlignment(verticalAlignment));
             break;
         case ABI::AdaptiveNamespace::BackgroundImageMode::RepeatHorizontally:
 
             // TODO: IMPLEMENT REPEAT_HORIZONTALLY
 
             // Ignore horizontalAlignment
-            THROW_IF_FAILED(backgroundAsFrameworkElement->put_VerticalAlignment(verticalAlignment));
+            //THROW_IF_FAILED(backgroundAsFrameworkElement->put_VerticalAlignment(verticalAlignment));
             break;
         case ABI::AdaptiveNamespace::BackgroundImageMode::RepeatVertically:
 
             // TODO: IMPLEMENT REPEAT_VERTICALLY
 
             // Ignore verticalAlignment
-            THROW_IF_FAILED(backgroundAsFrameworkElement->put_HorizontalAlignment(horizontalAlignment));
+            //THROW_IF_FAILED(backgroundAsFrameworkElement->put_HorizontalAlignment(horizontalAlignment));
             break;
 
         case ABI::AdaptiveNamespace::BackgroundImageMode::Stretch:

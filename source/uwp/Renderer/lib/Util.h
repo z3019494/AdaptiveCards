@@ -37,9 +37,6 @@ std::string HStringToUTF8(const HSTRING& in);
 
 bool Boolify(const boolean value);
 
-HRESULT ConvertHorizontalAlignment(const ABI::AdaptiveNamespace::HorizontalAlignment &in, ABI::Windows::UI::Xaml::HorizontalAlignment *out);
-HRESULT ConvertVerticalAlignment(const ABI::AdaptiveNamespace::VerticalAlignment &in, ABI::Windows::UI::Xaml::VerticalAlignment *out);
-
 HRESULT GetColorFromString(std::string colorString, ABI::Windows::UI::Color* color) noexcept;
 
 HRESULT GetColorFromAdaptiveColor(ABI::AdaptiveNamespace::IAdaptiveHostConfig* hostConfig,
