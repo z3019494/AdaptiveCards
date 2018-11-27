@@ -22,6 +22,7 @@
 #include "HtmlHelpers.h"
 #include "DateTimeParser.h"
 #include "MediaHelpers.h"
+#include "TileControl.h"
 
 using namespace Microsoft::WRL;
 using namespace Microsoft::WRL::Wrappers;
@@ -483,36 +484,37 @@ namespace AdaptiveNamespace
         ComPtr<IFrameworkElement> backgroundAsFrameworkElement;
         switch (mode)
         {
-        case ABI::AdaptiveNamespace::BackgroundImageMode::Repeat:
-            THROW_IF_FAILED(xamlImage.As(&backgroundAsFrameworkElement));
+        //case ABI::AdaptiveNamespace::BackgroundImageMode::Repeat:
+        //    THROW_IF_FAILED(xamlImage.As(&backgroundAsFrameworkElement));
 
-            // TODO: IMPLEMENT REPEAT
+        //    // TODO: IMPLEMENT REPEAT
 
-            //THROW_IF_FAILED(backgroundAsFrameworkElement->put_HorizontalAlignment(horizontalAlignment));
-            //THROW_IF_FAILED(backgroundAsFrameworkElement->put_VerticalAlignment(verticalAlignment));
-            break;
-        case ABI::AdaptiveNamespace::BackgroundImageMode::RepeatHorizontally:
+        //    //THROW_IF_FAILED(backgroundAsFrameworkElement->put_HorizontalAlignment(horizontalAlignment));
+        //    //THROW_IF_FAILED(backgroundAsFrameworkElement->put_VerticalAlignment(verticalAlignment));
+        //    break;
+        //case ABI::AdaptiveNamespace::BackgroundImageMode::RepeatHorizontally:
 
-            // TODO: IMPLEMENT REPEAT_HORIZONTALLY
+        //    // TODO: IMPLEMENT REPEAT_HORIZONTALLY
 
-            // Ignore horizontalAlignment
-            //THROW_IF_FAILED(backgroundAsFrameworkElement->put_VerticalAlignment(verticalAlignment));
-            break;
-        case ABI::AdaptiveNamespace::BackgroundImageMode::RepeatVertically:
+        //    // Ignore horizontalAlignment
+        //    //THROW_IF_FAILED(backgroundAsFrameworkElement->put_VerticalAlignment(verticalAlignment));
+        //    break;
+        //case ABI::AdaptiveNamespace::BackgroundImageMode::RepeatVertically:
 
-            // TODO: IMPLEMENT REPEAT_VERTICALLY
+        //    // TODO: IMPLEMENT REPEAT_VERTICALLY
 
-            // Ignore verticalAlignment
-            //THROW_IF_FAILED(backgroundAsFrameworkElement->put_HorizontalAlignment(horizontalAlignment));
-            break;
-
+        //    // Ignore verticalAlignment
+        //    //THROW_IF_FAILED(backgroundAsFrameworkElement->put_HorizontalAlignment(horizontalAlignment));
+        //    break;
         case ABI::AdaptiveNamespace::BackgroundImageMode::Stretch:
-        default:
             // Ignored: horizontalAlignment, verticalAlignment
             THROW_IF_FAILED(xamlImage->put_Stretch(Stretch::Stretch_UniformToFill));
 
             THROW_IF_FAILED(xamlImage.As(&backgroundAsFrameworkElement));
             THROW_IF_FAILED(backgroundAsFrameworkElement->put_VerticalAlignment(VerticalAlignment_Stretch));
+            break;
+        default:
+            TileControl tileControl;
             break;
         }
 
