@@ -484,28 +484,6 @@ namespace AdaptiveNamespace
         ComPtr<IFrameworkElement> backgroundAsFrameworkElement;
         switch (mode)
         {
-        //case ABI::AdaptiveNamespace::BackgroundImageMode::Repeat:
-        //    THROW_IF_FAILED(xamlImage.As(&backgroundAsFrameworkElement));
-
-        //    // TODO: IMPLEMENT REPEAT
-
-        //    //THROW_IF_FAILED(backgroundAsFrameworkElement->put_HorizontalAlignment(horizontalAlignment));
-        //    //THROW_IF_FAILED(backgroundAsFrameworkElement->put_VerticalAlignment(verticalAlignment));
-        //    break;
-        //case ABI::AdaptiveNamespace::BackgroundImageMode::RepeatHorizontally:
-
-        //    // TODO: IMPLEMENT REPEAT_HORIZONTALLY
-
-        //    // Ignore horizontalAlignment
-        //    //THROW_IF_FAILED(backgroundAsFrameworkElement->put_VerticalAlignment(verticalAlignment));
-        //    break;
-        //case ABI::AdaptiveNamespace::BackgroundImageMode::RepeatVertically:
-
-        //    // TODO: IMPLEMENT REPEAT_VERTICALLY
-
-        //    // Ignore verticalAlignment
-        //    //THROW_IF_FAILED(backgroundAsFrameworkElement->put_HorizontalAlignment(horizontalAlignment));
-        //    break;
         case ABI::AdaptiveNamespace::BackgroundImageMode::Stretch:
             // Ignored: horizontalAlignment, verticalAlignment
             THROW_IF_FAILED(xamlImage->put_Stretch(Stretch::Stretch_UniformToFill));
@@ -514,7 +492,15 @@ namespace AdaptiveNamespace
             THROW_IF_FAILED(backgroundAsFrameworkElement->put_VerticalAlignment(VerticalAlignment_Stretch));
             break;
         default:
-            TileControl tileControl;
+            ComPtr<TileControl> tileControl;
+            MakeAndInitialize<TileControl>(&tileControl); //, renderContext, backgroundImage);
+            tileControl->put_BackgroundImage(backgroundImage);
+            tileControl->put_RenderContext(renderContext);
+
+            tileControl.As(&backgroundAsFrameworkElement);
+            //ComPtr<TileControl> tileControl;
+            //TileControl tileControl(renderContext, backgroundImage);
+
             break;
         }
 

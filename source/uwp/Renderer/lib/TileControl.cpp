@@ -1,6 +1,6 @@
 #include "pch.h"
 
-//#include "enums.h"
+#include "enums.h"
 #include <math.h>
 #include "AdaptiveBackgroundImage.h"
 #include "TileControl.h"
@@ -17,14 +17,15 @@
 using namespace Microsoft::WRL;
 using namespace Microsoft::WRL::Wrappers;
 using namespace ABI::AdaptiveNamespace;
+using namespace ABI::Windows::Foundation;
 using namespace ABI::Windows::Foundation::Numerics;
 using namespace ABI::Windows::Foundation::Collections;
 using namespace ABI::Windows::UI::Composition;
-using namespace ABI::Windows::UI::Xaml::Hosting;
 
 // XAML STUFF
 using namespace ABI::Windows::Storage;
 using namespace ABI::Windows::Foundation;
+using namespace ABI::Windows::UI::Xaml;
 using namespace ABI::Windows::UI::Xaml::Shapes;
 using namespace ABI::Windows::UI::Xaml::Controls;
 using namespace ABI::Windows::UI::Xaml::Media;
@@ -36,6 +37,20 @@ using namespace ABI::Windows::Storage::FileProperties;
 
 namespace AdaptiveNamespace
 {
+    HRESULT TileControl::RuntimeClassInitialize() noexcept try
+    {
+        return S_OK;
+    }
+    CATCH_RETURN;
+    
+    /*HRESULT TileControl::RuntimeClassInitialize(IAdaptiveRenderContext* context, IAdaptiveBackgroundImage* backgroundImage) noexcept try
+    {
+        m_renderContext = context;
+        m_backgroundImage = backgroundImage;
+        return S_OK;
+    }
+    CATCH_RETURN;*/
+
     _Use_decl_annotations_ HRESULT TileControl::put_RenderContext(_In_ IAdaptiveRenderContext* value)
     {
         m_renderContext = value;
@@ -62,7 +77,7 @@ namespace AdaptiveNamespace
         if (m_uri == nullptr)
         {
             m_renderContext->AddWarning(ABI::AdaptiveNamespace::WarningStatusCode::AssetLoadFailed,
-                                      HStringReference(L"Image not found").Get());
+                                        HStringReference(L"Image not found").Get());
             return FALSE;
         }
 
@@ -114,8 +129,8 @@ namespace AdaptiveNamespace
         INT32 imageHeight;
         image->get_DecodePixelWidth(&imageWidth);
         image->get_DecodePixelHeight(&imageHeight);
-        m_imageSize->Height = imageHeight;
-        m_imageSize->Width = imageWidth;
+        m_imageSize.Height = imageHeight;
+        m_imageSize.Width = imageWidth;
 
         m_isImageSourceLoaded = TRUE;
 
@@ -130,10 +145,9 @@ namespace AdaptiveNamespace
         ComPtr<IFrameworkElement> rootElement = m_rootElement.Get();
         if (rootElement != NULL)
         {
-            EventRegistrationToken eventToken;
-            rootElement->remove_SizeChanged(eventToken);
+            rootElement->remove_SizeChanged(m_eventToken);
         }
-        
+
         // TRANSLATE: rootElement = GetTemplateChild("RootElement") as FrameworkElement;
 
         m_rootElement = rootElement;
@@ -141,15 +155,15 @@ namespace AdaptiveNamespace
         if (rootElement != NULL)
         {
             // TODO: FIX ASYNC OF THIS EVENT HANDLING
-            EventRegistrationToken eventToken;
             // ISizeChangedEventHandler* eventHandler;
             // rootElement->add_SizeChanged(eventHandler, &eventToken);
-            rootElement->add_SizeChanged(Callback<ISizeChangedEventHandler>([this]() {
-                                             this->put_isRootElementSizeChanged(FALSE);
-                                             this->RefreshContainerTileLockedAsync();
-                                         })
-                                             .Get(),
-                                         &eventToken);
+            auto sizeChangedCallback = Callback<Implements<RuntimeClassFlags<WinRtClassicComMix>, ISizeChangedEventHandler>>(
+                [&](IInspectable* pSender, ISizeChangedEventArgs* pArgs) -> HRESULT {
+                    this->put_isRootElementSizeChanged(FALSE);
+                    this->RefreshContainerTileLockedAsync();
+                    return S_OK;
+                });
+            rootElement->add_SizeChanged(sizeChangedCallback.Get(), &m_eventToken);
 
             // Set m_containerElement
             HSTRING name;
@@ -174,7 +188,45 @@ namespace AdaptiveNamespace
         }
 
         ComPtr<IFrameworkElementOverrides> super;
+        RETURN_IF_FAILED(QueryInterface(__uuidof(IFrameworkElementOverrides),
+                                        reinterpret_cast<void**>(super.GetAddressOf())));
         super->OnApplyTemplate();
+        return super->OnApplyTemplate();
+    }
+
+    HRESULT TileControl::MeasureOverride(Size availableSize, Size* pReturnValue)
+    {
+        /*ComPtr<IFrameworkElement> thisAsFrameworkElement;
+        RETURN_IF_FAILED(QueryInterface(__uuidof(IFrameworkElement),
+                                        reinterpret_cast<void**>(thisAsFrameworkElement.GetAddressOf())));*/
+
+        // return this->MeasureOverride(availableSize, pReturnValue);
+        //this->Measure(availableSize);
+        //this->get_DesiredSize(pReturnValue);
+
+        return E_NOTIMPL;
+    }
+
+    HRESULT TileControl::ArrangeOverride(Size arrangeBounds, Size* pReturnValue)
+    {
+        /*INT count = (INT)(m_xamlChildren.size());
+        for (INT i = 0; i < count; i++)
+        {
+            ComPtr<IUIElement> childAsUIElement;
+            m_xamlChildren[i].As(&childAsUIElement);
+
+            Size desiredSize;
+            childAsUIElement->get_DesiredSize(&desiredSize);
+
+            Rect finalRect;
+            finalRect.X = 0;
+            finalRect.Y = 0;
+            finalRect.Width = desiredSize.Width;
+            finalRect.Height = desiredSize.Height;
+
+            childAsUIElement->Arrange(finalRect);
+        }*/
+        return E_NOTIMPL;
     }
 
     void TileControl::RefreshContainerTileLockedAsync()
@@ -191,8 +243,7 @@ namespace AdaptiveNamespace
             HStringReference(RuntimeClass_Windows_UI_Xaml_SizeHelper));
         sizeStatics->get_Empty(&emptySize);
 
-        // SUPPOSED TO GO IN IF STATEMENT: m_imageSize.Get() == emptySize ||
-        BOOL imageSizeIsEmpty = (m_imageSize->Height == emptySize.Height && m_imageSize->Width == emptySize.Width);
+        BOOL imageSizeIsEmpty = (m_imageSize.Height == emptySize.Height && m_imageSize.Width == emptySize.Width);
         if (imageSizeIsEmpty || m_rootElement == NULL)
         {
             return;
@@ -205,7 +256,7 @@ namespace AdaptiveNamespace
             DOUBLE actualHeight;
             m_rootElement->get_ActualWidth(&actualHeight);
 
-            RefreshContainerTile(actualWidth, actualHeight, m_imageSize->Width, m_imageSize->Height);
+            RefreshContainerTile(actualWidth, actualHeight, m_imageSize.Width, m_imageSize.Height);
         }
     }
 
