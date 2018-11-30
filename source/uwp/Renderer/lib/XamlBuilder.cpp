@@ -497,7 +497,7 @@ namespace AdaptiveNamespace
             tileControl->put_BackgroundImage(backgroundImage);
             tileControl->put_RenderContext(renderContext);
 
-            tileControl.As(&backgroundAsFrameworkElement);
+            tileControl.As(&background);
             //ComPtr<TileControl> tileControl;
             //TileControl tileControl(renderContext, backgroundImage);
 

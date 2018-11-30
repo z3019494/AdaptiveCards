@@ -30,27 +30,38 @@ using namespace ABI::Windows::Storage::FileProperties;
 
 namespace AdaptiveNamespace
 {
-    class TileControl
-        : public Microsoft::WRL::RuntimeClass<Microsoft::WRL::RuntimeClassFlags<Microsoft::WRL::RuntimeClassType::WinRtClassicComMix>,
+    class DECLSPEC_UUID("0F485063-EF2A-400E-A946-73E00EDFAC83") TileControl
+        : public Microsoft::WRL::RuntimeClass<ABI::AdaptiveNamespace::ITileControl,
                                               ABI::Windows::UI::Xaml::IFrameworkElementOverrides,
+                                              Microsoft::WRL::CloakedIid<ITypePeek>,
                                               Microsoft::WRL::ComposableBase<ABI::Windows::UI::Xaml::Controls::IContentControlFactory>>
     {
         AdaptiveRuntimeStringClass(TileControl);
 
     public:
         HRESULT RuntimeClassInitialize() noexcept;
-        //HRESULT RuntimeClassInitialize(_In_ IAdaptiveRenderContext* context, _In_ IAdaptiveBackgroundImage* backgroundImage) noexcept;
+        // HRESULT RuntimeClassInitialize(_In_ IAdaptiveRenderContext* context, _In_ IAdaptiveBackgroundImage* backgroundImage) noexcept;
 
         // IFrameworkElementOverrides overrides
-        IFACEMETHODIMP OnApplyTemplate();
+        virtual HRESULT STDMETHODCALLTYPE OnApplyTemplate();
 
         // Also overrides these but eww
-        IFACEMETHODIMP MeasureOverride(_In_ Size availableSize, _Out_ Size* pReturnValue);
-        IFACEMETHODIMP ArrangeOverride(_In_ Size arrangeBounds, _Out_ Size* pReturnValue);
+        virtual HRESULT STDMETHODCALLTYPE MeasureOverride(_In_ Size availableSize, _Out_ Size* pReturnValue);
+        virtual HRESULT STDMETHODCALLTYPE ArrangeOverride(_In_ Size arrangeBounds, _Out_ Size* pReturnValue);
 
-        IFACEMETHODIMP put_RenderContext(_In_ IAdaptiveRenderContext* value);
-        IFACEMETHODIMP put_BackgroundImage(_In_ IAdaptiveBackgroundImage* value);
-        IFACEMETHODIMP put_isRootElementSizeChanged(_In_ BOOL value);
+        virtual HRESULT STDMETHODCALLTYPE put_RenderContext(_In_ IAdaptiveRenderContext* value);
+        virtual HRESULT STDMETHODCALLTYPE put_BackgroundImage(_In_ IAdaptiveBackgroundImage* value);
+        virtual HRESULT STDMETHODCALLTYPE put_isRootElementSizeChanged(_In_ boolean value);
+
+        virtual HRESULT STDMETHODCALLTYPE get_RenderContext(_In_ IAdaptiveRenderContext** value) { return E_NOTIMPL; }
+        virtual HRESULT STDMETHODCALLTYPE get_BackgroundImage(_In_ IAdaptiveBackgroundImage** value)
+        {
+            return E_NOTIMPL;
+        }
+        virtual HRESULT STDMETHODCALLTYPE get_isRootElementSizeChanged(_In_ boolean* value) { return E_NOTIMPL; }
+
+        // ITypePeek method
+        void* PeekAt(REFIID riid) override { return PeekHelper(riid, this); }
 
     private:
         // Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::ISizeChangedEventHandler> RootElement_SizeChanged();
@@ -84,6 +95,4 @@ namespace AdaptiveNamespace
         BOOL m_isRootElementSizeChanged = FALSE;
     };
     ActivatableClass(TileControl);
-
-
 }

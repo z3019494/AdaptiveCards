@@ -39,6 +39,16 @@ namespace AdaptiveNamespace
 {
     HRESULT TileControl::RuntimeClassInitialize() noexcept try
     {
+        ComPtr<IContentControlFactory> spFactory;
+        ComPtr<IInspectable> spInnerInspectable;
+        ComPtr<IContentControl> spInnerContentControl;
+        RETURN_IF_FAILED(
+            Windows::Foundation::GetActivationFactory(HStringReference(RuntimeClass_Windows_UI_Xaml_Controls_ContentControl).Get(), &spFactory));
+        RETURN_IF_FAILED(spFactory->CreateInstance(static_cast<ITileControl*>(this),
+                                                   spInnerInspectable.GetAddressOf(),
+                                                   spInnerContentControl.GetAddressOf()));
+        RETURN_IF_FAILED(SetComposableBasePointers(spInnerInspectable.Get(), spFactory.Get()));
+
         return S_OK;
     }
     CATCH_RETURN;
@@ -63,7 +73,7 @@ namespace AdaptiveNamespace
         return S_OK;
     }
 
-    _Use_decl_annotations_ HRESULT TileControl::put_isRootElementSizeChanged(BOOL value)
+    _Use_decl_annotations_ HRESULT TileControl::put_isRootElementSizeChanged(boolean value)
     {
         m_isRootElementSizeChanged = value;
         return S_OK;
@@ -188,9 +198,8 @@ namespace AdaptiveNamespace
         }
 
         ComPtr<IFrameworkElementOverrides> super;
-        RETURN_IF_FAILED(QueryInterface(__uuidof(IFrameworkElementOverrides),
+        RETURN_IF_FAILED(GetComposableBase()->QueryInterface(__uuidof(IFrameworkElementOverrides),
                                         reinterpret_cast<void**>(super.GetAddressOf())));
-        super->OnApplyTemplate();
         return super->OnApplyTemplate();
     }
 

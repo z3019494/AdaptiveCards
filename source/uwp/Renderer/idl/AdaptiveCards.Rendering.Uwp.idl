@@ -103,7 +103,9 @@ AdaptiveNamespaceStart
     runtimeclass AdaptiveToggleInputRenderer;
     runtimeclass AdaptiveRemoteResourceInformation;
 
+    runtimeclass TileControl;
     runtimeclass WholeItemsPanel;
+
 
     interface IAdaptiveCardResourceResolvers;
     interface IAdaptiveCardResourceResolver;
@@ -168,6 +170,7 @@ AdaptiveNamespaceStart
     interface IAdaptiveRenderArgs;
     interface IAdaptiveActionInvoker;
 
+    interface ITileControl;
     interface IWholeItemsPanel;
 
     [version(NTDDI_WIN10_RS1)]
@@ -3366,6 +3369,41 @@ AdaptiveNamespaceStart
     {
         [default] interface IAdaptiveWarning;
     };
+
+    [
+        version(NTDDI_WIN10_RS1),
+        exclusiveto(TileControl),
+#ifdef ADAPTIVE_CARDS_WINDOWS
+        uuid(cd0a4aaf-d7f7-4398-a874-e5735f72f78d),
+        contract(InternalContract, 1),
+        internal
+#else
+        uuid(779a1ef5-69a2-4b62-8ed4-ab239aab96d0)
+#endif
+    ] interface ITileControl : IInspectable
+    {
+        [propput] HRESULT RenderContext([in] AdaptiveRenderContext * value);
+        [propput] HRESULT BackgroundImage([in] IAdaptiveBackgroundImage * value);
+        [propput] HRESULT isRootElementSizeChanged([in] boolean value);
+        [propget] HRESULT RenderContext([out, retval] AdaptiveRenderContext * *value);
+        [propget] HRESULT BackgroundImage([out, retval] IAdaptiveBackgroundImage ** value);
+        [propget] HRESULT isRootElementSizeChanged([out, retval] boolean* value);
+    }
+
+    [
+        version(NTDDI_WIN10_RS1),
+        activatable(NTDDI_WIN10_RS1),
+        threading(both),
+        marshaling_behavior(agile),
+#ifdef ADAPTIVE_CARDS_WINDOWS
+        contract(InternalContract, 1),
+        internal,
+        activatable(InternalContract, 1)
+#endif
+    ] runtimeclass TileControl : Windows.UI.Xaml.Controls.ContentControl
+    {
+        [default] interface ITileControl;
+    }
 
     [
         version(NTDDI_WIN10_RS1),
