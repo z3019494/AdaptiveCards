@@ -497,14 +497,24 @@ namespace AdaptiveNamespace
             tileControl->put_BackgroundImage(backgroundImage);
             tileControl->put_RenderContext(renderContext);
 
-            tileControl.As(&background);
+            ComPtr<IPanel> copy(rootPanel);
+            ComPtr<IFrameworkElement> rootElement;
+            copy.As(&rootElement);
+            //rootPanel->QueryInterface(rootElement.GetAddressOf());
+            tileControl->put_RootElement(rootElement.Get());
+
+            tileControl->LoadImageBrush(background.Get());
+
+
+            tileControl.As(&backgroundAsFrameworkElement);
+            //tileControl.As(&background);
             //ComPtr<TileControl> tileControl;
             //TileControl tileControl(renderContext, backgroundImage);
 
             break;
         }
 
-        XamlHelpers::AppendXamlElementToPanel(background.Get(), rootPanel);
+        XamlHelpers::AppendXamlElementToPanel(backgroundAsFrameworkElement.Get(), rootPanel);
 
         // The overlay applied to the background image is determined by a resouce, so create
         // the overlay if that resources exists

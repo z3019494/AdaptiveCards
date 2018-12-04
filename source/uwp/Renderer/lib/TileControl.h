@@ -42,23 +42,24 @@ namespace AdaptiveNamespace
         HRESULT RuntimeClassInitialize() noexcept;
         // HRESULT RuntimeClassInitialize(_In_ IAdaptiveRenderContext* context, _In_ IAdaptiveBackgroundImage* backgroundImage) noexcept;
 
+        virtual HRESULT STDMETHODCALLTYPE put_RenderContext(_In_ IAdaptiveRenderContext* value);
+        virtual HRESULT STDMETHODCALLTYPE put_BackgroundImage(_In_ IAdaptiveBackgroundImage* value);
+        virtual HRESULT STDMETHODCALLTYPE put_RootElement(_In_ IFrameworkElement* value);
+        virtual HRESULT STDMETHODCALLTYPE put_isRootElementSizeChanged(_In_ boolean value);
+
+        virtual HRESULT STDMETHODCALLTYPE LoadImageBrush(_In_ IUIElement* image);
+
         // IFrameworkElementOverrides overrides
         virtual HRESULT STDMETHODCALLTYPE OnApplyTemplate();
-
-        // Also overrides these but eww
         virtual HRESULT STDMETHODCALLTYPE MeasureOverride(_In_ Size availableSize, _Out_ Size* pReturnValue);
         virtual HRESULT STDMETHODCALLTYPE ArrangeOverride(_In_ Size arrangeBounds, _Out_ Size* pReturnValue);
 
-        virtual HRESULT STDMETHODCALLTYPE put_RenderContext(_In_ IAdaptiveRenderContext* value);
-        virtual HRESULT STDMETHODCALLTYPE put_BackgroundImage(_In_ IAdaptiveBackgroundImage* value);
-        virtual HRESULT STDMETHODCALLTYPE put_isRootElementSizeChanged(_In_ boolean value);
-
+        // not implemented
         virtual HRESULT STDMETHODCALLTYPE get_RenderContext(_In_ IAdaptiveRenderContext** value) { return E_NOTIMPL; }
-        virtual HRESULT STDMETHODCALLTYPE get_BackgroundImage(_In_ IAdaptiveBackgroundImage** value)
-        {
-            return E_NOTIMPL;
-        }
+        virtual HRESULT STDMETHODCALLTYPE get_BackgroundImage(_In_ IAdaptiveBackgroundImage** value) { return E_NOTIMPL; }
+        virtual HRESULT STDMETHODCALLTYPE get_RootElement(_In_ IFrameworkElement** value) { return E_NOTIMPL; }
         virtual HRESULT STDMETHODCALLTYPE get_isRootElementSizeChanged(_In_ boolean* value) { return E_NOTIMPL; }
+
 
         // ITypePeek method
         void* PeekAt(REFIID riid) override { return PeekHelper(riid, this); }
@@ -67,7 +68,7 @@ namespace AdaptiveNamespace
         // Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::ISizeChangedEventHandler> RootElement_SizeChanged();
 
         // Microsoft::WRL::ComPtr<ABI::Windows::Foundation::IAsyncOperation<BOOL>>
-        BOOL LoadImageBrushAsync();
+        //BOOL LoadImageBrushAsync();
 
         // Microsoft::WRL::ComPtr<ABI::Windows::Foundation::IAsyncAction>
         void RefreshContainerTileLockedAsync();
@@ -87,7 +88,7 @@ namespace AdaptiveNamespace
         Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveBackgroundImage> m_backgroundImage{};
         Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveRenderContext> m_renderContext{};
 
-        ABI::Windows::Foundation::IUriRuntimeClass* m_uri{};
+        ComPtr<ABI::Windows::Foundation::IUriRuntimeClass> m_uri{};
         EventRegistrationToken m_eventToken{};
         // Microsoft::WRL::Wrappers::Semaphore m_flag;
         std::vector<Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Shapes::IRectangle>> m_xamlChildren{};
