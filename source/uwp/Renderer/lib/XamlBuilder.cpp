@@ -493,24 +493,15 @@ namespace AdaptiveNamespace
             break;
         default:
             ComPtr<TileControl> tileControl;
-            MakeAndInitialize<TileControl>(&tileControl); //, renderContext, backgroundImage);
+            MakeAndInitialize<TileControl>(&tileControl);
             tileControl->put_BackgroundImage(backgroundImage);
-            tileControl->put_RenderContext(renderContext);
 
-            ComPtr<IPanel> copy(rootPanel);
             ComPtr<IFrameworkElement> rootElement;
-            copy.As(&rootElement);
-            //rootPanel->QueryInterface(rootElement.GetAddressOf());
+            rootPanel->QueryInterface(rootElement.GetAddressOf());
             tileControl->put_RootElement(rootElement.Get());
 
             tileControl->LoadImageBrush(background.Get());
-
-
             tileControl.As(&backgroundAsFrameworkElement);
-            //tileControl.As(&background);
-            //ComPtr<TileControl> tileControl;
-            //TileControl tileControl(renderContext, backgroundImage);
-
             break;
         }
 

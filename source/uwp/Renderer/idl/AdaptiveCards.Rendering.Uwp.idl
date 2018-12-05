@@ -3382,14 +3382,17 @@ AdaptiveNamespaceStart
 #endif
     ] interface ITileControl : IInspectable
     {
-        [propget] HRESULT RenderContext([out, retval] AdaptiveRenderContext** value);
-        [propput] HRESULT RenderContext([in] AdaptiveRenderContext* value);
-
         [propget] HRESULT BackgroundImage([out, retval] IAdaptiveBackgroundImage** value);
         [propput] HRESULT BackgroundImage([in] IAdaptiveBackgroundImage* value);
 
         [propget] HRESULT RootElement([out, retval] Windows.UI.Xaml.FrameworkElement * *value);
         [propput] HRESULT RootElement([in] Windows.UI.Xaml.FrameworkElement * value);
+
+        [propget] HRESULT ResolvedImage([out, retval] Windows.UI.Xaml.UIElement * *value);
+        [propput] HRESULT ResolvedImage([in] Windows.UI.Xaml.UIElement * value);
+
+        [propget] HRESULT ImageSize([out, retval] Windows.Foundation.Size * value);
+        [propput] HRESULT ImageSize([in] Windows.Foundation.Size value);
 
         [propget] HRESULT isRootElementSizeChanged([out, retval] boolean* value);
         [propput] HRESULT isRootElementSizeChanged([in] boolean value);

@@ -61,24 +61,9 @@ namespace AdaptiveNamespace
     }
     CATCH_RETURN;
 
-    /*HRESULT TileControl::RuntimeClassInitialize(IAdaptiveRenderContext* context, IAdaptiveBackgroundImage*
-    backgroundImage) noexcept try
-    {
-        m_renderContext = context;
-        m_backgroundImage = backgroundImage;
-        return S_OK;
-    }
-    CATCH_RETURN;*/
-
-    _Use_decl_annotations_ HRESULT TileControl::put_RenderContext(_In_ IAdaptiveRenderContext* value)
-    {
-        m_renderContext = value;
-        return S_OK;
-    }
-
     _Use_decl_annotations_ HRESULT TileControl::put_BackgroundImage(_In_ IAdaptiveBackgroundImage* value)
     {
-        m_backgroundImage = value;
+        m_adaptiveBackgroundImage = value;
         return S_OK;
     }
 
@@ -94,129 +79,70 @@ namespace AdaptiveNamespace
         return S_OK;
     }
 
+    _Use_decl_annotations_ HRESULT TileControl::get_ResolvedImage(_In_ IUIElement** value)
+    {
+        return m_resolvedImage.CopyTo(value);
+    }
+
+    _Use_decl_annotations_ HRESULT TileControl::put_ImageSize(_In_ ABI::Windows::Foundation::Size value)
+    {
+        m_imageSize = value;
+        return S_OK;
+    }
+
     _Use_decl_annotations_ HRESULT TileControl::LoadImageBrush(_In_ IUIElement* uielement)
     {
-        if (m_isImageSourceLoaded == TRUE)
-        {
-            for (INT i = 0; i < m_xamlChildren.size(); i++)
-            {
-                // Convert xamlChild to shape to set fill to null
-                ComPtr<IShape> childAsShape;
-                m_xamlChildren[i].As(&childAsShape);
-                childAsShape->put_Fill(NULL);
-            }
-        }
+        // if (m_isImageSourceLoaded == TRUE)
+        //{
+        //    for (INT i = 0; i < m_xamlChildren.size(); i++)
+        //    {
+        //        // Convert xamlChild to shape to set fill to null
+        //        ComPtr<IShape> childAsShape;
+        //        m_xamlChildren[i].As(&childAsShape);
+        //        childAsShape->put_Fill(NULL);
+        //    }
+        //}
 
-        m_isImageSourceLoaded = FALSE;
+        // m_isImageSourceLoaded = FALSE;
+        // if (m_resolvedImage != nullptr)
+        //{
+        //    // Remove imageLoaded hook
+        //}
 
-        ComPtr<IUIElement> backgroundImage(uielement);
+        m_resolvedImage = uielement;
 
-        // Update Brush
         ComPtr<IImage> image;
-        backgroundImage.As(&image);
+        m_resolvedImage.As(&image);
+
+        if (image != nullptr)
+        {
+            EventRegistrationToken eventToken;
+            image->add_ImageOpened(Callback<IRoutedEventHandler>([&](IInspectable* /*sender*/, IRoutedEventArgs *
+                                                                     /*args*/) -> HRESULT {
+                                       ComPtr<IUIElement> image;
+                                       this->get_ResolvedImage(&image);
+
+                                       Size imageSize;
+                                       image->get_DesiredSize(&imageSize);
+                                       this->put_ImageSize(imageSize);
+
+                                       this->RefreshContainerTile();
+                                       return S_OK;
+                                   })
+                                       .Get(),
+                                   &eventToken);
+        }
 
         ComPtr<IImageSource> imageSource;
         image->get_Source(&imageSource);
         m_brushXaml->put_ImageSource(imageSource.Get());
 
-        // Update ImageSize
-        DOUBLE imageWidth;
-        DOUBLE imageHeight;
-        ComPtr<IFrameworkElement> frameworkElement;
-        backgroundImage.As(&frameworkElement);
-
-        frameworkElement->get_Height(&imageHeight);
-        m_imageSize.Height = imageHeight;
-
-        frameworkElement->get_Width(&imageWidth);
-        m_imageSize.Width = imageWidth;
-
         m_isImageSourceLoaded = TRUE;
 
-        //RefreshContainerTile();
+        // RefreshContainerTile();
 
         return S_OK;
     }
-
-    /*
-    BOOL TileControl::LoadImageBrushAsync()
-    {
-        HSTRING url;
-        m_backgroundImage->get_Url(&url);
-
-        ComPtr<IAdaptiveHostConfig> hostConfig;
-        m_renderContext->get_HostConfig(&hostConfig);
-
-        GetUrlFromString(hostConfig.Get(), url, &m_uri);
-
-        if (m_uri == nullptr)
-        {
-            m_renderContext->AddWarning(ABI::AdaptiveNamespace::WarningStatusCode::AssetLoadFailed,
-                                        HStringReference(L"Image not found").Get());
-            return FALSE;
-        }
-
-        // TODO TRANSLATE: await_flag.WaitAsync()
-
-        if (m_isImageSourceLoaded == TRUE)
-        {
-            for (INT i = 0; i < m_xamlChildren.size(); i++)
-            {
-                // Convert xamlChild to shape to set fill to null
-                ComPtr<IShape> childAsShape;
-                m_xamlChildren[i].As(&childAsShape);
-                childAsShape->put_Fill(NULL);
-            }
-        }
-
-        m_isImageSourceLoaded = FALSE;
-
-        // Load Image Brush
-        ComPtr<IBitmapImage> image = AdaptiveNamespace::XamlHelpers::CreateXamlClass<IBitmapImage>(
-            HStringReference(RuntimeClass_Windows_UI_Xaml_Media_Imaging_BitmapImage));
-
-        // Populate storageFile
-        ComPtr<IStorageFile> storageFile;
-        ComPtr<IAsyncOperation<StorageFile*>> asyncStorageFile;
-        ComPtr<IStorageFileStatics> storageFileStatics;
-        ABI::Windows::Foundation::GetActivationFactory(HStringReference(RuntimeClass_Windows_Storage_StorageFile).Get(),
-                                                       &storageFileStatics); //
-    ABI::Windows::Foundation::GetActivationFactory(HStringReference(RuntimeClass_Windows_Storage_StorageFile));
-        storageFileStatics->GetFileFromApplicationUriAsync(m_uri.Get(), asyncStorageFile.GetAddressOf());
-        // TODO: IF THIS FAILS, TRY TO TRANSLATE... BlockOnCompletionAndGetResults(asyncOperation.Get(), &storageFile);
-        asyncStorageFile->GetResults(&storageFile);
-
-        // Get image source
-        ComPtr<IRandomAccessStream> stream;
-        ComPtr<IAsyncOperation<IRandomAccessStream*>> asyncStream;
-        storageFile->OpenAsync(FileAccessMode_Read, asyncStream.GetAddressOf());
-        asyncStream->GetResults(&stream);
-
-        // Set image source
-        ComPtr<IBitmapSource> imageAsBitmapSource;
-        image.As(&imageAsBitmapSource);
-        imageAsBitmapSource->SetSource(stream.Get());
-
-        // Update Brush
-        ComPtr<IImageSource> imageAsSource;
-        image.As(&imageAsSource);
-        m_brushXaml->put_ImageSource(imageAsSource.Get());
-
-        // Update ImageSize
-        INT32 imageWidth;
-        INT32 imageHeight;
-        image->get_DecodePixelWidth(&imageWidth);
-        image->get_DecodePixelHeight(&imageHeight);
-        m_imageSize.Height = imageHeight;
-        m_imageSize.Width = imageWidth;
-
-        m_isImageSourceLoaded = TRUE;
-
-        RefreshContainerTile();
-
-        // TODO TRANSLATE: _flag.Release()
-        return TRUE;
-    }*/
 
     HRESULT TileControl::OnApplyTemplate()
     {
@@ -265,7 +191,7 @@ namespace AdaptiveNamespace
 
         // TODO TRANSLATE: await
         // LoadImageBrushAsync();
-        RefreshContainerTile();
+        //RefreshContainerTile();
         //}
 
         ComPtr<IFrameworkElementOverrides> base;
@@ -276,54 +202,63 @@ namespace AdaptiveNamespace
 
     HRESULT TileControl::MeasureOverride(Size availableSize, Size* pReturnValue)
     {
-        /*ComPtr<IFrameworkElement> thisAsFrameworkElement;
-        RETURN_IF_FAILED(QueryInterface(__uuidof(IFrameworkElement),
-                                        reinterpret_cast<void**>(thisAsFrameworkElement.GetAddressOf())));*/
-
-        // return this->MeasureOverride(availableSize, pReturnValue);
-        // this->Measure(availableSize);
-        // this->get_DesiredSize(pReturnValue);
-
         ComPtr<IFrameworkElementOverrides> base;
         RETURN_IF_FAILED(GetComposableBase()->QueryInterface(__uuidof(IFrameworkElementOverrides),
                                                              reinterpret_cast<void**>(base.GetAddressOf())));
+
         return base->MeasureOverride(availableSize, pReturnValue);
     }
 
     HRESULT TileControl::ArrangeOverride(Size arrangeBounds, Size* pReturnValue)
     {
-        /*INT count = (INT)(m_xamlChildren.size());
-        for (INT i = 0; i < count; i++)
-        {
-            ComPtr<IUIElement> childAsUIElement;
-            m_xamlChildren[i].As(&childAsUIElement);
-
-            Size desiredSize;
-            childAsUIElement->get_DesiredSize(&desiredSize);
-
-            Rect finalRect;
-            finalRect.X = 0;
-            finalRect.Y = 0;
-            finalRect.Width = desiredSize.Width;
-            finalRect.Height = desiredSize.Height;
-
-            childAsUIElement->Arrange(finalRect);
-        }*/
-
         ComPtr<IFrameworkElementOverrides> base;
         RETURN_IF_FAILED(GetComposableBase()->QueryInterface(__uuidof(IFrameworkElementOverrides),
                                                              reinterpret_cast<void**>(base.GetAddressOf())));
-        return base->ArrangeOverride(arrangeBounds, pReturnValue);
-    }
 
-    void TileControl::RefreshContainerTileLockedAsync()
-    {
-        // TODO TRANSLATE: await _flag.WaitAsync();
+        HRESULT hr2 = base->ArrangeOverride(arrangeBounds, pReturnValue);
+        RETURN_IF_FAILED(hr2);
+
+        // RefreshContainerTile(pReturnValue->Width, pReturnValue->Height, m_imageSize.Width, m_imageSize.Height);
+        // RefreshContainerTile(pReturnValue->Width, pReturnValue->Height);
+        m_containerSize = *pReturnValue;
         RefreshContainerTile();
-        // TODO TRANSLATE: _flag.Release();
+
+        return hr2;
     }
 
-    void TileControl::RefreshContainerTile()
+    //    void TileControl::RefreshImageSize()
+    //    {
+    //        DOUBLE imageWidth;
+    //        DOUBLE imageHeight;
+    //        ComPtr<IFrameworkElement> frameworkElement;
+    //        m_resolvedImage.As(&frameworkElement);
+    //
+    //        frameworkElement->get_Height(&imageHeight);
+    //        m_imageSize.Height = imageHeight;
+    //
+    //        frameworkElement->get_Width(&imageWidth);
+    //        m_imageSize.Width = imageWidth;
+    //
+    //        /*INT32 imageWidth, imageHeight;
+    //        ComPtr<IBitmapImage> image;
+    //        m_resolvedImage.As(&image);
+    //
+    //        image->get_DecodePixelHeight(&imageHeight);
+    //        m_imageSize.Height = imageHeight;
+    //
+    //        image->get_DecodePixelWidth(&imageWidth);
+    //        m_imageSize.Width = imageWidth;
+    //*/
+    //    }
+
+    // void TileControl::RefreshContainerTileLockedAsync()
+    //{
+    //    // TODO TRANSLATE: await _flag.WaitAsync();
+    //    RefreshContainerTile();
+    //    // TODO TRANSLATE: _flag.Release();
+    //}
+
+    void TileControl::RefreshContainerTile()//DOUBLE actualWidth, DOUBLE actualHeight)
     {
         Size emptySize;
         ComPtr<ISizeHelperStatics> sizeStatics;
@@ -337,13 +272,14 @@ namespace AdaptiveNamespace
         }
         else
         {
-            DOUBLE actualWidth;
+            /*DOUBLE actualWidth;
             m_rootElement->get_ActualWidth(&actualWidth);
 
             DOUBLE actualHeight;
-            m_rootElement->get_ActualWidth(&actualHeight);
+            m_rootElement->get_ActualWidth(&actualHeight);*/
 
-            RefreshContainerTile(actualWidth, actualHeight, m_imageSize.Width, m_imageSize.Height);
+            //RefreshContainerTile(actualWidth, actualHeight, m_imageSize.Width, m_imageSize.Height);
+            RefreshContainerTile(m_containerSize.Width, m_containerSize.Height, m_imageSize.Width, m_imageSize.Height);
         }
     }
 
@@ -465,9 +401,11 @@ namespace AdaptiveNamespace
                 rectangleAsShape.As(&rectangleAsUIElement);
 
                 // Set Left and Top for rectangle
-                ComPtr<ICanvasStatics> canvas;
-                canvas->SetLeft(rectangleAsUIElement.Get(), (x * imageWidth) + offsetVerticalAlignment);
-                canvas->SetTop(rectangleAsUIElement.Get(), (y * imageHeight) + offsetHorizontalAlignment);
+                ComPtr<ICanvasStatics> canvasStatics;
+                ABI::Windows::Foundation::GetActivationFactory(
+                    HStringReference(RuntimeClass_Windows_UI_Xaml_Controls_Canvas).Get(), &canvasStatics);
+                canvasStatics->SetLeft(rectangleAsUIElement.Get(), (x * imageWidth) + offsetVerticalAlignment);
+                canvasStatics->SetTop(rectangleAsUIElement.Get(), (y * imageHeight) + offsetHorizontalAlignment);
 
                 // Set Width and Height for Rectangle
                 rectangle->put_RadiusX(imageWidth);
@@ -481,9 +419,9 @@ namespace AdaptiveNamespace
                                                     ABI::AdaptiveNamespace::HorizontalAlignment* hAlignment,
                                                     ABI::AdaptiveNamespace::VerticalAlignment* vAlignment)
     {
-        m_backgroundImage->get_Mode(mode);
-        m_backgroundImage->get_HorizontalAlignment(hAlignment);
-        m_backgroundImage->get_VerticalAlignment(vAlignment);
+        m_adaptiveBackgroundImage->get_Mode(mode);
+        m_adaptiveBackgroundImage->get_HorizontalAlignment(hAlignment);
+        m_adaptiveBackgroundImage->get_VerticalAlignment(vAlignment);
         return S_OK;
     }
 }
