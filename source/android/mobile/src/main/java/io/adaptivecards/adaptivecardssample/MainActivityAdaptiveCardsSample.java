@@ -143,7 +143,7 @@ public class MainActivityAdaptiveCardsSample extends FragmentActivity
     public class CustomBlahParser extends BaseCardElementParser
     {
         @Override
-        public BaseCardElement Deserialize(ElementParserRegistration elementParserRegistration, ActionParserRegistration actionParserRegistration, AdaptiveCardParseWarningVector warnings, JsonValue value)
+        public BaseCardElement Deserialize(ParseContext context, JsonValue value)
         {
             CustomCardElement element = new CustomCardElement(CardElementType.Custom);
             element.SetElementTypeString("blah");
@@ -151,6 +151,22 @@ public class MainActivityAdaptiveCardsSample extends FragmentActivity
             String val = value.getString();
             try {
                 JSONObject obj = new JSONObject(val);
+                element.setSecretString(obj.getString("secret"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+                element.setSecretString("Failed");
+            }
+            return element;
+        }
+
+        @Override
+        public BaseCardElement DeserializeFromString(ParseContext context, String jsonString)
+        {
+            CustomCardElement element = new CustomCardElement(CardElementType.Custom);
+            element.SetElementTypeString("blah");
+            element.SetId("BlahDeserialize");
+            try {
+                JSONObject obj = new JSONObject(jsonString);
                 element.setSecretString(obj.getString("secret"));
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -353,9 +369,13 @@ public class MainActivityAdaptiveCardsSample extends FragmentActivity
             CardRendererRegistration.getInstance().registerRenderer("blah", new CustomBlahRenderer());
 
             // Example on how a custom OnlineMediaLoader should be registered
-            CardRendererRegistration.getInstance().registerOnlineMediaLoader(new OnlineMediaLoader());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                CardRendererRegistration.getInstance().registerOnlineMediaLoader(new OnlineMediaLoader());
+            }
 
-            ParseResult parseResult = AdaptiveCard.DeserializeFromString(jsonText, AdaptiveCardRenderer.VERSION, elementParserRegistration);
+            ParseContext context = new ParseContext(elementParserRegistration, null);
+
+            ParseResult parseResult = AdaptiveCard.DeserializeFromString(jsonText, AdaptiveCardRenderer.VERSION, context);
             LinearLayout layout = (LinearLayout) findViewById(R.id.visualAdaptiveCardLayout);
             layout.removeAllViews();
             RenderedAdaptiveCard renderedCard = AdaptiveCardRenderer.getInstance().render(this, getSupportFragmentManager(), parseResult.GetAdaptiveCard(), this, hostConfig);

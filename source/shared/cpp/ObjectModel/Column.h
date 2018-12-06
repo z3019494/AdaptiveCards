@@ -8,6 +8,8 @@
 
 namespace AdaptiveSharedNamespace
 {
+    class BaseActionElement;
+
     class Column : public BaseCardElement
     {
     public:
@@ -16,15 +18,9 @@ namespace AdaptiveSharedNamespace
         std::string Serialize() const override;
         Json::Value SerializeToJsonValue() const override;
 
-        static std::shared_ptr<Column> Deserialize(std::shared_ptr<ElementParserRegistration> elementParserRegistration,
-                                                   std::shared_ptr<ActionParserRegistration> actionParserRegistration,
-                                                   std::vector<std::shared_ptr<AdaptiveCardParseWarning>>& warnings,
-                                                   const Json::Value& root);
+        static std::shared_ptr<Column> Deserialize(ParseContext& context, const Json::Value& root);
 
-        static std::shared_ptr<Column> DeserializeFromString(std::shared_ptr<ElementParserRegistration> elementParserRegistration,
-                                                             std::shared_ptr<ActionParserRegistration> actionParserRegistration,
-                                                             std::vector<std::shared_ptr<AdaptiveCardParseWarning>>& warnings,
-                                                             const std::string& jsonString);
+        static std::shared_ptr<Column> DeserializeFromString(ParseContext& context, const std::string& jsonString);
 
         std::string GetWidth() const;
         void SetWidth(const std::string& value);

@@ -15,7 +15,19 @@ typedef NS_ENUM(NSInteger, ACRActionType) {
     ACROpenUrl,
 };
 
+typedef NS_ENUM(NSInteger, ACRIconPlacement) {
+    ACRAboveTitle = 0,
+    ACRLeftOfTitle
+};
+
+typedef NS_ENUM(NSInteger, ACRSentiment) {
+    ACRSentimentDefault = 0,
+    ACRSentimentPositive,
+    ACRSentimentDestructive
+};
+
 @property ACRActionType type;
+@property ACRSentiment sentiment;
 
 - (NSString *)title;
 - (NSString *)elementId;

@@ -111,6 +111,7 @@ namespace AdaptiveCards.Test
         [TestMethod]
         public void TestAllTestCards()
         {
+            // List of json payloads that are expected to fail parsing
             TestPayloadsInDirectory(Path.Combine(SamplesPath, "tests"),
                 new string[]
                 {
@@ -123,9 +124,10 @@ namespace AdaptiveCards.Test
                     "AdaptiveCard.MissingVersion",
                     "AdaptiveCard.Version1.3",
                     "FlightItinerary_es_fail",
+                    "Action.DuplicateIds",
+                    "Action.NestedDuplicateIds"
 
                     // These are cards that features haven't been implemented yet
-                    "Input.Text.InlineAction.ShowCard.json",
                 });
         }
     }
