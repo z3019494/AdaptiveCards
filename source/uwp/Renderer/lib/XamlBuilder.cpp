@@ -3245,7 +3245,7 @@ namespace AdaptiveNamespace
             if (!isMultiLine)
             {
                 THROW_IF_FAILED(textBoxWithInlineAction.As(&textBoxAsFrameworkElement));
-                THROW_IF_FAILED(textBoxAsFrameworkElement->put_VerticalAlignment(ABI::Windows::UI::Xaml::VerticalAlignment_Top));
+                THROW_IF_FAILED(textBoxAsFrameworkElement->put_VerticalAlignment(VerticalAlignment_Top));
             }
 
             THROW_IF_FAILED(textBoxWithInlineAction.CopyTo(textInputControl));
@@ -3254,7 +3254,7 @@ namespace AdaptiveNamespace
         {
             if (!isMultiLine)
             {
-                THROW_IF_FAILED(textBoxAsFrameworkElement->put_VerticalAlignment(ABI::Windows::UI::Xaml::VerticalAlignment_Top));
+                THROW_IF_FAILED(textBoxAsFrameworkElement->put_VerticalAlignment(VerticalAlignment_Top));
             }
 
             THROW_IF_FAILED(textBox.CopyTo(textInputControl));
