@@ -2090,6 +2090,16 @@ namespace AdaptiveNamespace
 
         ComPtr<IPanel> containerPanelAsPanel;
         THROW_IF_FAILED(containerPanel.As(&containerPanelAsPanel));
+
+        HSTRING backgroundImageUrl;
+        ComPtr<IAdaptiveBackgroundImage> backgroundImage;
+        THROW_IF_FAILED(adaptiveContainer->get_BackgroundImage(&backgroundImage));
+        THROW_IF_FAILED(backgroundImage->get_Url(&backgroundImageUrl));
+        if (backgroundImageUrl != nullptr)
+        {
+            ApplyBackgroundToRoot(containerPanelAsPanel.Get(), backgroundImage.Get(), renderContext, renderArgs);
+        }
+
         ComPtr<IVector<IAdaptiveCardElement*>> childItems;
         THROW_IF_FAILED(adaptiveContainer->get_Items(&childItems));
         BuildPanelChildren(childItems.Get(), containerPanelAsPanel.Get(), renderContext, newRenderArgs.Get(), [](IUIElement*) {});
@@ -2192,6 +2202,16 @@ namespace AdaptiveNamespace
 
         ComPtr<IPanel> columnPanelAsPanel;
         THROW_IF_FAILED(columnPanel.As(&columnPanelAsPanel));
+
+        HSTRING backgroundImageUrl;
+        ComPtr<IAdaptiveBackgroundImage> backgroundImage;
+        THROW_IF_FAILED(adaptiveColumn->get_BackgroundImage(&backgroundImage));
+        THROW_IF_FAILED(backgroundImage->get_Url(&backgroundImageUrl));
+        if (backgroundImageUrl != nullptr)
+        {
+            ApplyBackgroundToRoot(columnPanelAsPanel.Get(), backgroundImage.Get(), renderContext, renderArgs);
+        }
+
         ComPtr<IVector<IAdaptiveCardElement*>> childItems;
         THROW_IF_FAILED(adaptiveColumn->get_Items(&childItems));
         BuildPanelChildren(childItems.Get(), columnPanelAsPanel.Get(), renderContext, newRenderArgs.Get(), [](IUIElement*) {});

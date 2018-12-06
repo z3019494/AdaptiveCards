@@ -46,11 +46,11 @@ namespace AdaptiveNamespace
                                    _In_ ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext,
                                    _In_ ABI::AdaptiveNamespace::IAdaptiveRenderArgs* renderArgs,
                                    _Outptr_ ABI::Windows::UI::Xaml::IUIElement** textBlockControl);
-        static void BuildContainer(_In_ ABI::AdaptiveNamespace::IAdaptiveCardElement* adaptiveCardElement,
+        void BuildContainer(_In_ ABI::AdaptiveNamespace::IAdaptiveCardElement* adaptiveCardElement,
                                    _In_ ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext,
                                    _In_ ABI::AdaptiveNamespace::IAdaptiveRenderArgs* renderArgs,
                                    _Outptr_ ABI::Windows::UI::Xaml::IUIElement** containerControl);
-        static void BuildColumn(_In_ ABI::AdaptiveNamespace::IAdaptiveCardElement* adaptiveCardElement,
+        void BuildColumn(_In_ ABI::AdaptiveNamespace::IAdaptiveCardElement* adaptiveCardElement,
                                 _In_ ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext,
                                 _In_ ABI::AdaptiveNamespace::IAdaptiveRenderArgs* renderArgs,
                                 _Outptr_ ABI::Windows::UI::Xaml::IUIElement** columnControl);
