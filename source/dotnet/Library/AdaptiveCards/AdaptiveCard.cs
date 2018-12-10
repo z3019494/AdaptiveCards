@@ -116,25 +116,16 @@ namespace AdaptiveCards
         /// <summary>
         ///     Background image for card
         /// </summary>
-        [JsonProperty(Order = -5, DefaultValueHandling = DefaultValueHandling.Ignore)]
-#if !NETSTANDARD1_3
-        [XmlIgnore]
-#endif
-        public Uri BackgroundImage { get; set; }
+        //        [JsonProperty(Order = -5, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        //#if !NETSTANDARD1_3
+        //        //[XmlAttribute("BackgroundImage")]
+        //        [XmlElement]
+        //#endif
+        //        [DefaultValue(null)]
 
-        /// <summary>
-        ///     This is necessary for XML serialization. You should use the <see cref="F:BackgroundImage" /> property directly.
-        /// </summary>
-#if !NETSTANDARD1_3
-        [XmlAttribute("BackgroundImage")]
-        [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
-#endif
+        // Serialization handled explicitly in AdaptiveCardConverter.ReadJson(...)
         [JsonIgnore]
-        public string BackgroundImageString
-        {
-            get { return BackgroundImage?.ToString(); }
-            set { BackgroundImage = new Uri(value); }
-        }
+        public AdaptiveBackgroundImage BackgroundImage { get; set; }
 
         /// <summary>
         ///     Schema version that this card requires. If a client is lower than this version the fallbackText will be rendered.
@@ -288,10 +279,10 @@ namespace AdaptiveCards
             List<RemoteResourceInformation> resourceInformationList = new List<RemoteResourceInformation>();
 
             // Get background image
-            if (!String.IsNullOrEmpty(card.BackgroundImageString))
+            if (!String.IsNullOrEmpty(card.BackgroundImage?.Url.ToString()))
             {
                 resourceInformationList.Add(new RemoteResourceInformation(
-                    card.BackgroundImageString,
+                    card.BackgroundImage?.Url.ToString(),
                     "image"
                 ));
             }

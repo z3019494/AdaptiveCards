@@ -126,6 +126,24 @@ namespace AdaptiveCards
                 }
 
                 var result = (AdaptiveTypedElement)Activator.CreateInstance(type);
+                if (typeName == AdaptiveContainer.TypeName || typeName == AdaptiveColumn.TypeName)
+                {
+                    JToken backgroundImageJSON;
+                    if (jObject.TryGetValue("backgroundImage", out backgroundImageJSON))
+                    {
+                        // Handle BackgroundImage as a string ("DuckTyping")
+                        if (backgroundImageJSON.Type == JTokenType.String)
+                        {
+                            ((AdaptiveContainer)result).BackgroundImage = new AdaptiveBackgroundImage(jObject.Value<string>("backgroundImage"));
+                        }
+                        // backgroundImage is an object (Modern/Explicit)
+                        else
+                        {
+                            ((AdaptiveContainer)result).BackgroundImage = (AdaptiveBackgroundImage)Activator.CreateInstance(typeof(AdaptiveBackgroundImage));
+                            serializer.Populate(backgroundImageJSON.CreateReader(), ((AdaptiveContainer)result).BackgroundImage);
+                        }
+                    }
+                }
                 try
                 {
                     serializer.Populate(jObject.CreateReader(), result);
