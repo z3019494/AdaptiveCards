@@ -116,15 +116,12 @@ namespace AdaptiveCards
         /// <summary>
         ///     Background image for card
         /// </summary>
-        //        [JsonProperty(Order = -5, DefaultValueHandling = DefaultValueHandling.Ignore)]
-        //#if !NETSTANDARD1_3
-        //        //[XmlAttribute("BackgroundImage")]
-        //        [XmlElement]
-        //#endif
-        //        [DefaultValue(null)]
-
-        // Serialization handled explicitly in AdaptiveCardConverter.ReadJson(...)
-        [JsonIgnore]
+#if !NETSTANDARD1_3
+        [XmlElement]
+#endif
+        [JsonProperty(Order = -5, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonConverter(typeof(AdaptiveBackgroundImageConverter))]
+        [DefaultValue(null)]
         public AdaptiveBackgroundImage BackgroundImage { get; set; }
 
         /// <summary>
@@ -279,10 +276,10 @@ namespace AdaptiveCards
             List<RemoteResourceInformation> resourceInformationList = new List<RemoteResourceInformation>();
 
             // Get background image
-            if (!String.IsNullOrEmpty(card.BackgroundImage?.Url.ToString()))
+            if (!String.IsNullOrEmpty(card.BackgroundImage?.BackgroundImageString))
             {
                 resourceInformationList.Add(new RemoteResourceInformation(
-                    card.BackgroundImage?.Url.ToString(),
+                    card.BackgroundImage?.BackgroundImageString,
                     "image"
                 ));
             }

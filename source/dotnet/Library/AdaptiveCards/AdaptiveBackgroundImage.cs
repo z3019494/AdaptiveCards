@@ -42,10 +42,21 @@ namespace AdaptiveCards
 
         [JsonRequired]
 #if !NETSTANDARD1_3
-        [XmlAttribute]
+        [XmlIgnore]
 #endif
         [DefaultValue(null)]
         public Uri Url { get; set; }
+
+#if !NETSTANDARD1_3
+        [XmlAttribute("BackgroundImage")]
+        [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
+#endif
+        [JsonIgnore]
+        public string BackgroundImageString
+        {
+            get { return Url?.ToString(); }
+            set { Url = new Uri(value); }
+        }
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
 #if !NETSTANDARD1_3
@@ -67,5 +78,17 @@ namespace AdaptiveCards
 #endif
         [DefaultValue(typeof(AdaptiveVerticalAlignment), "top")]
         public AdaptiveVerticalAlignment VerticalAlignment { get; set; }
+
+        public bool HasDefaultValues()
+        {
+            if (Mode == AdaptiveBackgroundImageMode.Stretch && HorizontalAlignment == AdaptiveHorizontalAlignment.Left && VerticalAlignment == AdaptiveVerticalAlignment.Top)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }
