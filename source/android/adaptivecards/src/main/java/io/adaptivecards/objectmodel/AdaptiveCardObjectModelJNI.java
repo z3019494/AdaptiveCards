@@ -202,6 +202,12 @@ public class AdaptiveCardObjectModelJNI {
   public final static native long getHorizontalAlignmentEnum();
   public final static native String HorizontalAlignmentToString(int jarg1);
   public final static native int HorizontalAlignmentFromString(String jarg1);
+  public final static native long getVerticalAlignmentEnum();
+  public final static native String VerticalAlignmentToString(int jarg1);
+  public final static native int VerticalAlignmentFromString(String jarg1);
+  public final static native long getBackgroundImageModeEnum();
+  public final static native String BackgroundImageModeToString(int jarg1);
+  public final static native int BackgroundImageModeFromString(String jarg1);
   public final static native long getImageStyleEnum();
   public final static native String ImageStyleToString(int jarg1);
   public final static native int ImageStyleFromString(String jarg1);
@@ -371,6 +377,8 @@ public class AdaptiveCardObjectModelJNI {
   public final static native void Container_SetLanguage(long jarg1, Container jarg1_, String jarg2);
   public final static native int Container_GetVerticalContentAlignment(long jarg1, Container jarg1_);
   public final static native void Container_SetVerticalContentAlignment(long jarg1, Container jarg1_, int jarg2);
+  public final static native long Container_GetBackgroundImage(long jarg1, Container jarg1_);
+  public final static native void Container_SetBackgroundImage(long jarg1, Container jarg1_, long jarg2);
   public final static native void Container_GetResourceInformation(long jarg1, Container jarg1_, long jarg2, RemoteResourceInformationVector jarg2_);
   public final static native long Container_dynamic_cast(long jarg1, BaseCardElement jarg1_);
   public final static native void delete_Container(long jarg1);
@@ -438,6 +446,8 @@ public class AdaptiveCardObjectModelJNI {
   public final static native void Column_SetLanguage(long jarg1, Column jarg1_, String jarg2);
   public final static native int Column_GetVerticalContentAlignment(long jarg1, Column jarg1_);
   public final static native void Column_SetVerticalContentAlignment(long jarg1, Column jarg1_, int jarg2);
+  public final static native long Column_GetBackgroundImage(long jarg1, Column jarg1_);
+  public final static native void Column_SetBackgroundImage(long jarg1, Column jarg1_, long jarg2);
   public final static native void Column_GetResourceInformation(long jarg1, Column jarg1_, long jarg2, RemoteResourceInformationVector jarg2_);
   public final static native long Column_dynamic_cast(long jarg1, BaseCardElement jarg1_);
   public final static native void delete_Column(long jarg1);
@@ -626,12 +636,14 @@ public class AdaptiveCardObjectModelJNI {
   public final static native long new_AdaptiveCard__SWIG_0();
   public final static native long new_AdaptiveCard__SWIG_1(String jarg1, String jarg2, String jarg3, int jarg4, String jarg5, String jarg6, int jarg7, int jarg8);
   public final static native long new_AdaptiveCard__SWIG_2(String jarg1, String jarg2, String jarg3, int jarg4, String jarg5, String jarg6, int jarg7, int jarg8, long jarg9, BaseCardElementVector jarg9_, long jarg10, BaseActionElementVector jarg10_);
+  public final static native long new_AdaptiveCard__SWIG_3(String jarg1, String jarg2, long jarg3, int jarg4, String jarg5, String jarg6, int jarg7, int jarg8);
+  public final static native long new_AdaptiveCard__SWIG_4(String jarg1, String jarg2, long jarg3, int jarg4, String jarg5, String jarg6, int jarg7, int jarg8, long jarg9, BaseCardElementVector jarg9_, long jarg10, BaseActionElementVector jarg10_);
   public final static native String AdaptiveCard_GetVersion(long jarg1, AdaptiveCard jarg1_);
   public final static native void AdaptiveCard_SetVersion(long jarg1, AdaptiveCard jarg1_, String jarg2);
   public final static native String AdaptiveCard_GetFallbackText(long jarg1, AdaptiveCard jarg1_);
   public final static native void AdaptiveCard_SetFallbackText(long jarg1, AdaptiveCard jarg1_, String jarg2);
-  public final static native String AdaptiveCard_GetBackgroundImage(long jarg1, AdaptiveCard jarg1_);
-  public final static native void AdaptiveCard_SetBackgroundImage(long jarg1, AdaptiveCard jarg1_, String jarg2);
+  public final static native long AdaptiveCard_GetBackgroundImage(long jarg1, AdaptiveCard jarg1_);
+  public final static native void AdaptiveCard_SetBackgroundImage(long jarg1, AdaptiveCard jarg1_, long jarg2);
   public final static native String AdaptiveCard_GetSpeak(long jarg1, AdaptiveCard jarg1_);
   public final static native void AdaptiveCard_SetSpeak(long jarg1, AdaptiveCard jarg1_, String jarg2);
   public final static native int AdaptiveCard_GetStyle(long jarg1, AdaptiveCard jarg1_);
