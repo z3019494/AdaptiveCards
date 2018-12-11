@@ -29,19 +29,19 @@ namespace AdaptiveCards
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             JToken backgroundImageJSON = JToken.Load(reader);
+
             // Handle BackgroundImage as a string (BackCompat)
             if (backgroundImageJSON.Type == JTokenType.String)
             {
-                //card.BackgroundImage = new AdaptiveBackgroundImage(jObject.Value<string>("backgroundImage"));
                 return new AdaptiveBackgroundImage(backgroundImageJSON.Value<string>());
             }
+
             // backgroundImage is an object (Modern)
             else if (backgroundImageJSON.Type == JTokenType.Object)
             {
-                //card.BackgroundImage = (AdaptiveBackgroundImage)Activator.CreateInstance(typeof(AdaptiveBackgroundImage));
-                //serializer.Populate(backgroundImageJSON.CreateReader(), card.BackgroundImage);
                 return backgroundImageJSON.ToObject<AdaptiveBackgroundImage>();
             }
+
             else
             {
                 return null;
