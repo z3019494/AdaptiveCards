@@ -14,7 +14,7 @@ namespace AdaptiveCards
 
         public AdaptiveBackgroundImage(string url)
         {
-            Url = new Uri(url);
+            Url = new Uri(url, UriKind.RelativeOrAbsolute);
         }
 
         public AdaptiveBackgroundImage(Uri url)
@@ -24,7 +24,7 @@ namespace AdaptiveCards
 
         public AdaptiveBackgroundImage(string url, AdaptiveBackgroundImageMode mode, AdaptiveHorizontalAlignment hAlignment, AdaptiveVerticalAlignment vAlignment)
         {
-            Url = new Uri(url);
+            Url = new Uri(url, UriKind.RelativeOrAbsolute);
             Mode = mode;
             HorizontalAlignment = hAlignment;
             VerticalAlignment = vAlignment;
