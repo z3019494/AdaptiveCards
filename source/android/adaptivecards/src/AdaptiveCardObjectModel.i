@@ -67,6 +67,7 @@ struct tm {
 #include "../../../shared/cpp/ObjectModel/BaseCardElement.h"
 #include "../../../shared/cpp/ObjectModel/BaseActionElement.h"
 #include "../../../shared/cpp/ObjectModel/BaseInputElement.h"
+#include "../../../shared/cpp/ObjectModel/BackgroundImage.h"
 #include "../../../shared/cpp/ObjectModel/AdaptiveCardParseWarning.h"
 #include "../../../shared/cpp/ObjectModel/ActionParserRegistration.h"
 #include "../../../shared/cpp/ObjectModel/ElementParserRegistration.h"
@@ -87,6 +88,7 @@ struct tm {
 #include "../../../shared/cpp/ObjectModel/SubmitAction.h"
 #include "../../../shared/cpp/ObjectModel/ParseContext.h"
 #include "../../../shared/cpp/ObjectModel/ParseResult.h"
+#include "../../../shared/cpp/ObjectModel/ParseUtil.h"
 #include "../../../shared/cpp/ObjectModel/SharedAdaptiveCard.h"
 #include "../../../shared/cpp/ObjectModel/AdaptiveCardParseException.h"
 #include "../../../shared/cpp/ObjectModel/HostConfig.h"
@@ -100,6 +102,7 @@ struct tm {
 #include "../../../shared/cpp/ObjectModel/Media.h"
 %}
 
+%shared_ptr(AdaptiveCards::BackgroundImage)
 %shared_ptr(AdaptiveCards::BaseActionElement)
 %shared_ptr(AdaptiveCards::BaseCardElement)
 %shared_ptr(AdaptiveCards::BaseInputElement)
@@ -583,6 +586,7 @@ namespace Json {
 %include "../../../shared/cpp/ObjectModel/Enums.h"
 %include "../../../shared/cpp/ObjectModel/AdaptiveBase64Util.h"
 %include "../../../shared/cpp/ObjectModel/RemoteResourceInformation.h"
+%include "../../../shared/cpp/ObjectModel/BackgroundImage.h"
 %include "../../../shared/cpp/ObjectModel/BaseCardElement.h"
 %include "../../../shared/cpp/ObjectModel/BaseActionElement.h"
 %include "../../../shared/cpp/ObjectModel/BaseInputElement.h"

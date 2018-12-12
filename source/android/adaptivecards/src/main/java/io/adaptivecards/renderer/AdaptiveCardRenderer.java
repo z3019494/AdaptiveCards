@@ -203,7 +203,7 @@ public class AdaptiveCardRenderer
             renderedCard.addWarning(new AdaptiveWarning(AdaptiveWarning.INTERACTIVITY_DISALLOWED, "Interactivity is not allowed. Actions not rendered."));
         }
 
-        String imageUrl = adaptiveCard.GetBackgroundImage();
+        String imageUrl = adaptiveCard.GetBackgroundImage().GetUrl();
         if (!imageUrl.isEmpty())
         {
             BackgroundImageLoaderAsync loaderAsync = new BackgroundImageLoaderAsync(renderedCard, context, layout, hostConfig.GetImageBaseUrl());
