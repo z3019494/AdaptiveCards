@@ -5,7 +5,6 @@
 #include "Enums.h"
 #include "json/json.h"
 #include "ParseContext.h"
-#include "BackgroundImage.h"
 
 namespace AdaptiveSharedNamespace
 {
