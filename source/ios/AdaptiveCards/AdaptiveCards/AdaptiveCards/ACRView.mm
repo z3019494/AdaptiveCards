@@ -30,6 +30,7 @@
 #import "ACRUIImageView.h"
 #import "FactSet.h"
 #import "AdaptiveBase64Util.h"
+#import "BackgroundImage.h"
 
 using namespace AdaptiveCards;
 typedef UIImage* (^ImageLoadBlock)(NSURL *url);
@@ -96,7 +97,14 @@ typedef UIImage* (^ImageLoadBlock)(NSURL *url);
     newView.backgroundColor = [_hostConfig getBackgroundColorForContainerStyle:
         [ACOHostConfig getPlatformContainerStyle:style]];
 
-    NSString *key = [NSString stringWithCString:[_adaptiveCard card]->GetBackgroundImage().c_str() encoding:[NSString defaultCStringEncoding]];
+    auto backgroundImage = [_adaptiveCard card]->GetBackgroundImage();
+    const char* backgroundUrl = "";
+    if (backgroundImage != nullptr)
+    {
+        backgroundUrl = backgroundImage->GetUrl().c_str();
+    }
+        
+    NSString *key = [NSString stringWithCString:backgroundUrl encoding:[NSString defaultCStringEncoding]];
     if([key length]){
         UIView *imgView = nil;
         UIImage *img = nil;

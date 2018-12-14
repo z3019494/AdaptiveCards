@@ -1,6 +1,5 @@
 #pragma once
 
-#include "BackgroundImage.h"
 #include "BaseCardElement.h"
 #include "BaseActionElement.h"
 #include "Enums.h"
@@ -10,6 +9,7 @@
 namespace AdaptiveSharedNamespace
 {
     class Container;
+    class BackgroundImage;
 
     class AdaptiveCard
     {
