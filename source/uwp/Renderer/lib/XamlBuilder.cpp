@@ -494,6 +494,7 @@ namespace AdaptiveNamespace
             THROW_IF_FAILED(backgroundAsFrameworkElement->put_VerticalAlignment(VerticalAlignment_Stretch));
             break;
         default:
+
             ComPtr<TileControl> tileControl;
             MakeAndInitialize<TileControl>(&tileControl);
             tileControl->put_BackgroundImage(backgroundImage);
@@ -503,7 +504,21 @@ namespace AdaptiveNamespace
             tileControl->put_RootElement(rootElement.Get());
 
             tileControl->LoadImageBrush(background.Get());
+
+            /*ComPtr<IContentControl> control;
+            tileControl.As(&control);
+            control->put_Content(rootElement.Get());*/
             tileControl.As(&backgroundAsFrameworkElement);
+
+            // temp button placement
+            /*auto str = "SAMPLE TITLE";
+            HString title;
+            UTF8ToHString(str, title.GetAddressOf());
+            ComPtr<IButton> tempButton = XamlHelpers::CreateXamlClass<IButton>(HStringReference(RuntimeClass_Windows_UI_Xaml_Controls_Button));
+            XamlHelpers::SetContent(tempButton.Get(), title.Get());
+            tempButton.As(&backgroundAsFrameworkElement);*/
+            // end temp
+
             break;
         }
 
@@ -1935,7 +1950,7 @@ namespace AdaptiveNamespace
 
                     // Handle ImageOpened event so we can check the imageSource's size to determine if it fits in its parent
                     EventRegistrationToken eventToken;
-                    THROW_IF_FAILED(xamlImage->add_ImageOpened(
+                    HRESULT hr = (xamlImage->add_ImageOpened(
                         Callback<IRoutedEventHandler>([frameworkElement, parentElement, imageSourceAsBitmap](IInspectable* /*sender*/, IRoutedEventArgs *
                             /*args*/) -> HRESULT {
                         return SetAutoImageSize(frameworkElement.Get(), parentElement.Get(), imageSourceAsBitmap.Get());

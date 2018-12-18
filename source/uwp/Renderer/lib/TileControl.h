@@ -32,6 +32,7 @@ namespace AdaptiveNamespace
 {
     class DECLSPEC_UUID("0F485063-EF2A-400E-A946-73E00EDFAC83") TileControl
         : public Microsoft::WRL::RuntimeClass<ABI::AdaptiveNamespace::ITileControl,
+                                              //ABI::Windows::UI::Xaml::Controls::IContentControl,
                                               ABI::Windows::UI::Xaml::IFrameworkElementOverrides,
                                               Microsoft::WRL::CloakedIid<ITypePeek>,
                                               Microsoft::WRL::ComposableBase<ABI::Windows::UI::Xaml::Controls::IContentControlFactory>>

@@ -36,6 +36,9 @@ using namespace ABI::Windows::Storage::Streams;
 using namespace ABI::Windows::Storage::FileProperties;
 using namespace ABI::Windows::System;
 
+//temp
+using namespace ABI::Windows::UI;
+
 namespace AdaptiveNamespace
 {
     HRESULT TileControl::RuntimeClassInitialize() noexcept try
@@ -56,6 +59,12 @@ namespace AdaptiveNamespace
             HStringReference(RuntimeClass_Windows_UI_Xaml_Controls_Canvas));
         m_brushXaml = AdaptiveNamespace::XamlHelpers::CreateXamlClass<IImageBrush>(
             HStringReference(RuntimeClass_Windows_UI_Xaml_Media_ImageBrush));
+
+        // Add containerElement to content of ContentControl
+        ComPtr<IInspectable> content;
+        m_containerElement.As(&content);
+        spInnerContentControl->put_Content(content.Get());
+        //this->put_Content(content.Get());
 
         return S_OK;
     }
@@ -105,34 +114,34 @@ namespace AdaptiveNamespace
             ComPtr<IBitmapImage> bitmapImage;
             imageSource.As(&bitmapImage);
             bitmapImage->add_ImageOpened(Callback<IRoutedEventHandler>([&](IInspectable* /*sender*/, IRoutedEventArgs *
-                                                                     /*args*/) -> HRESULT {
-                                       ComPtr<IUIElement> uiElement;
-                                       this->get_ResolvedImage(&uiElement);
+                                                                           /*args*/) -> HRESULT {
+                                             ComPtr<IUIElement> uiElement;
+                                             this->get_ResolvedImage(&uiElement);
 
-                                       // Extract BitmapSource from Image
-                                       ComPtr<IImage> image;
-                                       uiElement.As(&image);
-                                       ComPtr<IImageSource> imageSource;
-                                       image->get_Source(&imageSource);
-                                       ComPtr<IBitmapSource> bitmapSource;
-                                       imageSource.As(&bitmapSource);
+                                             // Extract BitmapSource from Image
+                                             ComPtr<IImage> image;
+                                             uiElement.As(&image);
+                                             ComPtr<IImageSource> imageSource;
+                                             image->get_Source(&imageSource);
+                                             ComPtr<IBitmapSource> bitmapSource;
+                                             imageSource.As(&bitmapSource);
 
-                                       // Extract Size from Image
-                                       INT32 height, width;
-                                       bitmapSource->get_PixelHeight(&height);
-                                       bitmapSource->get_PixelWidth(&width);
+                                             // Extract Size from Image
+                                             INT32 height, width;
+                                             bitmapSource->get_PixelHeight(&height);
+                                             bitmapSource->get_PixelWidth(&width);
 
-                                       // Save dimensions to member
-                                       Size imageSize;
-                                       imageSize.Height = height;
-                                       imageSize.Width = width;
-                                       this->put_ImageSize(imageSize);
+                                             // Save dimensions to member
+                                             Size imageSize;
+                                             imageSize.Height = height;
+                                             imageSize.Width = width;
+                                             this->put_ImageSize(imageSize);
 
-                                       this->RefreshContainerTile();
-                                       return S_OK;
-                                   })
-                                       .Get(),
-                                   &eventToken);
+                                             this->RefreshContainerTile();
+                                             return S_OK;
+                                         })
+                                             .Get(),
+                                         &eventToken);
         }
 
         ComPtr<IImageSource> imageSource;
@@ -231,7 +240,7 @@ namespace AdaptiveNamespace
     //    // TODO TRANSLATE: _flag.Release();
     //}
 
-    void TileControl::RefreshContainerTile()//DOUBLE actualWidth, DOUBLE actualHeight)
+    void TileControl::RefreshContainerTile() // DOUBLE actualWidth, DOUBLE actualHeight)
     {
         Size emptySize;
         ComPtr<ISizeHelperStatics> sizeStatics;
@@ -251,7 +260,7 @@ namespace AdaptiveNamespace
             DOUBLE actualHeight;
             m_rootElement->get_ActualWidth(&actualHeight);*/
 
-            //RefreshContainerTile(actualWidth, actualHeight, m_imageSize.Width, m_imageSize.Height);
+            // RefreshContainerTile(actualWidth, actualHeight, m_imageSize.Width, m_imageSize.Height);
             RefreshContainerTile(m_containerSize.Width, m_containerSize.Height, m_imageSize.Width, m_imageSize.Height);
         }
     }
@@ -262,6 +271,14 @@ namespace AdaptiveNamespace
         ABI::AdaptiveNamespace::HorizontalAlignment hAlignment;
         ABI::AdaptiveNamespace::VerticalAlignment vAlignment;
         THROW_IF_FAILED(ExtractBackgroundImageData(&mode, &hAlignment, &vAlignment));
+        if (imageWidth == 0)
+        {
+            imageWidth = width;
+        }
+        if (imageHeight == 0)
+        {
+            imageHeight = height;
+        }
 
         /*if (m_isImageSourceLoaded == FALSE || m_isRootElementSizeChanged == FALSE)
         {
@@ -278,46 +295,60 @@ namespace AdaptiveNamespace
         switch (mode)
         {
         case ABI::AdaptiveNamespace::BackgroundImageMode::RepeatHorizontally:
-            numberImagePerColumn = (INT)ceil(width / imageWidth) + 1;
+            // og: numberImagePerColumn = (INT)ceil(width / imageWidth) + 1;
+            // me...
+            numberImagePerRow = (INT)ceil(width / imageWidth);
+            numberImagePerColumn = 1;
+            // end me
 
             switch (vAlignment)
             {
             case ABI::AdaptiveNamespace::VerticalAlignment::Bottom:
-                numberImagePerRow = 1;
-                offsetHorizontalAlignment = (INT)(height - imageHeight);
+                // og: numberImagePerRow = 1;
+                // og: offsetHorizontalAlignment = (INT)(height - imageHeight);
+                offsetVerticalAlignment = height - imageHeight;
                 break;
             case ABI::AdaptiveNamespace::VerticalAlignment::Center:
-                numberImagePerRow = (INT)ceil(height / imageHeight);
+                // og: numberImagePerRow = (INT)ceil(height / imageHeight);
+                offsetVerticalAlignment = (height - imageHeight) / 2;
                 break;
             case ABI::AdaptiveNamespace::VerticalAlignment::Top:
             default:
-                numberImagePerRow = 1;
+                // numberImagePerRow = 1;
                 break;
             }
             break;
 
         case ABI::AdaptiveNamespace::BackgroundImageMode::RepeatVertically:
-            numberImagePerRow = (INT)ceil(height / imageHeight) + 1;
+            // og: numberImagePerRow = (INT)ceil(height / imageHeight) + 1;
+            // me...
+            numberImagePerRow = 1;
+            numberImagePerColumn = (INT)ceil(height / imageHeight);
+            // end me
 
             switch (hAlignment)
             {
             case ABI::AdaptiveNamespace::HorizontalAlignment::Right:
-                numberImagePerColumn = 1;
-                offsetVerticalAlignment = (INT)(width - imageWidth);
+                // og: numberImagePerColumn = 1;
+                // og: offsetVerticalAlignment = (INT)(width - imageWidth);
+                offsetHorizontalAlignment = width - imageWidth;
                 break;
             case ABI::AdaptiveNamespace::HorizontalAlignment::Center:
-                numberImagePerColumn = (INT)ceil(width / imageWidth);
+                // og: numberImagePerColumn = (INT)ceil(width / imageWidth);
+                offsetHorizontalAlignment = (width - imageWidth) / 2;
                 break;
             case ABI::AdaptiveNamespace::HorizontalAlignment::Left:
             default:
-                numberImagePerColumn = 1;
+                // numberImagePerColumn = 1;
                 break;
             }
             break;
 
         case ABI::AdaptiveNamespace::BackgroundImageMode::Repeat:
-            numberImagePerRow = (INT)ceil(height / imageHeight) + 1;
-            numberImagePerColumn = (INT)ceil(width / imageWidth) + 1;
+            // numberImagePerRow = (INT)ceil(height / imageHeight) + 1;
+            // numberImagePerColumn = (INT)ceil(width / imageWidth) + 1;
+            numberImagePerColumn = (INT)ceil(height / imageHeight) + 1;
+            numberImagePerRow = (INT)ceil(width / imageWidth) + 1;
             break;
         }
         numberSpriteToInstanciate = numberImagePerColumn * numberImagePerRow;
@@ -352,7 +383,25 @@ namespace AdaptiveNamespace
 
         // Convert ImageBrush to Brush
         ComPtr<IBrush> brushXamlAsBrush;
-        THROW_IF_FAILED(m_brushXaml.As(&brushXamlAsBrush));
+        // THROW_IF_FAILED(m_brushXaml.As(&brushXamlAsBrush));
+        ComPtr<ISolidColorBrushFactory> factory;
+        ComPtr<ISolidColorBrush> colorBrush;
+        ComPtr<IColorHelperStatics> statics;
+
+        ABI::Windows::UI::Color color = {};
+        BYTE a, r, g, b;
+        a = 0xff;
+        r = 0x1e;
+        g = 0x99;
+        b = 0x11;
+
+        ABI::Windows::Foundation::GetActivationFactory(HStringReference(L"Windows.UI.ColorHelper").Get(), &statics);
+        statics->FromArgb(a,r,g,b,&color);
+
+        ABI::Windows::Foundation::GetActivationFactory(HStringReference(L"Windows.UI.Xaml.Media.SolidColorBrush").Get(), &factory);
+        factory->CreateInstanceWithColor(color, &colorBrush);
+        ComPtr<IBrush> brush;
+        colorBrush.As(&brush);
 
         // Change positions+brush for all actives elements
         for (INT y = 0; y < numberImagePerRow; y++)
@@ -367,7 +416,8 @@ namespace AdaptiveNamespace
                 // Set rectangle.Fill
                 ComPtr<IShape> rectangleAsShape;
                 THROW_IF_FAILED(rectangle.As(&rectangleAsShape));
-                THROW_IF_FAILED(rectangleAsShape->put_Fill(brushXamlAsBrush.Get()));
+                // THROW_IF_FAILED(rectangleAsShape->put_Fill(brushXamlAsBrush.Get()));
+                rectangleAsShape->put_Fill(brush.Get());
 
                 // Convert rectangle to UIElement
                 ComPtr<IUIElement> rectangleAsUIElement;
