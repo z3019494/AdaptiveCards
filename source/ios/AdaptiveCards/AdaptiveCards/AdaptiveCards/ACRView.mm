@@ -98,30 +98,36 @@ typedef UIImage* (^ImageLoadBlock)(NSURL *url);
         [ACOHostConfig getPlatformContainerStyle:style]];
 
     auto backgroundImage = [_adaptiveCard card]->GetBackgroundImage();
-    const char* backgroundUrl = "";
+    std::string backgroundUrl = "";
     if (backgroundImage != nullptr)
     {
-        backgroundUrl = backgroundImage->GetUrl().c_str();
+        backgroundUrl = backgroundImage->GetUrl();
     }
         
-    NSString *key = [NSString stringWithCString:backgroundUrl encoding:[NSString defaultCStringEncoding]];
+    NSString *key = [NSString stringWithCString:backgroundUrl.c_str() encoding:[NSString defaultCStringEncoding]];
     if([key length]){
         UIView *imgView = nil;
         UIImage *img = nil;
         img = _imageViewMap[key];
-        imgView = [[ACRUIImageView alloc] initWithImage:img];
-        if(img) {
+        
+        if(img)
+        {
+            if(backgroundImage->GetMode() == AdaptiveCards::BackgroundImageMode::Stretch)
+            {
+                imgView = [[ACRUIImageView alloc] initWithImage:img];
+            }
+            else
+            {
+                imgView = [[ACRUIImageView alloc] init];
+                imgView.backgroundColor = [UIColor colorWithPatternImage:img];
+            }
+            
             imgView.translatesAutoresizingMaskIntoConstraints = NO;
-            imgView.contentMode = UIViewContentModeScaleAspectFill;
             [newView addSubview:imgView];
             [newView sendSubviewToBack:imgView];
-            [NSLayoutConstraint constraintWithItem:imgView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:newView attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0].active = YES;
-            [NSLayoutConstraint constraintWithItem:imgView attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:newView attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0].active = YES;
-            [NSLayoutConstraint constraintWithItem:imgView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:newView attribute:NSLayoutAttributeTop multiplier:1.0 constant:0].active = YES;
-            [NSLayoutConstraint constraintWithItem:imgView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:newView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0].active = YES;
-            [NSLayoutConstraint constraintWithItem:imgView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:newView attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0].active = YES;
-            [NSLayoutConstraint constraintWithItem:imgView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:newView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0].active = YES;
-
+            
+            [self applyBackgroundImageConstraints:backgroundImage.get() image:img imageView:imgView parentView:newView];
+            
             [imgView setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
             [imgView setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisVertical];
             [imgView setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
@@ -130,6 +136,79 @@ typedef UIImage* (^ImageLoadBlock)(NSURL *url);
     }
     [self callDidLoadElementsIfNeeded];
     return newView;
+}
+
+- (void) applyBackgroundImageConstraints: (const BackgroundImage *)backgroundImageProperties image:(UIImage *)image imageView:(UIView *)imageView parentView:(UIView *)parentView
+{
+    switch (backgroundImageProperties->GetMode())
+    {
+        case AdaptiveCards::BackgroundImageMode::Repeat:
+        {
+            [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0].active = YES;
+            [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0].active = YES;
+            [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeTop multiplier:1.0 constant:0].active = YES;
+            [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0].active = YES;
+            [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0].active = YES;
+            [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0].active = YES;
+            
+            imageView.contentMode = UIViewContentModeScaleAspectFill;
+            break;
+        }
+        case AdaptiveCards::BackgroundImageMode::RepeatHorizontally:
+        {
+            [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:image.size.height].active = YES;
+            [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0].active = YES;
+            [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0].active = YES;
+            
+            switch (backgroundImageProperties->GetVerticalAlignment())
+            {
+                case AdaptiveCards::VerticalAlignment::Bottom:
+                    [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0].active = YES;
+                    break;
+                case AdaptiveCards::VerticalAlignment::Center:
+                    [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0].active = YES;
+                    break;
+                case AdaptiveCards::VerticalAlignment::Top:
+                default:
+                    [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeTop multiplier:1.0 constant:0].active = YES;
+                    break;
+            }
+            break;
+        }
+        case AdaptiveCards::BackgroundImageMode::RepeatVertically:
+        {
+            [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:image.size.width].active = YES;
+            [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeTop multiplier:1.0 constant:0].active = YES;
+            [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0].active = YES;
+            switch (backgroundImageProperties->GetHorizontalAlignment())
+            {
+                case AdaptiveCards::HorizontalAlignment::Right:
+                    [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeRight multiplier:1.0 constant:0].active = YES;
+                    break;
+                case AdaptiveCards::HorizontalAlignment::Center:
+                    [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0].active = YES;
+                    break;
+                case AdaptiveCards::HorizontalAlignment::Left:
+                default:
+                    [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0].active = YES;
+                    break;
+            }
+            break;
+        }
+        case AdaptiveCards::BackgroundImageMode::Stretch:
+        default:
+        {
+            [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0].active = YES;
+            [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0].active = YES;
+            [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeTop multiplier:1.0 constant:0].active = YES;
+            [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0].active = YES;
+            [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0].active = YES;
+            [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:parentView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0].active = YES;
+            
+            imageView.contentMode = UIViewContentModeScaleAspectFill;
+            break;
+        }
+    }
 }
 
 - (void)waitForAsyncTasksToFinish

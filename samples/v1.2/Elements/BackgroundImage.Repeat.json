@@ -12,14 +12,20 @@
 			"text": "Text in body"
 		},
 		{
-			"type": "Column",
-			"width": "auto",
-			"items": [
-				{
-					"type": "TextBlock",
-					"text": "Text in Column"
-				}
-			]
+				"type": "ColumnSet",
+				"height": "stretch",
+				"columns": [
+						{
+								"type": "Column",
+								"width": "auto",
+								"items": [
+										{
+												"type": "TextBlock",
+												"text": "Text in Column"
+										}
+								]
+						}
+				]
 		},
 		{
 			"type": "Container",
