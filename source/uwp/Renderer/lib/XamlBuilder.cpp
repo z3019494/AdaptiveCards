@@ -505,19 +505,7 @@ namespace AdaptiveNamespace
 
             tileControl->LoadImageBrush(background.Get());
 
-            /*ComPtr<IContentControl> control;
-            tileControl.As(&control);
-            control->put_Content(rootElement.Get());*/
             tileControl.As(&backgroundAsFrameworkElement);
-
-            // temp button placement
-            /*auto str = "SAMPLE TITLE";
-            HString title;
-            UTF8ToHString(str, title.GetAddressOf());
-            ComPtr<IButton> tempButton = XamlHelpers::CreateXamlClass<IButton>(HStringReference(RuntimeClass_Windows_UI_Xaml_Controls_Button));
-            XamlHelpers::SetContent(tempButton.Get(), title.Get());
-            tempButton.As(&backgroundAsFrameworkElement);*/
-            // end temp
 
             break;
         }

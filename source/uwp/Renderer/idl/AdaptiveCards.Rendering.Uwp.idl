@@ -3394,9 +3394,6 @@ AdaptiveNamespaceStart
         [propget] HRESULT ImageSize([out, retval] Windows.Foundation.Size * value);
         [propput] HRESULT ImageSize([in] Windows.Foundation.Size value);
 
-        [propget] HRESULT isRootElementSizeChanged([out, retval] boolean* value);
-        [propput] HRESULT isRootElementSizeChanged([in] boolean value);
-
         HRESULT LoadImageBrush([in] Windows.UI.Xaml.UIElement * uielement);
     }
 
