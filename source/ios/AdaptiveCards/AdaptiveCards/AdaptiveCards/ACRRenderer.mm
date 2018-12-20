@@ -20,6 +20,7 @@
 #import "ACRViewController.h"
 #import "ACRContentHoldingUIScrollView.h"
 #import "ACRLongPressGestureRecognizerFactory.h"
+#import "BackgroundImage.h"
 
 using namespace AdaptiveCards;
 
@@ -77,8 +78,8 @@ using namespace AdaptiveCards;
                                                                          hostConfig:config];
     }
 
-    if(!adaptiveCard->GetBackgroundImage().empty()) {
-            [rootView loadImage:adaptiveCard->GetBackgroundImage()];
+    if(adaptiveCard->GetBackgroundImage() != nullptr) {
+            [rootView loadImage:adaptiveCard->GetBackgroundImage()->GetUrl()];
         }
     if(![config getHostConfig]->GetMedia().playButton.empty()) {
             [rootView loadImage:[config getHostConfig]->GetMedia().playButton];
