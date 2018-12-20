@@ -2,10 +2,6 @@
   "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
   "type": "AdaptiveCard",
   "version": "1.2",
-  "backgroundImage": {
-    "url": "http://icons.iconarchive.com/icons/pixelmixer/basic/48/plus-icon.png",
-    "mode": "repeat"
-  },
   "body": [
     {
       "type": "TextBlock",
@@ -17,6 +13,11 @@
         {
           "type": "Column",
           "width": "auto",
+          "backgroundImage": {
+            "url": "http://icons.iconarchive.com/icons/pixelmixer/basic/48/plus-icon.png",
+            "mode": "repeatVertically",
+            "horizontalAlignment": "left"
+          },
           "items": [
             {
               "type": "TextBlock",
@@ -27,6 +28,11 @@
         {
           "type": "Column",
           "width": "auto",
+          "backgroundImage": {
+            "url": "http://icons.iconarchive.com/icons/pixelmixer/basic/48/plus-icon.png",
+            "mode": "repeatVertically",
+            "horizontalAlignment": "center"
+          },
           "items": [
             {
               "type": "TextBlock",
@@ -37,6 +43,11 @@
         {
           "type": "Column",
           "width": "auto",
+          "backgroundImage": {
+            "url": "http://icons.iconarchive.com/icons/pixelmixer/basic/48/plus-icon.png",
+            "mode": "repeatVertically",
+            "horizontalAlignment": "right"
+          },
           "items": [
             {
               "type": "TextBlock",

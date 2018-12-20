@@ -2,10 +2,6 @@
   "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
   "type": "AdaptiveCard",
   "version": "1.2",
-  "backgroundImage": {
-    "url": "http://icons.iconarchive.com/icons/pixelmixer/basic/48/plus-icon.png",
-    "mode": "repeat"
-  },
   "body": [
     {
       "type": "TextBlock",
@@ -48,6 +44,10 @@
     },
     {
       "type": "Container",
+      "backgroundImage": {
+        "url": "http://icons.iconarchive.com/icons/pixelmixer/basic/48/plus-icon.png",
+        "mode": "repeat"
+      },
       "items": [
         {
           "type": "TextBlock",
