@@ -5,28 +5,16 @@
 #include "AdaptiveCards.Rendering.Uwp.h"
 #include "Enums.h"
 
-//#ifdef ADAPTIVE_CARDS_WINDOWS
-// using namespace InternalNamespace;
-//#endif
-
 using namespace Microsoft::WRL;
 using namespace Microsoft::WRL::Wrappers;
 using namespace ABI::AdaptiveNamespace;
-using namespace ABI::Windows::Foundation::Numerics;
 using namespace ABI::Windows::Foundation::Collections;
 
-// XAML STUFF
-using namespace ABI::Windows::Storage;
 using namespace ABI::Windows::Foundation;
 using namespace ABI::Windows::UI::Xaml;
 using namespace ABI::Windows::UI::Xaml::Shapes;
 using namespace ABI::Windows::UI::Xaml::Controls;
 using namespace ABI::Windows::UI::Xaml::Media;
-using namespace ABI::Windows::UI::Xaml::Media::Imaging;
-
-// KEEP FOR NOW, CLEAN UP LATER
-using namespace ABI::Windows::Storage::Streams;
-using namespace ABI::Windows::Storage::FileProperties;
 
 namespace AdaptiveNamespace
 {
@@ -41,7 +29,6 @@ namespace AdaptiveNamespace
 
     public:
         HRESULT RuntimeClassInitialize() noexcept;
-        // HRESULT RuntimeClassInitialize(_In_ IAdaptiveRenderContext* context, _In_ IAdaptiveBackgroundImage* backgroundImage) noexcept;
 
         virtual HRESULT STDMETHODCALLTYPE put_BackgroundImage(_In_ IAdaptiveBackgroundImage* value);
         virtual HRESULT STDMETHODCALLTYPE put_RootElement(_In_ IFrameworkElement* value);
@@ -64,26 +51,22 @@ namespace AdaptiveNamespace
         // ITypePeek method
         void* PeekAt(REFIID riid) override { return PeekHelper(riid, this); }
 
-        void RefreshContainerTile();//DOUBLE actualWidth, DOUBLE actualHeight);
-
     private:
-        void RefreshContainerTile(DOUBLE width, DOUBLE height, FLOAT imageWidth, FLOAT imageHeight);
+        void RefreshContainerTile();
         HRESULT ExtractBackgroundImageData(ABI::AdaptiveNamespace::BackgroundImageMode* mode,
                                            ABI::AdaptiveNamespace::HorizontalAlignment* hAlignment,
                                            ABI::AdaptiveNamespace::VerticalAlignment* vAlignment);
 
         // Fields
-        Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::IFrameworkElement> m_rootElement{};
+        Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::IFrameworkElement> m_rootElement;
         Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::IUIElement> m_resolvedImage;
-        Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Controls::ICanvas> m_containerElement{};
-        Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Media::IImageBrush> m_brushXaml{};
+        Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Controls::ICanvas> m_containerElement;
+        Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Media::IImageBrush> m_brushXaml;
 
-        Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveBackgroundImage> m_adaptiveBackgroundImage{};
+        Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveBackgroundImage> m_adaptiveBackgroundImage;
         ABI::Windows::Foundation::Size m_imageSize{};
         ABI::Windows::Foundation::Size m_containerSize{};
-
         std::vector<Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Shapes::IRectangle>> m_xamlChildren;
-        BOOL m_isImageSourceLoaded = FALSE;
     };
     ActivatableClass(TileControl);
 }
