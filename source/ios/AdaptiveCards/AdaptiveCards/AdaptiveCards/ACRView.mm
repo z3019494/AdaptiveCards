@@ -140,6 +140,7 @@ typedef UIImage* (^ImageLoadBlock)(NSURL *url);
                 imgView = [[ACRUIImageView alloc] init];
                 imgView.backgroundColor = [UIColor colorWithPatternImage:img];
             }
+        }
 		else
 		{
             imgView = [self getImageView:@"backgroundImage"];
@@ -151,7 +152,7 @@ typedef UIImage* (^ImageLoadBlock)(NSURL *url);
             [newView addSubview:imgView];
             [newView sendSubviewToBack:imgView];
             
-            [self applyBackgroundImageConstraints:backgroundImage.get() image:img imageView:imgView parentView:newView];
+            [ACRView applyBackgroundImageConstraints:backgroundImage.get() image:img imageView:imgView parentView:newView];
             
             [imgView setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
             [imgView setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisVertical];
@@ -163,7 +164,7 @@ typedef UIImage* (^ImageLoadBlock)(NSURL *url);
     return newView;
 }
 
-- (void) applyBackgroundImageConstraints: (const BackgroundImage *)backgroundImageProperties image:(UIImage *)image imageView:(UIView *)imageView parentView:(UIView *)parentView
++ (void) applyBackgroundImageConstraints: (const BackgroundImage *)backgroundImageProperties image:(UIImage *)image imageView:(UIView *)imageView parentView:(UIView *)parentView
 {
     switch (backgroundImageProperties->GetMode())
     {
@@ -643,7 +644,7 @@ typedef UIImage* (^ImageLoadBlock)(NSURL *url);
     return _adaptiveCard;
 }
 
-// notifcation is delivered from main (serial) queue, thus run in the main thread context
+// notification is delivered from main (serial) queue, thus run in the main thread context
 - (void)observeValueForKeyPath:(NSString *)path ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
     if ([path isEqualToString:@"image"])
@@ -661,6 +662,7 @@ typedef UIImage* (^ImageLoadBlock)(NSURL *url);
                 }
             } else {
                 id view = _imageViewContextMap[key];
+                
                 if([view isKindOfClass:[ACRButton class]]) {
                     ACRButton *button = (ACRButton *)view;
                     [button setImageView:image withConfig:_hostConfig];

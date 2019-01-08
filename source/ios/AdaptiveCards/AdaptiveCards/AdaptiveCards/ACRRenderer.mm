@@ -85,7 +85,7 @@ using namespace AdaptiveCards;
                                                                          hostConfig:config];
     }
 
-    if(!adaptiveCard->GetBackgroundImage() != nullptr) {
+    if(adaptiveCard->GetBackgroundImage() != nullptr) {
         ObserverActionBlock observerAction =
         ^(NSObject<ACOIResourceResolver>* imageResourceResolver, NSString* key, std::shared_ptr<BaseCardElement> const &elem, NSURL* url, ACRView* rootView) {
             UIImageView *view = [imageResourceResolver resolveImageViewResource:url];
