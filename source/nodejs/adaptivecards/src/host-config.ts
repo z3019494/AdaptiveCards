@@ -1,5 +1,5 @@
 import * as Enums from "./enums";
-import * as Utils from "./utils";
+import { Utils, SizeAndUnit } from "./utils";
 
 export interface IValidationError {
     error: Enums.ValidationError,
@@ -177,7 +177,7 @@ export class ActionsConfig {
             this.allowTitleToWrap = obj["allowTitleToWrap"] != null ? obj["allowTitleToWrap"] : this.allowTitleToWrap;
 
             try {
-                let sizeAndUnit = Utils.SizeAndUnit.parse(obj["iconSize"]);
+                let sizeAndUnit = SizeAndUnit.parse(obj["iconSize"]);
 
                 if (sizeAndUnit.unit == Enums.SizeUnit.Pixel) {
                     this.iconSize = sizeAndUnit.physicalSize;
