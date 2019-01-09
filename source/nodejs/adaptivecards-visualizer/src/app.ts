@@ -265,6 +265,7 @@ function actionExecuted(action: AdaptiveCards.Action) {
     alert(message);
 }
 
+/*
 function actionCompletedCallback(action: AdaptiveCards.Action) {
     action.setStatus(
         {
@@ -279,6 +280,7 @@ function actionCompletedCallback(action: AdaptiveCards.Action) {
             ]
         });
 }
+*/
 
 function showPopupCard(action: AdaptiveCards.ShowCardAction) {
     var overlayElement = document.createElement("div");

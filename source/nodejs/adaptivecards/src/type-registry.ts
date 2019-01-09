@@ -1,5 +1,22 @@
-import { Action, OpenUrlAction, SubmitAction, ShowCardAction, CardElement, Container, TextBlock, Image, ImageSet, Media, FactSet, TextInput, DateInput, TimeInput, NumberInput, ChoiceSetInput, ToggleInput } from "./card-elements";
+import { CardElement, Action } from "./card-elements";
+
+import { OpenUrlAction } from "./actions/open-url-action";
+import { SubmitAction } from "./actions/submit-action";
+import { ShowCardAction } from "./actions/show-card-action";
+
+import { TextBlock } from "./elements/text-block";
+import { Image } from "./elements/image";
+import { ImageSet } from "./elements/image-set";
+import { FactSet } from "./elements/fact-set";
+import { Media } from "./elements/media";
+import { Container } from "./elements/container";
 import { ColumnSet } from "./elements/column-set";
+import { TextInput } from "./elements/text-input";
+import { DateInput } from "./elements/date-input";
+import { TimeInput } from "./elements/time-input";
+import { NumberInput } from "./elements/number-input";
+import { ToggleInput } from "./elements/toggle-input";
+import { ChoiceSetInput } from "./elements/choice-set-input";
 
 export interface ITypeRegistration<T> {
 	typeName: string,

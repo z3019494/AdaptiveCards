@@ -1,13 +1,11 @@
-import * as Utils from "../utils";
-import * as Enums from "../enums";
-import * as HostConfig from "../host-config";
-import * as Core from "../card-elements";
-import { Container } from "./container";
-import { AdaptiveCard } from "./adaptive-card";
+import * as Core from "./card-elements";
+import { Utils, SizeAndUnit } from "./utils";
+import * as Enums from "./enums";
+import * as HostConfig from "./host-config";
 
-export type ColumnWidth = Utils.SizeAndUnit | "auto" | "stretch";
+export type ColumnWidth = SizeAndUnit | "auto" | "stretch";
 
-export class Column extends Container {
+export class Column extends Core.Container {
 	private _computedWeight: number = 0;
 
 	protected adjustRenderedElementSize(renderedElement: HTMLElement) {
@@ -26,7 +24,7 @@ export class Column extends Container {
 			renderedElement.style.flex = "1 1 50px";
 		}
 		else {
-			let sizeAndUnit = <Utils.SizeAndUnit>this.width;
+			let sizeAndUnit = <SizeAndUnit>this.width;
 
 			if (sizeAndUnit.unit == Enums.SizeUnit.Pixel) {
 				renderedElement.style.flex = "0 0 auto";
@@ -57,7 +55,7 @@ export class Column extends Container {
 	toJSON() {
 		let result = super.toJSON();
 
-		if (this.width instanceof Utils.SizeAndUnit) {
+		if (this.width instanceof SizeAndUnit) {
 			if (this.width.unit == Enums.SizeUnit.Pixel) {
 				Utils.setProperty(result, "width", this.width.physicalSize + "px");
 			}
@@ -94,7 +92,7 @@ export class Column extends Container {
 		var invalidWidth = false;
 
 		try {
-			this.width = Utils.SizeAndUnit.parse(jsonWidth);
+			this.width = SizeAndUnit.parse(jsonWidth);
 		}
 		catch (e) {
 			if (typeof jsonWidth === "string" && (jsonWidth === "auto" || jsonWidth === "stretch")) {
@@ -156,7 +154,7 @@ export class ColumnSet extends Core.CardElementContainer {
 			element.className = hostConfig.makeCssClassName("ac-columnSet");
 			element.style.display = "flex";
 
-			if (AdaptiveCard.useAdvancedCardBottomTruncation) {
+			if (Core.AdaptiveCard.useAdvancedCardBottomTruncation) {
 				// See comment in Container.internalRender()
 				element.style.minHeight = '-webkit-min-content';
 			}
@@ -185,7 +183,7 @@ export class ColumnSet extends Core.CardElementContainer {
 			var totalWeight: number = 0;
 
 			for (let column of this._columns) {
-				if (column.width instanceof Utils.SizeAndUnit && (column.width.unit == Enums.SizeUnit.Weight)) {
+				if (column.width instanceof SizeAndUnit && (column.width.unit == Enums.SizeUnit.Weight)) {
 					totalWeight += column.width.physicalSize;
 				}
 			}
@@ -193,7 +191,7 @@ export class ColumnSet extends Core.CardElementContainer {
 			var renderedColumnCount: number = 0;
 
 			for (let column of this._columns) {
-				if (column.width instanceof Utils.SizeAndUnit && column.width.unit == Enums.SizeUnit.Weight && totalWeight > 0) {
+				if (column.width instanceof SizeAndUnit && column.width.unit == Enums.SizeUnit.Weight && totalWeight > 0) {
 					var computedWeight = 100 / totalWeight * column.width.physicalSize;
 
 					// Best way to emulate "internal" access I know of

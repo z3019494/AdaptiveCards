@@ -6,7 +6,7 @@ import * as Enums from "./enums";
  * @license MIT license
  * @link http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
  **/
-export class UUID {
+class UUID {
 	private static lut = [];
 
 	static generate(): string {
@@ -41,226 +41,226 @@ export interface IInput {
 	value: string;
 }
 
-export class Utils {
-	// Private members
+function findBreakableIndices(html: string): Array<number> {
+	var results: Array<number> = [];
+	var idx = findNextCharacter(html, -1);
 
-	private static findBreakableIndices(html: string): Array<number> {
-		var results: Array<number> = [];
-		var idx = Utils.findNextCharacter(html, -1);
-	
-		while (idx < html.length) {
-			if (html[idx] == ' ') {
-				results.push(idx);
-			}
-	
-			idx = Utils.findNextCharacter(html, idx);
+	while (idx < html.length) {
+		if (html[idx] == ' ') {
+			results.push(idx);
 		}
-	
-		return results;
-	}
-	
-	private static findNextCharacter(html: string, currIdx: number): number {
-		currIdx += 1;
-	
-		// If we found the start of an HTML tag, keep advancing until we get
-		// past it, so we don't end up truncating in the middle of the tag
-		while (currIdx < html.length && html[currIdx] == '<') {
-			while (currIdx < html.length && html[currIdx++] != '>');
-		}
-	
-		return currIdx;
-	}
-	
-	static getFitStatus(element: HTMLElement, containerEnd: number): Enums.ContainerFitStatus {
-		var start = element.offsetTop;
-		var end = start + element.clientHeight;
-	
-		if (end <= containerEnd) {
-			return Enums.ContainerFitStatus.FullyInContainer;
-		}
-		else if (start < containerEnd) {
-			return Enums.ContainerFitStatus.Overflowing;
-		}
-		else {
-			return Enums.ContainerFitStatus.FullyOutOfContainer;
-		}
+
+		idx = findNextCharacter(html, idx);
 	}
 
-	// Public members
+	return results;
+}
 
-	static ContentTypes = {
-		applicationJson: "application/json",
-		applicationXWwwFormUrlencoded: "application/x-www-form-urlencoded"
+function findNextCharacter(html: string, currIdx: number): number {
+	currIdx += 1;
+
+	// If we found the start of an HTML tag, keep advancing until we get
+	// past it, so we don't end up truncating in the middle of the tag
+	while (currIdx < html.length && html[currIdx] == '<') {
+		while (currIdx < html.length && html[currIdx++] != '>');
 	}
-	
-	static getValueOrDefault<T>(obj: any, defaultValue: T): T {
-		return obj ? <T>obj : defaultValue;
+
+	return currIdx;
+}
+
+export function getFitStatus(element: HTMLElement, containerEnd: number): Enums.ContainerFitStatus {
+	var start = element.offsetTop;
+	var end = start + element.clientHeight;
+
+	if (end <= containerEnd) {
+		return Enums.ContainerFitStatus.FullyInContainer;
 	}
-	
-	static isNullOrEmpty(value: string): boolean {
-		return value === undefined || value === null || value === "";
+	else if (start < containerEnd) {
+		return Enums.ContainerFitStatus.Overflowing;
 	}
-	
-	static appendChild(node: Node, child: Node) {
-		if (child != null && child != undefined) {
-			node.appendChild(child);
-		}
+	else {
+		return Enums.ContainerFitStatus.FullyOutOfContainer;
 	}
-	
-	static setProperty(target: any, propertyName: string, propertyValue: any, defaultValue: any = undefined) {
-		if (propertyValue && (!defaultValue || defaultValue !== propertyValue)) {
-			target[propertyName] = propertyValue;
-		}
+}
+
+export const ContentTypes = {
+	applicationJson: "application/json",
+	applicationXWwwFormUrlencoded: "application/x-www-form-urlencoded"
+}
+
+export function getValueOrDefault<T>(obj: any, defaultValue: T): T {
+	return obj ? <T>obj : defaultValue;
+}
+
+export function isNullOrEmpty(value: string): boolean {
+	return value === undefined || value === null || value === "";
+}
+
+export function appendChild(node: Node, child: Node) {
+	if (child != null && child != undefined) {
+		node.appendChild(child);
 	}
-	
-	static setEnumProperty(enumType: { [s: number]: string }, target: any, propertyName: string, propertyValue: number, defaultValue?: number) {
-		if (defaultValue === undefined || defaultValue !== propertyValue) {
-			target[propertyName] = enumType[propertyValue];
-		}
+}
+
+export function setProperty(target: any, propertyName: string, propertyValue: any, defaultValue: any = undefined) {
+	if (propertyValue && (!defaultValue || defaultValue !== propertyValue)) {
+		target[propertyName] = propertyValue;
 	}
-	
-	static getEnumValueOrDefault(targetEnum: { [s: number]: string }, name: string, defaultValue: number): number {
-		if (Utils.isNullOrEmpty(name)) {
-			return defaultValue;
-		}
-	
-		for (var key in targetEnum) {
-			let isValueProperty = parseInt(key, 10) >= 0
-	
-			if (isValueProperty) {
-				let value = targetEnum[key];
-	
-				if (value && typeof value === "string") {
-					if (value.toLowerCase() === name.toLowerCase()) {
-						return parseInt(key, 10);
-					}
-				}
-			}
-		}
-	
+}
+
+export function setEnumProperty(enumType: { [s: number]: string }, target: any, propertyName: string, propertyValue: number, defaultValue?: number) {
+	if (defaultValue === undefined || defaultValue !== propertyValue) {
+		target[propertyName] = enumType[propertyValue];
+	}
+}
+
+export function getEnumValueOrDefault(targetEnum: { [s: number]: string }, name: string, defaultValue: number): number {
+	if (isNullOrEmpty(name)) {
 		return defaultValue;
 	}
-	
-	static parseHostConfigEnum(targetEnum: { [s: number]: string }, value: string | number, defaultValue: any): any {
-		if (typeof value === "string") {
-			return Utils.getEnumValueOrDefault(targetEnum, value, defaultValue);
-		} else if (typeof value === "number") {
-			return Utils.getValueOrDefault<typeof targetEnum>(value, defaultValue);
-		} else {
-			return defaultValue;
-		}
-	}
-	
-	static renderSeparation(separationDefinition: ISeparationDefinition, orientation: Enums.Orientation): HTMLElement {
-		if (separationDefinition.spacing > 0 || separationDefinition.lineThickness > 0) {
-			var separator = document.createElement("div");
-	
-			if (orientation == Enums.Orientation.Horizontal) {
-				if (separationDefinition.lineThickness) {
-					separator.style.marginTop = (separationDefinition.spacing / 2) + "px";
-					separator.style.paddingTop = (separationDefinition.spacing / 2) + "px";
-					separator.style.borderTop = separationDefinition.lineThickness + "px solid " + Utils.stringToCssColor(separationDefinition.lineColor);
-				}
-				else {
-					separator.style.height = separationDefinition.spacing + "px";
+
+	for (var key in targetEnum) {
+		let isValueProperty = parseInt(key, 10) >= 0
+
+		if (isValueProperty) {
+			let value = targetEnum[key];
+
+			if (value && typeof value === "string") {
+				if (value.toLowerCase() === name.toLowerCase()) {
+					return parseInt(key, 10);
 				}
 			}
-			else {
-				if (separationDefinition.lineThickness) {
-					separator.style.marginLeft = (separationDefinition.spacing / 2) + "px";
-					separator.style.paddingLeft = (separationDefinition.spacing / 2) + "px";
-					separator.style.borderLeft = separationDefinition.lineThickness + "px solid " + Utils.stringToCssColor(separationDefinition.lineColor);
-				}
-				else {
-					separator.style.width = separationDefinition.spacing + "px";
-				}
-			}
-	
-			separator.style.overflow = "hidden";
-	
-			return separator;
-		}
-		else {
-			return null;
-		}
-	}
-	
-	static stringToCssColor(color: string): string {
-		var regEx = /#([0-9A-F]{2})([0-9A-F]{2})([0-9A-F]{2})([0-9A-F]{2})?/gi;
-	
-		var matches = regEx.exec(color);
-	
-		if (matches && matches[4]) {
-			var a = parseInt(matches[1], 16) / 255;
-			var r = parseInt(matches[2], 16);
-			var g = parseInt(matches[3], 16);
-			var b = parseInt(matches[4], 16);
-	
-			return "rgba(" + r + "," + g + "," + b + "," + a + ")";
-		}
-		else {
-			return color;
 		}
 	}
 
-	static truncate(element: HTMLElement,
-		maxHeight: number,
-		lineHeight?: number) {
-		var fits = () => {
-			// Allow a one pixel overflow to account for rounding differences
-			// between browsers
-			return maxHeight - element.scrollHeight >= -1.0;
-		};
-	
-		if (fits()) return;
-	
-		var fullText = element.innerHTML;
-		var truncateAt = (idx) => {
-			element.innerHTML = fullText.substring(0, idx) + '...';
-		}
-	
-		var breakableIndices = Utils.findBreakableIndices(fullText);
-		var lo = 0;
-		var hi = breakableIndices.length;
-		var bestBreakIdx = 0;
-	
-		// Do a binary search for the longest string that fits
-		while (lo < hi) {
-			var mid = Math.floor((lo + hi) / 2);
-			truncateAt(breakableIndices[mid]);
-	
-			if (fits()) {
-				bestBreakIdx = breakableIndices[mid];
-				lo = mid + 1;
+	return defaultValue;
+}
+
+export function parseHostConfigEnum(targetEnum: { [s: number]: string }, value: string | number, defaultValue: any): any {
+	if (typeof value === "string") {
+		return getEnumValueOrDefault(targetEnum, value, defaultValue);
+	}
+	else if (typeof value === "number") {
+		return getValueOrDefault<typeof targetEnum>(value, defaultValue);
+	}
+	else {
+		return defaultValue;
+	}
+}
+
+export function renderSeparation(separationDefinition: ISeparationDefinition, orientation: Enums.Orientation): HTMLElement {
+	if (separationDefinition.spacing > 0 || separationDefinition.lineThickness > 0) {
+		var separator = document.createElement("div");
+
+		if (orientation == Enums.Orientation.Horizontal) {
+			if (separationDefinition.lineThickness) {
+				separator.style.marginTop = (separationDefinition.spacing / 2) + "px";
+				separator.style.paddingTop = (separationDefinition.spacing / 2) + "px";
+				separator.style.borderTop = separationDefinition.lineThickness + "px solid " + stringToCssColor(separationDefinition.lineColor);
 			}
 			else {
-				hi = mid;
+				separator.style.height = separationDefinition.spacing + "px";
 			}
 		}
-	
-		truncateAt(bestBreakIdx);
-	
-		// If we have extra room, try to expand the string letter by letter
-		// (covers the case where we have to break in the middle of a long word)
-		if (lineHeight && maxHeight - element.scrollHeight >= lineHeight - 1.0) {
-			let idx = Utils.findNextCharacter(fullText, bestBreakIdx);
-	
-			while (idx < fullText.length) {
-				truncateAt(idx);
-	
-				if (fits()) {
-					bestBreakIdx = idx;
-					idx = Utils.findNextCharacter(fullText, idx);
-				}
-				else {
-					break;
-				}
+		else {
+			if (separationDefinition.lineThickness) {
+				separator.style.marginLeft = (separationDefinition.spacing / 2) + "px";
+				separator.style.paddingLeft = (separationDefinition.spacing / 2) + "px";
+				separator.style.borderLeft = separationDefinition.lineThickness + "px solid " + stringToCssColor(separationDefinition.lineColor);
 			}
-	
-			truncateAt(bestBreakIdx);
+			else {
+				separator.style.width = separationDefinition.spacing + "px";
+			}
 		}
-	}	
+
+		separator.style.overflow = "hidden";
+
+		return separator;
+	}
+	else {
+		return null;
+	}
 }
+
+export function stringToCssColor(color: string): string {
+	var regEx = /#([0-9A-F]{2})([0-9A-F]{2})([0-9A-F]{2})([0-9A-F]{2})?/gi;
+
+	var matches = regEx.exec(color);
+
+	if (matches && matches[4]) {
+		var a = parseInt(matches[1], 16) / 255;
+		var r = parseInt(matches[2], 16);
+		var g = parseInt(matches[3], 16);
+		var b = parseInt(matches[4], 16);
+
+		return "rgba(" + r + "," + g + "," + b + "," + a + ")";
+	}
+	else {
+		return color;
+	}
+}
+
+export function truncate(element: HTMLElement,
+	maxHeight: number,
+	lineHeight?: number) {
+	var fits = () => {
+		// Allow a one pixel overflow to account for rounding differences
+		// between browsers
+		return maxHeight - element.scrollHeight >= -1.0;
+	};
+
+	if (fits()) return;
+
+	var fullText = element.innerHTML;
+	var truncateAt = (idx) => {
+		element.innerHTML = fullText.substring(0, idx) + '...';
+	}
+
+	var breakableIndices = findBreakableIndices(fullText);
+	var lo = 0;
+	var hi = breakableIndices.length;
+	var bestBreakIdx = 0;
+
+	// Do a binary search for the longest string that fits
+	while (lo < hi) {
+		var mid = Math.floor((lo + hi) / 2);
+		truncateAt(breakableIndices[mid]);
+
+		if (fits()) {
+			bestBreakIdx = breakableIndices[mid];
+			lo = mid + 1;
+		}
+		else {
+			hi = mid;
+		}
+	}
+
+	truncateAt(bestBreakIdx);
+
+	// If we have extra room, try to expand the string letter by letter
+	// (covers the case where we have to break in the middle of a long word)
+	if (lineHeight && maxHeight - element.scrollHeight >= lineHeight - 1.0) {
+		let idx = findNextCharacter(fullText, bestBreakIdx);
+
+		while (idx < fullText.length) {
+			truncateAt(idx);
+
+			if (fits()) {
+				bestBreakIdx = idx;
+				idx = findNextCharacter(fullText, idx);
+			}
+			else {
+				break;
+			}
+		}
+
+		truncateAt(bestBreakIdx);
+	}
+}
+
+export function generateUniqueId(): string {
+	return "__ac-" + UUID.generate();
+}	
 
 export class StringWithSubstitutions {
 	private _isProcessed: boolean = false;
@@ -290,11 +290,11 @@ export class StringWithSubstitutions {
 					valueForReplace = matchedInput.value;
 				}
 
-				if (contentType === Utils.ContentTypes.applicationJson) {
+				if (contentType === ContentTypes.applicationJson) {
 					valueForReplace = JSON.stringify(valueForReplace);
 					valueForReplace = valueForReplace.slice(1, -1);
 				}
-				else if (contentType === Utils.ContentTypes.applicationXWwwFormUrlencoded) {
+				else if (contentType === ContentTypes.applicationXWwwFormUrlencoded) {
 					valueForReplace = encodeURIComponent(valueForReplace);
 				}
 

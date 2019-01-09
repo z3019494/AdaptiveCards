@@ -9,7 +9,7 @@
     "release": "hexo clean && hexo generate"
   },
   "hexo": {
-    "version": "3.8.0"
+    "version": "3.7.1"
   },
   "devDependencies": {
     "change-case": "^3.0.1",
