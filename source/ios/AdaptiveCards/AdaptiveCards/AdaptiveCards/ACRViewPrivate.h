@@ -33,4 +33,5 @@ typedef void (^ObserverActionBlockForBaseAction)(NSObject<ACOIResourceResolver> 
 
 - (void)loadImageAccordingToResourceResolverIF:(std::shared_ptr<BaseCardElement> const &)elem
     key:(NSString *)key observerAction:(ObserverActionBlock)observerAction;
+
 @end

@@ -12,6 +12,7 @@
 #import "ACOHostConfig.h"
 #import "ACRColumnView.h"
 #import "ACRIMedia.h"
+#import "BackgroundImage.h"
 
 @interface ACRView:ACRColumnView
 
@@ -39,4 +40,6 @@
 - (UIView *)render;
 
 - (void)waitForAsyncTasksToFinish;
+
++ (void) applyBackgroundImageConstraints:(const AdaptiveCards::BackgroundImage *)backgroundImageProperties image:(UIImage *)image imageView:(UIView *)imageView parentView:(UIView *)parentView;
 @end

@@ -78,8 +78,8 @@
 		6BF4307C219126CD0068E432 /* ACRQuickActionMultilineView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6BF4307B219126CD0068E432 /* ACRQuickActionMultilineView.xib */; };
 		6BF4307F219129600068E432 /* ACRQuickReplyMultilineView.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BF4307D219129600068E432 /* ACRQuickReplyMultilineView.h */; };
 		6BF43080219129600068E432 /* ACRQuickReplyMultilineView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6BF4307E219129600068E432 /* ACRQuickReplyMultilineView.mm */; };
-		7EB981C321C309C20098A392 /* BackgroundImage.h in Headers */ = {isa = PBXBuildFile; fileRef = 7EB981C121C309C20098A392 /* BackgroundImage.h */; };
-		7EB981C421C309C20098A392 /* BackgroundImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7EB981C221C309C20098A392 /* BackgroundImage.cpp */; };
+		7EB981EB21E402E80098A392 /* BackgroundImage.h in Headers */ = {isa = PBXBuildFile; fileRef = 7EB981E921E402E70098A392 /* BackgroundImage.h */; };
+		7EB981EC21E402E80098A392 /* BackgroundImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7EB981EA21E402E80098A392 /* BackgroundImage.cpp */; };
 		7ECFB63D219109B0004727A9 /* EnumMagic.h in Headers */ = {isa = PBXBuildFile; fileRef = 7ECFB63C219109B0004727A9 /* EnumMagic.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7ECFB640219A3940004727A9 /* ParseContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7ECFB63E219A3940004727A9 /* ParseContext.cpp */; };
 		7ECFB641219A3940004727A9 /* ParseContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 7ECFB63F219A3940004727A9 /* ParseContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -364,8 +364,8 @@
 		6BF4307B219126CD0068E432 /* ACRQuickActionMultilineView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ACRQuickActionMultilineView.xib; sourceTree = "<group>"; };
 		6BF4307D219129600068E432 /* ACRQuickReplyMultilineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ACRQuickReplyMultilineView.h; sourceTree = "<group>"; };
 		6BF4307E219129600068E432 /* ACRQuickReplyMultilineView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ACRQuickReplyMultilineView.mm; sourceTree = "<group>"; };
-		7EB981C121C309C20098A392 /* BackgroundImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BackgroundImage.h; sourceTree = "<group>"; };
-		7EB981C221C309C20098A392 /* BackgroundImage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BackgroundImage.cpp; sourceTree = "<group>"; };
+		7EB981E921E402E70098A392 /* BackgroundImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BackgroundImage.h; path = ../../../../shared/cpp/ObjectModel/BackgroundImage.h; sourceTree = "<group>"; };
+		7EB981EA21E402E80098A392 /* BackgroundImage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BackgroundImage.cpp; path = ../../../../shared/cpp/ObjectModel/BackgroundImage.cpp; sourceTree = "<group>"; };
 		7ECFB63A219106E1004727A9 /* EnumMagic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EnumMagic.h; path = ../../../../shared/cpp/ObjectModel/EnumMagic.h; sourceTree = "<group>"; };
 		7ECFB63C219109B0004727A9 /* EnumMagic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = EnumMagic.h; path = ../../../shared/cpp/ObjectModel/EnumMagic.h; sourceTree = "<group>"; };
 		7ECFB63E219A3940004727A9 /* ParseContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParseContext.cpp; path = ../../../../shared/cpp/ObjectModel/ParseContext.cpp; sourceTree = "<group>"; };
@@ -723,8 +723,8 @@
 		F423C0D71EE1FF2F00905679 /* SharedLib */ = {
 			isa = PBXGroup;
 			children = (
-				7EB981C221C309C20098A392 /* BackgroundImage.cpp */,
-				7EB981C121C309C20098A392 /* BackgroundImage.h */,
+				7EB981EA21E402E80098A392 /* BackgroundImage.cpp */,
+				7EB981E921E402E70098A392 /* BackgroundImage.h */,
 				300ECB61219A12D100371DC5 /* AdaptiveBase64Util.cpp */,
 				300ECB62219A12D100371DC5 /* AdaptiveBase64Util.h */,
 				7ECFB63E219A3940004727A9 /* ParseContext.cpp */,
@@ -989,7 +989,7 @@
 				F44873201EE2261F00FCAFAE /* ShowCardAction.h in Headers */,
 				F448731B1EE2261F00FCAFAE /* OpenUrlAction.h in Headers */,
 				F44873191EE2261F00FCAFAE /* NumberInput.h in Headers */,
-				7EB981C321C309C20098A392 /* BackgroundImage.h in Headers */,
+				7EB981EB21E402E80098A392 /* BackgroundImage.h in Headers */,
 				F44873151EE2261F00FCAFAE /* ImageSet.h in Headers */,
 				F44873131EE2261F00FCAFAE /* Image.h in Headers */,
 				F448730F1EE2261F00FCAFAE /* HostConfig.h in Headers */,
@@ -1360,7 +1360,7 @@
 				F42741251EFB274C00399FBB /* ACRColumnRenderer.mm in Sources */,
 				F4F255701F98247600A80D39 /* ACOBaseActionElement.mm in Sources */,
 				6BF43080219129600068E432 /* ACRQuickReplyMultilineView.mm in Sources */,
-				7EB981C421C309C20098A392 /* BackgroundImage.cpp in Sources */,
+				7EB981EC21E402E80098A392 /* BackgroundImage.cpp in Sources */,
 				6B9BDF7320E1BD0E00F13155 /* ACRToggleInputDataSource.mm in Sources */,
 				F4C1F5DA1F218ABC0018CB78 /* ACRInputTimeRenderer.mm in Sources */,
 				F4D402121F7DAC2C00D0356B /* ACOAdaptiveCardParseResult.mm in Sources */,

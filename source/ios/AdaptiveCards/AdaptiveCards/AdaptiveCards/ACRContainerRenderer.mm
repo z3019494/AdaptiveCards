@@ -79,4 +79,19 @@
     return viewGroup;
 }
 
+- (void)configUpdateForUIImageView:(ACOBaseCardElement *)acoElem
+                            config:(ACOHostConfig *)acoConfig
+                             image:(UIImage *)image
+                         imageView:(UIImageView *)imageView
+{
+    std::shared_ptr<BaseCardElement> elem = [acoElem element];
+    std::shared_ptr<Container> containerElem = std::dynamic_pointer_cast<Container>(elem);
+    auto backgroundImage = containerElem->GetBackgroundImage();
+    
+    [ACRView applyBackgroundImageConstraints:backgroundImage.get()
+                                       image:image
+                                   imageView:imageView
+                                  parentView:nil]; // STILL NEED A PARENT VIEW HERE
+}
+
 @end

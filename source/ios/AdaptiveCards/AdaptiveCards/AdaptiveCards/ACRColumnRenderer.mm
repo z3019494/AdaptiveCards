@@ -85,4 +85,19 @@
     return column;
 }
 
+- (void)configUpdateForUIImageView:(ACOBaseCardElement *)acoElem
+                            config:(ACOHostConfig *)acoConfig
+                             image:(UIImage *)image
+                         imageView:(UIImageView *)imageView
+{
+    std::shared_ptr<BaseCardElement> elem = [acoElem element];
+    std::shared_ptr<Column> columnElem = std::dynamic_pointer_cast<Column>(elem);
+    auto backgroundImage = columnElem->GetBackgroundImage();
+    
+    [ACRView applyBackgroundImageConstraints:backgroundImage.get()
+                                       image:image
+                                   imageView:imageView
+                                  parentView:nil]; // STILL NEED A PARENT VIEW HERE
+}
+
 @end
