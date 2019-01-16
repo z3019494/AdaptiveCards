@@ -38,5 +38,11 @@ namespace AdaptiveCards
 #endif
         [DefaultValue(null)]
         public AdaptiveAction SelectAction { get; set; }
+
+        public bool Bleed
+        {
+            get { return MarginFromParent != null && MarginFromParent.Left == AdaptiveSpacing.None; }
+            set { MarginFromParent = new AdaptiveThickness(AdaptiveSpacing.None); }
+        }
     }
 }

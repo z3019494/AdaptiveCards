@@ -147,6 +147,12 @@ namespace AdaptiveCards
             }
             set { Height = new AdaptiveHeight(value); }
         }
+
+        public bool Bleed
+        {
+            get { return MarginFromParent != null && MarginFromParent.Left == AdaptiveSpacing.None; }
+            set { MarginFromParent = new AdaptiveThickness(AdaptiveSpacing.None); }
+        }
     }
 
 }

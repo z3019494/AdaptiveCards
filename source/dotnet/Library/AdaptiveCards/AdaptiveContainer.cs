@@ -71,5 +71,11 @@ namespace AdaptiveCards
 #endif
         [DefaultValue(typeof(AdaptiveVerticalContentAlignment), "top")]
         public AdaptiveVerticalContentAlignment VerticalContentAlignment { get; set; }
+
+        public bool Bleed
+        {
+            get { return MarginFromParent != null && MarginFromParent.Left == AdaptiveSpacing.None; }
+            set { MarginFromParent = new AdaptiveThickness(AdaptiveSpacing.None); }
+        }
     }
 }
