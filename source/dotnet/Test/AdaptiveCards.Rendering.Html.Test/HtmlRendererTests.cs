@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 
 namespace AdaptiveCards.Rendering.Html.Test
 {
@@ -27,6 +28,55 @@ namespace AdaptiveCards.Rendering.Html.Test
                 generatedHtml);
         }
 
+        [TestMethod]
+        public void TestUrlEncodingProperly()
+        {
+            var cardJson = @"{  
+    ""type"":""AdaptiveCard"",
+    ""version"":""1.0"",
+    ""body"":[
+         {  
+            ""type"":""Image"",
+            ""url"":""https://www.bing.com/th?u=https%3a%2f%2fsafetymoments-a1ea.azurewebsites.net%2fimages%2fOsha1.jpg&ehk=A8%2bdSDm336vG%2b3Vw4xoRUQ&p=0&pid=CortSkills&w=360""
+        }
+    ],
+    ""actions"":[
+        {  
+            ""type"":""Action.OpenUrl"",
+            ""url"":""https://www.osha.gov/SLTC/fallprotection/index.html"",
+            ""title"":""More at www.osha.gov""
+        },
+        {  
+            ""type"":""Action.OpenUrl"",
+            ""url"":""http://www.octavianit.com/p/safetymoments.html"",
+            ""title"":""About Safety Moments""
+        }
+    ]
+}";
+
+            var imageJson = @" {  
+            ""type"":""Image"",
+            ""url"":""https://www.bing.com/th?u=https%3a%2f%2fsafetymoments-a1ea.azurewebsites.net%2fimages%2fOsha1.jpg&ehk=A8%2bdSDm336vG%2b3Vw4xoRUQ&p=0&pid=CortSkills&w=360""
+        }";
+
+
+
+            var renderContext = new AdaptiveRenderContext(
+              new AdaptiveHostConfig(),
+              new AdaptiveElementRenderers<HtmlTag, AdaptiveRenderContext>());
+
+            var image = JsonConvert.DeserializeObject<AdaptiveImage>(imageJson);
+
+            //var image = new AdaptiveImage
+            //{
+            //    Url = new System.Uri("https://www.bing.com/th?u=https%3a%2f%2fsafetymoments-a1ea.azurewebsites.net%2fimages%2fOsha1.jpg&ehk=A8%2bdSDm336vG%2b3Vw4xoRUQ&p=0&pid=CortSkills&w=360")
+            //};
+
+
+            var imageHtml = TestHtmlRenderer.CallImageRender(image, renderContext).ToString();
+            StringAssert.Contains(imageHtml, "https://www.bing.com/th?u=https%3a%2f%2fsafetymoments-a1ea.azurewebsites.net%2fimages%2fOsha1.jpg&ehk=A8%2bdSDm336vG%2b3Vw4xoRUQ&p=0&pid=CortSkills&w=360");
+
+        }
 
 
         private class TestHtmlRenderer : AdaptiveCardRenderer
@@ -39,6 +89,11 @@ namespace AdaptiveCards.Rendering.Html.Test
             public static HtmlTag CallTextBlockRender(AdaptiveTextBlock element, AdaptiveRenderContext context)
             {
                 return TextBlockRender(element, context);
+            }
+
+            public static HtmlTag CallImageRender(AdaptiveImage element, AdaptiveRenderContext context)
+            {
+                return ImageRender(element, context);
             }
 
             public static HtmlTag CallChoiceSetInputRender(AdaptiveChoiceSetInput element, AdaptiveRenderContext context)
