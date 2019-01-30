@@ -52,7 +52,7 @@ namespace AdaptiveCards
         [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
 #endif
         [JsonIgnore]
-        public string BackgroundImageString
+        public string UrlString
         {
             get { return Url?.ToString(); }
             set { Url = new Uri(value); }
@@ -89,6 +89,11 @@ namespace AdaptiveCards
             {
                 return false;
             }
+        }
+
+        public static implicit operator AdaptiveBackgroundImage(Uri backgroundImageUrl)
+        {
+            return new AdaptiveBackgroundImage(backgroundImageUrl);
         }
     }
 }

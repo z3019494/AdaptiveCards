@@ -16,7 +16,7 @@ namespace AdaptiveCards
             AdaptiveBackgroundImage bi = (AdaptiveBackgroundImage) value;
             if (bi.HasDefaultValues())
             {
-                writer.WriteValue(bi.BackgroundImageString);
+                writer.WriteValue(bi.UrlString);
             }
             else
             {
