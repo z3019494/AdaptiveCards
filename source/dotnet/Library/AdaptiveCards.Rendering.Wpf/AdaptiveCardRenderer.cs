@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
 using System.Windows.Media;
+using WebSubClientLibrary;
 
 namespace AdaptiveCards.Rendering.Wpf
 {
@@ -206,6 +207,12 @@ namespace AdaptiveCards.Rendering.Wpf
         public RenderedAdaptiveCard RenderCard(AdaptiveCard card)
         {
             if (card == null) throw new ArgumentNullException(nameof(card));
+
+            if (card.Source != null)
+            {
+                return RenderRemoteCard(card);
+            }
+
             RenderedAdaptiveCard renderCard = null;
 
             //card.ResolveData(new ResolveContext()
@@ -249,6 +256,48 @@ namespace AdaptiveCards.Rendering.Wpf
 
 
             return renderCard;
+        }
+
+        private RenderedAdaptiveCard RenderRemoteCard(AdaptiveCard card)
+        {
+            try
+            {
+                var dispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
+                Border elementContainer = new Border()
+                {
+                    Child = new TextBlock()
+                    {
+                        Text = "Loading...",
+                        Margin = new Thickness(12)
+                    }
+                };
+                RenderedAdaptiveCard answer = new RenderedAdaptiveCard(elementContainer, card, new List<AdaptiveWarning>(), new Dictionary<string, Func<string>>());
+                string source = card.Source;
+                WebSubClient.GetAndSubscribe(new Uri(source), (newJson) =>
+                {
+                    dispatcher.Invoke(delegate
+                    {
+                        try
+                        {
+                            AdaptiveCard newCard = AdaptiveCard.FromJson(newJson).Card;
+                            elementContainer.Child = RenderCard(newCard).FrameworkElement;
+                        }
+                        catch (Exception ex)
+                        {
+                            elementContainer.Child = new TextBlock()
+                            {
+                                Text = ex.ToString(),
+                                TextWrapping = TextWrapping.Wrap
+                            };
+                        }
+                    });
+                });
+                return answer;
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         /// <summary>

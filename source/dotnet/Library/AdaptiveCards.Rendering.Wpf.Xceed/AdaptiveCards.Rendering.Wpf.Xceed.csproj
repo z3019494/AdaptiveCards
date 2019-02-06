@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net4.5.2</TargetFramework>
+    <TargetFramework>net461</TargetFramework>
     <Authors>Microsoft</Authors>
     <Summary>Adaptive Card renderer for WPF with enhanced input controls provided by the Xceed WPF toolkit</Summary>
     <Description>This library implements classes for rendering Adaptive Cards into WPF controls</Description>

@@ -1,0 +1,3 @@
+[submodule "source/WebSubForClients"]
+	path = source/WebSubForClients
+	url = https://github.com/andrewleader/WebSubForClients

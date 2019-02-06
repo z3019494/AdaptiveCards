@@ -227,6 +227,8 @@ namespace AdaptiveCards
         [DefaultValue(typeof(AdaptiveHeight), "auto")]
         public AdaptiveHeight Height { get; set; }
 
+        public string Source { get; set; }
+
         /// <summary>
         /// Parse an AdaptiveCard from a JSON string
         /// </summary>
@@ -234,6 +236,18 @@ namespace AdaptiveCards
         /// <returns></returns>
         public static AdaptiveCardParseResult FromJson(string json)
         {
+            var jObj = JObject.Parse(json);
+            if (jObj.TryGetValue("source", out JToken sourceValue) && sourceValue.Type == JTokenType.String)
+            {
+                return new AdaptiveCardParseResult()
+                {
+                    Card = new AdaptiveCard()
+                    {
+                        Source = sourceValue.Value<string>()
+                    }
+                };
+            }
+
             var parseResult = new AdaptiveCardParseResult();
 
             try
