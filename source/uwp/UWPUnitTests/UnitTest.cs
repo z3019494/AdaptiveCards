@@ -1,3 +1,4 @@
+using AdaptiveCards.Rendering.Uwp;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using UWPTestLibrary;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Core;
+using Windows.Data.Json;
 using Windows.Storage;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -38,7 +40,7 @@ namespace UWPUnitTests
         }
 
         [TestMethod]
-        public async Task TestMethod()
+        public async Task TestAllCards()
         {
             _expectedFolder = (TestContext.Properties["ExpectedFolder"] as StorageFolder);
             _tempResultsFolder = (TestContext.Properties["ResultsFolder"] as StorageFolder);
@@ -111,7 +113,7 @@ namespace UWPUnitTests
 
         async public Task TestCard(FileViewModel hostConfigFile, FileViewModel cardFile)
         {
-            var renderResult = await UWPTestLibrary.RenderTestHelpers.RenderCard(cardFile, hostConfigFile);
+            var renderResult = await UWPTestLibrary.RenderTestHelpers.RenderCard(cardFile, hostConfigFile, new Dictionary<string, AdaptiveCards.Rendering.Uwp.IAdaptiveCardResourceResolver>());
 
             if (renderResult.Tree != null)
             {
@@ -154,7 +156,7 @@ namespace UWPUnitTests
             if ((result.Status != TestStatus.Passed) &&
                 (result.Status != TestStatus.PassedButSourceWasChanged))
             {
-                throw new Exception(result.Status.ToString() + ": " + result.HostConfigName + "\\"  + result.CardName);
+                throw new Exception(result.Status.ToString() + ": " + result.HostConfigName + "\\" + result.CardName);
             }
         }
     }

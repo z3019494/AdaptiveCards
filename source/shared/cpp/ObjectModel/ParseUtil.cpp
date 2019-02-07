@@ -26,7 +26,6 @@ namespace AdaptiveSharedNamespace
         }
     }
 
-    // TODO: Remove? This code path might not be desirable going forward depending on how we decide to support forward compat. Task 10893205
     std::string ParseUtil::GetTypeAsString(const Json::Value& json)
     {
         std::string typeKey = "type";
@@ -75,6 +74,18 @@ namespace AdaptiveSharedNamespace
         }
 
         return propertyValue.asString();
+    }
+
+    std::string ParseUtil::GetString(const Json::Value& json, AdaptiveCardSchemaKey key, const std::string& defaultValue, bool isRequired)
+    {
+        std::string parseResult = GetString(json, key, isRequired);
+
+        if (parseResult.empty())
+        {
+            return defaultValue;
+        }
+
+        return parseResult;
     }
 
     std::string ParseUtil::GetJsonString(const Json::Value& json, AdaptiveCardSchemaKey key, bool isRequired)
@@ -268,7 +279,7 @@ namespace AdaptiveSharedNamespace
         }
         catch (const AdaptiveCardParseException&)
         {
-            return CardElementType::Unsupported;
+            return CardElementType::Unknown;
         }
     }
 
@@ -404,6 +415,10 @@ namespace AdaptiveSharedNamespace
         std::string typeString = GetTypeAsString(json);
 
         auto parser = context.actionParserRegistration->GetParser(typeString);
+        if (parser == nullptr)
+        {
+            parser = context.actionParserRegistration->GetParser("UnknownAction");
+        }
 
         // Parse it if it's allowed by the current parsers
         if (parser != nullptr)

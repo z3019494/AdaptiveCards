@@ -422,6 +422,81 @@ namespace AdaptiveCards.Test
         }
 
         [TestMethod]
+        public void BackgroundImage()
+        {
+            var card = new AdaptiveCard("1.2");
+            card.BackgroundImage = new AdaptiveBackgroundImage("http://adaptivecards.io/content/cats/1.png", AdaptiveBackgroundImageMode.Repeat, AdaptiveHorizontalAlignment.Right, AdaptiveVerticalAlignment.Bottom);
+
+            var columnSet = new AdaptiveColumnSet();
+            var column1 = new AdaptiveColumn();
+            column1.BackgroundImage = new AdaptiveBackgroundImage("http://adaptivecards.io/content/cats/1.png", AdaptiveBackgroundImageMode.RepeatVertically, AdaptiveHorizontalAlignment.Center, AdaptiveVerticalAlignment.Top);
+            columnSet.Columns.Add(column1);
+            var column2 = new AdaptiveColumn();
+            column2.BackgroundImage = new AdaptiveBackgroundImage("http://adaptivecards.io/content/cats/2.png", AdaptiveBackgroundImageMode.Stretch, AdaptiveHorizontalAlignment.Right, AdaptiveVerticalAlignment.Bottom);
+            columnSet.Columns.Add(column2);
+            card.Body.Add(columnSet);
+
+            var container1 = new AdaptiveContainer();
+            container1.BackgroundImage = new AdaptiveBackgroundImage("http://adaptivecards.io/content/cats/2.png", AdaptiveBackgroundImageMode.RepeatHorizontally, AdaptiveHorizontalAlignment.Left, AdaptiveVerticalAlignment.Center);
+            card.Body.Add(container1);
+
+            var container2 = new AdaptiveContainer();
+            container2.BackgroundImage = new AdaptiveBackgroundImage("http://adaptivecards.io/content/cats/3.png");
+            card.Body.Add(container2);
+
+            var expected = @"{
+  ""type"": ""AdaptiveCard"",
+  ""version"": ""1.2"",
+  ""backgroundImage"": {
+    ""url"": ""http://adaptivecards.io/content/cats/1.png"",
+    ""mode"": ""repeat"",
+    ""horizontalAlignment"": ""right"",
+    ""verticalAlignment"": ""bottom""
+  },
+  ""body"": [
+    {
+      ""type"": ""ColumnSet"",
+      ""columns"": [
+        {
+          ""type"": ""Column"",
+          ""backgroundImage"": {
+            ""url"": ""http://adaptivecards.io/content/cats/1.png"",
+            ""mode"": ""repeatVertically"",
+            ""horizontalAlignment"": ""center""
+          },
+          ""items"": []
+        },
+        {
+          ""type"": ""Column"",
+          ""backgroundImage"": {
+            ""url"": ""http://adaptivecards.io/content/cats/2.png"",
+            ""horizontalAlignment"": ""right"",
+            ""verticalAlignment"": ""bottom""
+          },
+          ""items"": []
+        }
+      ]
+    },
+    {
+      ""type"": ""Container"",
+      ""backgroundImage"": {
+        ""url"": ""http://adaptivecards.io/content/cats/2.png"",
+        ""mode"": ""repeatHorizontally"",
+        ""verticalAlignment"": ""center""
+      },
+      ""items"": []
+    },
+    {
+      ""type"": ""Container"",
+      ""backgroundImage"": ""http://adaptivecards.io/content/cats/3.png"",
+      ""items"": []
+    }
+  ]
+}";
+            Assert.AreEqual(expected, card.ToJson());
+        }
+
+        [TestMethod]
         public void MediaInvalid_ShouldThrowException()
         {
             var json = @"{
@@ -552,6 +627,99 @@ namespace AdaptiveCards.Test
                         PixelWidth = 20,
                         PixelHeight = 50
                     },
+                }
+            };
+
+            var actual = card.ToJson();
+            Assert.AreEqual(expected: expected, actual: actual);
+            var deserializedCard = AdaptiveCard.FromJson(expected).Card;
+            var deserializedActual = deserializedCard.ToJson();
+            Assert.AreEqual(expected: expected, actual: deserializedActual);
+        }
+
+        [TestMethod]
+        public void TargetElementSerialization()
+        {
+            string url = "http://adaptivecards.io/content/cats/1.png";
+            var expected = @"{
+  ""type"": ""AdaptiveCard"",
+  ""version"": ""1.2"",
+  ""id"": ""myCard"",
+  ""body"": [
+    {
+      ""type"": ""Image"",
+      ""url"": """ + url + @""",
+      ""selectAction"": {
+        ""type"": ""Action.ToggleVisibility"",
+        ""targetElements"": [
+          ""id1"",
+          {
+            ""elementId"": ""id2"",
+            ""isVisible"": false
+          },
+          {
+            ""elementId"": ""id3"",
+            ""isVisible"": true
+          },
+          {
+            ""elementId"": ""id4""
+          }
+        ]
+      }
+    }
+  ],
+  ""actions"": [
+    {
+      ""type"": ""Action.ToggleVisibility"",
+      ""targetElements"": [
+        ""id1"",
+        {
+          ""elementId"": ""id2"",
+          ""isVisible"": false
+        },
+        {
+          ""elementId"": ""id3"",
+          ""isVisible"": true
+        },
+        {
+          ""elementId"": ""id4""
+        }
+      ]
+    }
+  ]
+}";
+
+            var card = new AdaptiveCard("1.2")
+            {
+                Id = "myCard",
+                Body =
+                {
+                    new AdaptiveImage(url)
+                    {
+                        SelectAction = new AdaptiveToggleVisibilityAction()
+                        {
+                            TargetElements =
+                            {
+                                "id1",
+                                new AdaptiveTargetElement("id2", false),
+                                new AdaptiveTargetElement("id3", true),
+                                new AdaptiveTargetElement("id4")
+                            }
+                        }
+                    }
+                },
+                Actions =
+                {
+                    new AdaptiveToggleVisibilityAction()
+                    {
+                        TargetElements =
+                        {
+                            "id1",
+                            new AdaptiveTargetElement("id2", false),
+                            new AdaptiveTargetElement("id3", true),
+                            new AdaptiveTargetElement("id4")
+                        }
+                    }
                 }
             };
 

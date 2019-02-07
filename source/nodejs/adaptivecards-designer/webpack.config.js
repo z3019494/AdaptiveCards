@@ -3,6 +3,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const ConcatPlugin = require('webpack-concat-plugin');
 
 module.exports = (env, argv) => {
 	const mode = argv.mode || 'development';
@@ -25,15 +26,13 @@ module.exports = (env, argv) => {
 		},
 		devtool: devMode ? "inline-source-map" : "source-map",
 		devServer: {
-			contentBase: './dist',
-			port: 8001
+			contentBase: './dist'
 		},
 		resolve: {
 			extensions: [".ts", ".tsx", ".js"]
 		},
 		module: {
-			rules: [
-				{
+			rules: [{
 					test: /\.ts$/,
 					loader: "ts-loader",
 					exclude: /(node_modules|__tests__)/
@@ -55,6 +54,23 @@ module.exports = (env, argv) => {
 			}),
 			new MiniCssExtractPlugin({
 				filename: '[name].css'
+			}),
+			new CopyWebpackPlugin([{
+				from: 'src/adaptivecards-designer.css',
+				to: '.',
+				flatten: true
+			}]),
+			new CopyWebpackPlugin([{
+				from: 'node_modules/adaptivecards-controls/dist/adaptivecards-controls.css',
+				to: '.',
+				flatten: true
+			}]),
+			new ConcatPlugin({
+				uglify: false,
+				sourceMap: false,
+				fileName: 'adaptivecards-designer.css',
+				injectType: 'none',
+				filesToConcat: [ './node_modules/adaptivecards-controls/dist/adaptivecards-controls.css', './src/adaptivecards-designer.css']
 			}),
 			new CopyWebpackPlugin([{
 					from: 'src/adaptivecards-designer.css',
