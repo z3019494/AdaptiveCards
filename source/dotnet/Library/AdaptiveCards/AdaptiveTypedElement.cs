@@ -35,8 +35,13 @@ namespace AdaptiveCards
         [DefaultValue(null)]
         public string Id { get; set; }
 
-
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public AdaptiveElementDefinitions Elements { get; set; } = new AdaptiveElementDefinitions();
+
+        public bool ShouldSerializeElements()
+        {
+            return Elements?.Count > 0;
+        }
 
         /// <summary>
         /// Additional properties not found on the default schema
@@ -47,8 +52,11 @@ namespace AdaptiveCards
 #endif
         public IDictionary<string, object> AdditionalProperties { get; set;  } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
+
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public object Data { get; set; }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public object Repeat { get; set; }
 
         public virtual IEnumerable<AdaptiveTypedElement> GetChildren()
