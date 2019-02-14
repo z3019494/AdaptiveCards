@@ -6,7 +6,7 @@ namespace AdaptiveCards.Rendering.Html
 {
     public class AdaptiveRenderContext
     {
-        public AdaptiveRenderContext(AdaptiveHostConfig hostConfig, AdaptiveElementRenderers<HtmlTag, AdaptiveRenderContext> elementRenderers, Dictionary<string, object> elementDefinitions)
+        public AdaptiveRenderContext(AdaptiveHostConfig hostConfig, AdaptiveElementRenderers<HtmlTag, AdaptiveRenderContext> elementRenderers, Dictionary<string, object> elementDefinitions = default(Dictionary<string,object>))
         {
             // clone it
             Config = JsonConvert.DeserializeObject<AdaptiveHostConfig>(JsonConvert.SerializeObject(hostConfig));
