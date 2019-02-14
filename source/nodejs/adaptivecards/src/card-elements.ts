@@ -106,7 +106,168 @@ export function createElementInstance(
 		errors);
 }
 
+export abstract class PropertyDefinition {
+    protected abstract internalParse(input: any, errors?: Array<HostConfig.IValidationError>): any;
+
+    protected internalToJSON(output: object, value: any) {
+        if (value && (!this.defaultValue || this.defaultValue !== value)) {
+            output[this.name] = value;
+        }
+        else {
+            delete output[this.name];
+        }
+    }
+
+    constructor(readonly name: string, readonly defaultValue: any = undefined) {
+	}
+
+    parse(input: any, errors?: Array<HostConfig.IValidationError>): any {
+        return this.internalParse(input, errors);
+    }
+
+    toJSON(output: object, value: any) {
+        if (output) {
+            this.internalToJSON(output, value);
+        }
+    }
+}
+
+export class StringPropertyDefinition extends PropertyDefinition {
+    protected internalParse(input: any, errors?: Array<HostConfig.IValidationError>): string {
+        return input ? input.toString(): this.defaultValue;
+    }
+}
+
+export class EnumPropertyDefinition extends PropertyDefinition {
+    protected internalParse(input: any, errors?: Array<HostConfig.IValidationError>): number {
+		if (Utils.isNullOrEmpty(input)) {
+			return this.defaultValue;
+		}
+	
+		for (var key in this.targetEnum) {
+			let isValueProperty = parseInt(key, 10) >= 0
+	
+			if (isValueProperty) {
+				let value = this.targetEnum[key];
+	
+				if (value && typeof value === "string") {
+					if (value.toLowerCase() === input.toLowerCase()) {
+						return parseInt(key, 10);
+					}
+				}
+			}
+		}
+	
+		return this.defaultValue;
+	}
+
+    protected internalToJSON(output: object, value: any) {
+		if (this.defaultValue === undefined || this.defaultValue !== value) {
+			output[this.name] = this.targetEnum[value];
+		}
+		else {
+			delete output[this.name];
+		}
+	}
+
+	constructor(
+		readonly name: string,
+		readonly targetEnum: { [s: number]: string },
+		readonly defaultValue: any = undefined) {
+		super(name);
+	}
+}
+
+export class BooleanPropertyDefinition extends PropertyDefinition {
+    protected internalParse(input: any, errors?: Array<HostConfig.IValidationError>): boolean {
+        if (typeof input === "boolean") {
+            return input;
+        }
+        else if (typeof input === "string") {
+            switch (input.toLowerCase()) {
+                case "true":
+                    return true;
+                case "false":
+                    return false;
+                default:
+                    return this.defaultValue;
+            }
+        }
+    
+        return this.defaultValue;
+    }
+}
+
+interface PropertyInfo {
+    property: PropertyDefinition;
+    value: any;
+}
+
+type PropertyBagStore = { [key: string]: PropertyInfo };
+
+export class PropertyBag {
+	private _store: PropertyBagStore = {};
+	
+	toJSON(output: object) {
+		let keys = Object.keys(this._store);
+
+		for (let key of keys) {
+			let propertyInfo = this._store[key];
+			
+			propertyInfo.property.toJSON(output, propertyInfo.value);
+		}
+	}
+
+    setValue(property: PropertyDefinition, value: any) {
+        this._store[property.name] = { property: property, value: value };
+    }
+
+    getValue(property: PropertyDefinition): any {
+        let propertyInfo = this._store[property.name];
+
+        if (propertyInfo) {
+            return propertyInfo.value;
+        }
+        else {
+            return property.defaultValue;
+        }
+    }
+}
+
 export abstract class CardObject {
+	static readonly TypeProperty = new StringPropertyDefinition("type");
+	static readonly IdProperty = new StringPropertyDefinition("id");
+
+	private static internalGetSchema(o: any): PropertyDefinition[] {
+		let parentPrototype = Object.getPrototypeOf(o);
+
+		let result: PropertyDefinition[] = parentPrototype && parentPrototype instanceof CardObject ? CardObject.internalGetSchema(parentPrototype) : [];
+
+		let keys = Object.keys(o);
+
+		for (let key of keys) {
+			try
+			{
+				let member = o[key];
+
+				if (member instanceof PropertyDefinition) {
+					result.push(member);
+				}
+			}
+			catch (e) {
+				// Ignore
+			}
+		}
+
+		return result;
+	}
+
+	private getSchemaPropertyName(): string {
+		return "__$ac-" + this.getJsonTypeName + "_schema";
+	}
+
+	private _propertyBag = new PropertyBag();
+
 	private _customProperties = {};
 	private _parsedPayload: any;
 
@@ -114,14 +275,41 @@ export abstract class CardObject {
 	abstract shouldFallback(): boolean;
 	abstract setParent(parent: CardElement);
 
-	id: string;
+	private getSchema(): PropertyDefinition[] {
+		let schema = this.constructor[this.getSchemaPropertyName()];
+
+		if (!schema) {
+			schema = CardObject.internalGetSchema(this.constructor);
+
+			this.constructor[this.getSchemaPropertyName()] = schema;
+		}
+		
+		return schema;
+	}
+
+	// id: string;
+
+	constructor() {
+		this._propertyBag.setValue(CardObject.TypeProperty, this.getJsonTypeName());
+	}
 
 	parse(json: any, errors?: Array<HostConfig.IValidationError>) {
 		if (AdaptiveCard.enableFullJsonRoundTrip) {
 			this._parsedPayload = json;
 		}
 
-		this.id = json["id"];
+		let schema = this.getSchema();
+
+		for (let propertyDefinition of schema) {
+			let value = propertyDefinition.parse(json[propertyDefinition.name], errors);
+
+			this._propertyBag.setValue(propertyDefinition, value);
+		}
+
+
+		// this._propertyBag.parse(json);
+
+		// this.id = json["id"];
 	}
 
 	toJSON(): any {
@@ -138,8 +326,12 @@ export abstract class CardObject {
 			result[key] = this._customProperties[key];
 		};
 
+		this._propertyBag.toJSON(result);
+
+		/*
 		Utils.setProperty(result, "type", this.getJsonTypeName());
 		Utils.setProperty(result, "id", this.id);
+		*/
 
 		return result;
 	}
@@ -151,9 +343,43 @@ export abstract class CardObject {
 	getCustomProperty(name: string): any {
 		return this._customProperties[name];
 	}
+
+	get propertyBag(): PropertyBag {
+		return this._propertyBag;
+	}
+
+	get id(): string {
+		return this._propertyBag.getValue(CardObject.IdProperty);
+	}
+
+	set id(value: string) {
+		this._propertyBag.setValue(CardObject.IdProperty, value);
+	}
 }
 
 export type CardElementHeight = "auto" | "stretch";
+
+export class CustomPropertyDefinition extends PropertyDefinition {
+    protected internalParse(input: any, errors?: Array<HostConfig.IValidationError>): any {
+		if (this.onParse) {
+			this.onParse(this, input, errors);
+		}
+	}
+
+    protected internalToJSON(output: object, value: any) {
+		if (this.onToJSON) {
+			this.onToJSON(this, output, value);
+		}
+	}
+	
+	constructor(
+		readonly name: string,
+		readonly onParse: (property: PropertyDefinition, input: any, errors?: Array<HostConfig.IValidationError>) => any,
+		readonly onToJSON: (property: PropertyDefinition, output: object, value: any) => void,
+		readonly defaultValue: any = undefined) {
+		super(name);
+	}
+}
 
 export abstract class CardElement extends CardObject {
 	private _shouldFallback: boolean = false;
@@ -335,20 +561,116 @@ export abstract class CardElement extends CardObject {
 
 	readonly requires = new HostConfig.HostCapabilities();
 
-	id: string;
-	speak: string;
-	horizontalAlignment?: Enums.HorizontalAlignment = null;
-	spacing: Enums.Spacing = Enums.Spacing.Default;
-	separator: boolean = false;
+
+	static readonly SpeakProperty = new StringPropertyDefinition("speak");
+	static readonly SeparatorProperty = new BooleanPropertyDefinition("separator");
+	static readonly SpacingProperty = new EnumPropertyDefinition("spacing", Enums.Spacing, Enums.Spacing.Default);
+	static readonly HorizontalAlignmentProperty = new EnumPropertyDefinition("horizontalAlignment", Enums.HorizontalAlignment, null);
+	static readonly HeightProperty = new CustomPropertyDefinition(
+		"height",
+		(property: PropertyDefinition, input: any, errors?: Array<HostConfig.IValidationError>) => {
+			let height = input[property.name];
+
+			return height === "auto" || height === "stretch" ? height : property.defaultValue;
+		},
+		(property: PropertyDefinition, output: object, value: any) => {
+			Utils.setProperty(output, property.name, value, property.defaultValue);
+		},
+		"auto");
+
+	// id: string;
+	// speak: string;
+	// horizontalAlignment?: Enums.HorizontalAlignment = null;
+	// spacing: Enums.Spacing = Enums.Spacing.Default;
+	// separator: boolean = false;
 	customCssSelector: string = null;
-	height: CardElementHeight = "auto";
+	// height: CardElementHeight = "auto";
 	minPixelHeight?: number = null;
 
 	abstract renderSpeech(): string;
 
+	parse(json: any, errors?: Array<HostConfig.IValidationError>) {
+		super.parse(json, errors);
+
+		raiseParseElementEvent(this, json, errors);
+
+		this.requires.parse(json["requires"], errors);
+		this.isVisible = Utils.parseBoolProperty(json["isVisible"], this.isVisible);
+		/*
+		this.speak = json["speak"];
+		this.horizontalAlignment = Utils.getEnumValueOrDefault(Enums.HorizontalAlignment, json["horizontalAlignment"], null);
+
+		this.spacing = Utils.getEnumValueOrDefault(Enums.Spacing, json["spacing"], Enums.Spacing.Default);
+		this.separator = Utils.parseBoolProperty(json["separator"], this.separator);
+		*/
+
+		let jsonSeparation = json["separation"];
+
+		if (jsonSeparation !== undefined) {
+			if (jsonSeparation === "none") {
+				this.spacing = Enums.Spacing.None;
+				this.separator = false;
+			}
+			else if (jsonSeparation === "strong") {
+				this.spacing = Enums.Spacing.Large;
+				this.separator = true;
+			}
+			else if (jsonSeparation === "default") {
+				this.spacing = Enums.Spacing.Default;
+				this.separator = false;
+			}
+
+			raiseParseError(
+				{
+					error: Enums.ValidationError.Deprecated,
+					message: "The \"separation\" property is deprecated and will be removed. Use the \"spacing\" and \"separator\" properties instead."
+				},
+				errors
+			);
+		}
+
+		/*
+		let jsonHeight = json["height"];
+
+		if (jsonHeight === "auto" || jsonHeight === "stretch") {
+			this.height = jsonHeight;
+		}
+		*/
+
+		let jsonMinHeight = json["minHeight"];
+
+		if (jsonMinHeight && typeof jsonMinHeight === "string") {
+			let isValid = false;
+
+			try {
+				let size = Shared.SizeAndUnit.parse(jsonMinHeight, true);
+
+				if (size.unit == Enums.SizeUnit.Pixel) {
+					this.minPixelHeight = size.physicalSize;
+
+					isValid = true;
+				}
+			}
+			catch {
+				// Do nothing. A parse error is emitted below
+			}
+
+			if (!isValid) {
+				raiseParseError(
+					{
+						error: Enums.ValidationError.InvalidPropertyValue,
+						message: "Invalid \"minHeight\" value: " + jsonMinHeight
+					},
+					errors
+				);
+			}
+		}
+	}
+
 	toJSON(): any {
 		let result = super.toJSON();
 
+		/*
 		if (this.horizontalAlignment !== null) {
 			Utils.setEnumProperty(Enums.HorizontalAlignment, result, "horizontalAlignment", this.horizontalAlignment);
 		}
@@ -356,6 +678,7 @@ export abstract class CardElement extends CardObject {
 		Utils.setEnumProperty(Enums.Spacing, result, "spacing", this.spacing, Enums.Spacing.Default);
 		Utils.setProperty(result, "separator", this.separator, false);
 		Utils.setProperty(result, "height", this.height, "auto");
+		*/
 
 		if (this.minPixelHeight) {
 			Utils.setProperty(result, "minHeight", this.minPixelHeight + "px");
@@ -415,80 +738,6 @@ export abstract class CardElement extends CardObject {
 					doProcessRight,
 					doProcessBottom,
 					doProcessLeft);
-			}
-		}
-	}
-
-	parse(json: any, errors?: Array<HostConfig.IValidationError>) {
-		super.parse(json, errors);
-
-		raiseParseElementEvent(this, json, errors);
-
-		this.requires.parse(json["requires"], errors);
-		this.isVisible = Utils.parseBoolProperty(json["isVisible"], this.isVisible);
-		this.speak = json["speak"];
-		this.horizontalAlignment = Utils.getEnumValueOrDefault(Enums.HorizontalAlignment, json["horizontalAlignment"], null);
-
-		this.spacing = Utils.getEnumValueOrDefault(Enums.Spacing, json["spacing"], Enums.Spacing.Default);
-		this.separator = Utils.parseBoolProperty(json["separator"], this.separator);
-
-		let jsonSeparation = json["separation"];
-
-		if (jsonSeparation !== undefined) {
-			if (jsonSeparation === "none") {
-				this.spacing = Enums.Spacing.None;
-				this.separator = false;
-			}
-			else if (jsonSeparation === "strong") {
-				this.spacing = Enums.Spacing.Large;
-				this.separator = true;
-			}
-			else if (jsonSeparation === "default") {
-				this.spacing = Enums.Spacing.Default;
-				this.separator = false;
-			}
-
-			raiseParseError(
-				{
-					error: Enums.ValidationError.Deprecated,
-					message: "The \"separation\" property is deprecated and will be removed. Use the \"spacing\" and \"separator\" properties instead."
-				},
-				errors
-			);
-		}
-
-		let jsonHeight = json["height"];
-
-		if (jsonHeight === "auto" || jsonHeight === "stretch") {
-			this.height = jsonHeight;
-		}
-
-		let jsonMinHeight = json["minHeight"];
-
-		if (jsonMinHeight && typeof jsonMinHeight === "string") {
-			let isValid = false;
-
-			try {
-				let size = Shared.SizeAndUnit.parse(jsonMinHeight, true);
-
-				if (size.unit == Enums.SizeUnit.Pixel) {
-					this.minPixelHeight = size.physicalSize;
-
-					isValid = true;
-				}
-			}
-			catch {
-				// Do nothing. A parse error is emitted below
-			}
-
-			if (!isValid) {
-				raiseParseError(
-					{
-						error: Enums.ValidationError.InvalidPropertyValue,
-						message: "Invalid \"minHeight\" value: " + jsonMinHeight
-					},
-					errors
-				);
 			}
 		}
 	}
@@ -671,6 +920,46 @@ export abstract class CardElement extends CardObject {
 		}
 
 		this._lang = value;
+	}
+
+	get spacing(): Enums.Spacing {
+		return this.propertyBag.getValue(CardElement.SpacingProperty);
+	}
+
+	set spacing(value: Enums.Spacing) {
+		this.propertyBag.setValue(CardElement.SpacingProperty, value);
+	}
+
+	get separator(): boolean {
+		return this.propertyBag.getValue(CardElement.SeparatorProperty);
+	}
+
+	set separator(value: boolean) {
+		this.propertyBag.setValue(CardElement.SeparatorProperty, value);
+	}
+
+	get speak(): string {
+		return this.propertyBag.getValue(CardElement.SpeakProperty);
+	}
+
+	set speak(value: string) {
+		this.propertyBag.setValue(CardElement.SpeakProperty, value);
+	}
+
+	get horizontalAlignment(): Enums.HorizontalAlignment {
+		return this.propertyBag.getValue(CardElement.HorizontalAlignmentProperty);
+	}
+
+	set horizontalAlignment(value: Enums.HorizontalAlignment) {
+		this.propertyBag.setValue(CardElement.HorizontalAlignmentProperty, value);
+	}
+
+	get height(): CardElementHeight {
+		return this.propertyBag.getValue(CardElement.HeightProperty);
+	}
+
+	set height(value: CardElementHeight) {
+		this.propertyBag.setValue(CardElement.HeightProperty, value);
 	}
 
 	get hostConfig(): HostConfig.HostConfig {
