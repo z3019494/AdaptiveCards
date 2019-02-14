@@ -1,0 +1,31 @@
+{
+	"$schema": "ttp://adaptivecards.io/schemas/adaptive-card.json",
+	"type": "AdaptiveCard",
+	"version": "1.0",
+	"body": [
+		{
+			"type": "TextBlock",
+			"text": "🙋‍ Welcome to the Adaptive Cards Stock Bot, {name}!",
+			"wrap": true,
+			"size": "Medium"
+		},
+		{
+			"type": "TextBlock",
+			"text": "Enter a stock symbol to get the latest stock quote. For example: **{suggestedSymbols[0]}**",
+			"wrap": true
+		}
+	],
+	"actions": [
+		{
+			"type": "Action.Submit",
+			"$data": "{suggestedSymbols}",
+			"title": "{$data}",
+			"data": {
+				"msteams": {
+					"type": "imBack",
+					"value": "{$data}"
+				}
+			}
+		}
+	]
+}

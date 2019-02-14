@@ -99,7 +99,7 @@ namespace WpfVisualizer
 
             try
             {
-                AdaptiveCardParseResult parseResult = AdaptiveCard.ResolveFromJson(textBox.Text, textBoxData.Text);
+                AdaptiveCardParseResult parseResult = AdaptiveCard.FromJson(textBox.Text, textBoxData.Text);
 
                 AdaptiveCard card = parseResult.Card;
 

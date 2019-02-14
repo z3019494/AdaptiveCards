@@ -34,7 +34,7 @@ namespace AdaptiveCards.Test
 
         private void AssertTransform(string cardJson, string expectedJson)
         {
-            var actualResult = AdaptiveCard.ResolveFromJson(cardJson, null);
+            var actualResult = AdaptiveCard.FromJson(cardJson, null);
             var expectedResult = AdaptiveCard.FromJson(expectedJson);
 
             Assert.AreEqual(expectedResult.Card.ToJson(), actualResult.Card.ToJson());

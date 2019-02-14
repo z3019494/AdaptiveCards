@@ -251,17 +251,33 @@ namespace AdaptiveCards
             return parseResult;
         }
 
-        public static AdaptiveCardParseResult ResolveFromJson(string cardJson, string dataJson)
+
+        /// <summary>
+        /// Parse an AdaptiveCard from using a template and data object
+        /// </summary>
+        /// <param name="cardTemplate">A JSON-serialized Adaptive Card Template</param>
+        /// <param name="data">A data object to be passed to the template</param>
+        public static AdaptiveCardParseResult FromJson(string cardTemplate, object data)
+        {
+            return FromJson(cardTemplate, JsonConvert.SerializeObject(data));
+        }
+
+        /// <summary>
+        /// Parse an AdaptiveCard from using a template and data object
+        /// </summary>
+        /// <param name="cardTemplate">A JSON-serialized Adaptive Card Template</param>
+        /// <param name="dataJson">A JSON-serialized data object to be passed to the template</param>
+        public static AdaptiveCardParseResult FromJson(string cardTemplate, string dataJson)
         {
             // First extract and remove the elements (since we don't want these data-bound to the card data)
             AdaptiveElementDefinitions elementDefinitions = null;
             try
             {
-                JObject cardObj = JObject.Parse(cardJson);
+                JObject cardObj = JObject.Parse(cardTemplate);
                 if (cardObj.TryGetValue("elements", out JToken elementsToken))
                 {
                     cardObj.Remove("elements");
-                    cardJson = cardObj.ToString();
+                    cardTemplate = cardObj.ToString();
                     elementDefinitions = elementsToken.ToObject<AdaptiveElementDefinitions>();
                 }
             }
@@ -275,7 +291,7 @@ namespace AdaptiveCards
             // Then data-bind the card
             try
             {
-                JObject cardObj = JObject.Parse(cardJson);
+                JObject cardObj = JObject.Parse(cardTemplate);
                 JToken dataToken = null;
                 try
                 {
@@ -283,12 +299,12 @@ namespace AdaptiveCards
                 }
                 catch { }
                 var transformedCardObj = JsonTransformer.Transform(cardObj, dataToken, null);
-                cardJson = transformedCardObj.ToString();
+                cardTemplate = transformedCardObj.ToString();
             }
             catch { }
 
             // Then parse like normal
-            var result = FromJson(cardJson);
+            var result = FromJson(cardTemplate);
 
             if (result.Card != null)
             {
