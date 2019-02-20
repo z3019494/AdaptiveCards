@@ -25,6 +25,23 @@ namespace AdaptiveCardStockBot
             _env = env;
         }
 
+        public async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken)
+        {
+            if (turnContext.Activity.Type == ActivityTypes.ConversationUpdate)
+            {
+                await HandleNewConversationStarted(turnContext);
+            }
+            else if (turnContext.Activity.Type == ActivityTypes.Message)
+            {
+                await SendStockQuoteAsync(turnContext);
+            }
+            else
+            {
+                await turnContext.SendActivityAsync(turnContext.Activity.Type.ToString());
+            }
+        }
+
+
         private async Task HandleNewConversationStarted(ITurnContext turnContext)
         {
             foreach (var member in turnContext.Activity.MembersAdded ?? new List<ChannelAccount>())
@@ -55,22 +72,6 @@ namespace AdaptiveCardStockBot
             };
        
             await SendAdaptiveCardReplyAsync(turnContext, "WelcomeTemplate.json", data);
-        }
-
-        public async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken)
-        {
-            if (turnContext.Activity.Type == ActivityTypes.ConversationUpdate)
-            {
-                await HandleNewConversationStarted(turnContext);                
-            }
-            else if (turnContext.Activity.Type == ActivityTypes.Message)
-            {
-                await SendStockQuoteAsync(turnContext);
-            }
-            else
-            {
-                await turnContext.SendActivityAsync(turnContext.Activity.Type.ToString());
-            }
         }
 
         private async Task SendStockQuoteAsync(ITurnContext turnContext)
