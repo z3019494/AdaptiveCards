@@ -28,7 +28,36 @@ window.onload = function() {
 	hostContainers.push(new ACDesigner.BotFrameworkContainer("Bot Framework Other Channels (Image render)", "containers/bf-image-container.css"));
 	hostContainers.push(new ACDesigner.ToastContainer("Windows Notifications (Preview)", "containers/toast-container.css"));
 
-	let designer = new ACDesigner.CardDesigner(hostContainers);
+    let designer = new ACDesigner.CardDesigner(hostContainers);
+    designer.sampleCatalogueUrl = window.location.origin + "/sample-catalogue.json";
 	designer.attachTo(document.getElementById("designerRootHost"));
 	designer.monacoModuleLoaded(monaco);
-};
+
+	let sampleData = {
+		firstName: "John",
+		lastName: "Doe",
+		age: 45,
+		isMarried: true,
+		address: {
+			street: "1234 555th Ave NE",
+			city: "Redmond",
+			state: "WA",
+			countryOrRegion: "USA"
+		},
+		children: [
+			{
+				firstName: "Jennifer",
+				lastName: "Doe",
+				age: 9
+			},
+			{
+				firstName: "James",
+				lastName: "Doe",
+				age: 13
+			}
+		]
+	};
+	
+	designer.dataStructure = ACDesigner.FieldDefinition.create(sampleData);
+	designer.sampleData = sampleData;
+}

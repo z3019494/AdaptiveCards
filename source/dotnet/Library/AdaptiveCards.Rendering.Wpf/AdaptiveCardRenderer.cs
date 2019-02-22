@@ -129,6 +129,11 @@ namespace AdaptiveCards.Rendering.Wpf
             outerGrid.Background = context.GetColorBrush(context.Config.ContainerStyles.Default.BackgroundColor);
             outerGrid.SetBackgroundSource(card.BackgroundImage, context);
 
+            if(context.CardRoot == null)
+            {
+                context.CardRoot = outerGrid;
+            }
+
             var grid = new Grid();
             grid.Style = context.GetStyle("Adaptive.InnerCard");
             grid.Margin = new Thickness(context.Config.Spacing.Padding);
@@ -195,7 +200,7 @@ namespace AdaptiveCards.Rendering.Wpf
 
                 return outerGridWithSelectAction;
             }
-
+            
             return outerGrid;
         }
 

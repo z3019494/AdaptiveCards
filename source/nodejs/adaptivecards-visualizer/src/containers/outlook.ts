@@ -1,32 +1,6 @@
 import { HostContainer } from "./host-container";
 import * as Adaptive from "adaptivecards";
 
-export class ToggleVisibilityAction extends Adaptive.Action {
-    targetElementIds: Array<string> = [];
-
-    getJsonTypeName(): string {
-        return "Action.ToggleVisibility";
-    }
-
-    execute() {
-        if (this.targetElementIds) {
-            for (var i = 0; i < this.targetElementIds.length; i++) {
-                var targetElement = this.parent.getRootElement().getElementById(this.targetElementIds[i]);
-
-                if (targetElement) {
-                    targetElement.isVisible = !targetElement.isVisible;
-                }
-            }
-        }
-    }
-
-    parse(json: any) {
-        super.parse(json);
-
-        this.targetElementIds = json["targetElements"] as Array<string>;
-    }
-}
-
 export class OutlookContainer extends HostContainer {
     protected renderContainer(adaptiveCard: Adaptive.AdaptiveCard, target: HTMLElement): HTMLElement {
         var element = document.createElement("div");
@@ -44,11 +18,8 @@ export class OutlookContainer extends HostContainer {
     public initialize() {
         super.initialize();
 
-        Adaptive.AdaptiveCard.elementTypeRegistry.registerType("ActionSet", () => { return new Adaptive.ActionSet(); });
-
         Adaptive.AdaptiveCard.actionTypeRegistry.unregisterType("Action.Submit");
         Adaptive.AdaptiveCard.actionTypeRegistry.registerType("Action.Http", () => { return new Adaptive.HttpAction(); });
-        Adaptive.AdaptiveCard.actionTypeRegistry.registerType("Action.ToggleVisibility", () => { return new ToggleVisibilityAction(); });
 
         Adaptive.AdaptiveCard.useMarkdownInRadioButtonAndCheckbox = false;
         Adaptive.AdaptiveCard.allowMarkForTextHighlighting = true;
@@ -57,7 +28,7 @@ export class OutlookContainer extends HostContainer {
     private parsePadding(json: any): Adaptive.PaddingDefinition {
         if (json) {
             if (typeof json === "string") {
-                var uniformPadding = Adaptive.getEnumValueOrDefault(Adaptive.Spacing, json, Adaptive.Spacing.None);
+                var uniformPadding = Adaptive.getEnumValue(Adaptive.Spacing, json, Adaptive.Spacing.None);
 
                 return new Adaptive.PaddingDefinition(
                     uniformPadding,
@@ -67,10 +38,10 @@ export class OutlookContainer extends HostContainer {
             }
             else if (typeof json === "object") {
                 return new Adaptive.PaddingDefinition(
-                    Adaptive.getEnumValueOrDefault(Adaptive.Spacing, json["top"], Adaptive.Spacing.None),
-                    Adaptive.getEnumValueOrDefault(Adaptive.Spacing, json["right"], Adaptive.Spacing.None),
-                    Adaptive.getEnumValueOrDefault(Adaptive.Spacing, json["bottom"], Adaptive.Spacing.None),
-                    Adaptive.getEnumValueOrDefault(Adaptive.Spacing, json["left"], Adaptive.Spacing.None));
+                    Adaptive.getEnumValue(Adaptive.Spacing, json["top"], Adaptive.Spacing.None),
+                    Adaptive.getEnumValue(Adaptive.Spacing, json["right"], Adaptive.Spacing.None),
+                    Adaptive.getEnumValue(Adaptive.Spacing, json["bottom"], Adaptive.Spacing.None),
+                    Adaptive.getEnumValue(Adaptive.Spacing, json["left"], Adaptive.Spacing.None));
             }
         }
 
@@ -78,10 +49,6 @@ export class OutlookContainer extends HostContainer {
     }
 
     public parseElement(element: Adaptive.CardElement, json: any) {
-        if (typeof json["isVisible"] === "boolean") {
-            element.isVisible = json["isVisible"];
-        }
-
         if (element instanceof Adaptive.Container && json["rtl"] != undefined) {
             //element.rtl = json["rtl"];
         }

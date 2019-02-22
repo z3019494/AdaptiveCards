@@ -15,13 +15,13 @@ namespace AdaptiveSharedNamespace
     {
         void ThrowIfNotJsonObject(const Json::Value& json);
 
-        void ExpectString(const Json::Value& json);
-
         std::string GetTypeAsString(const Json::Value& json);
 
         std::string TryGetTypeAsString(const Json::Value& json);
 
         std::string GetString(const Json::Value& json, AdaptiveCardSchemaKey key, bool isRequired = false);
+
+        std::string GetString(const Json::Value& json, AdaptiveCardSchemaKey key, const std::string& defaultValue, bool isRequired = false);
 
         // Gets the specified property and returns a JSON string of the value
         std::string GetJsonString(const Json::Value& json, AdaptiveCardSchemaKey key, bool isRequired = false);
@@ -73,10 +73,8 @@ namespace AdaptiveSharedNamespace
                                                                             AdaptiveCardSchemaKey key,
                                                                             bool isRequired = false);
 
-        std::shared_ptr<BaseActionElement> GetAction(ParseContext& context,
-                                                     const Json::Value& json,
-                                                     AdaptiveCardSchemaKey key,
-                                                     bool isRequired = false);
+        std::shared_ptr<BaseActionElement>
+        GetAction(ParseContext& context, const Json::Value& json, AdaptiveCardSchemaKey key, bool isRequired = false);
 
         template<typename T>
         T ExtractJsonValueAndMergeWithDefault(const Json::Value& rootJson,

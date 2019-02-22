@@ -25,6 +25,7 @@
 		30860BCC20C9B5C9009F9D99 /* ColumnSet_Container.VerticalStretch.json in Resources */ = {isa = PBXBuildFile; fileRef = 30860BC020C9B5C9009F9D99 /* ColumnSet_Container.VerticalStretch.json */; };
 		30860BCD20C9B5C9009F9D99 /* ColumnSet.Input.Time.VerticalStretch.json in Resources */ = {isa = PBXBuildFile; fileRef = 30860BC120C9B5C9009F9D99 /* ColumnSet.Input.Time.VerticalStretch.json */; };
 		30A3885E20D315AA00AAEE59 /* NotificationCard.json in Resources */ = {isa = PBXBuildFile; fileRef = 30A3885C20D315AA00AAEE59 /* NotificationCard.json */; };
+		30C340E42214D50F009A785D /* ColumnSet.Style.json in Resources */ = {isa = PBXBuildFile; fileRef = 30C340E32214D50F009A785D /* ColumnSet.Style.json */; };
 		6B14FC5D2113BC2200A11CC5 /* (null) in Resources */ = {isa = PBXBuildFile; };
 		6B2630DB2150804500ED9207 /* ColumnSet.Media.VerticalStretch.json in Resources */ = {isa = PBXBuildFile; fileRef = 6B2630DA2150804500ED9207 /* ColumnSet.Media.VerticalStretch.json */; };
 		6B2630DD215080FB00ED9207 /* ColumnSet.VerticalStretch.json in Resources */ = {isa = PBXBuildFile; fileRef = 6B2630DC215080FA00ED9207 /* ColumnSet.VerticalStretch.json */; };
@@ -56,6 +57,7 @@
 		6B9BDF7020E18E5B00F13155 /* CustomImageRenderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6B9BDF6F20E18E5B00F13155 /* CustomImageRenderer.mm */; };
 		6B9BDF7C20E6E0C200F13155 /* Column.Explicit.Size.json in Resources */ = {isa = PBXBuildFile; fileRef = 6B9BDF7B20E6E0C200F13155 /* Column.Explicit.Size.json */; };
 		6B9BDFCC20F6D11F00F13155 /* ADCResolver.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B9BDFCB20F6D11F00F13155 /* ADCResolver.m */; };
+		6BC30F6021DD69D800B9FAAE /* ActionSet.json in Resources */ = {isa = PBXBuildFile; fileRef = 6BC30F5F21DD69D800B9FAAE /* ActionSet.json */; };
 		6BC30F6421DFE8CF00B9FAAE /* TextBlock.FontStyles.json in Resources */ = {isa = PBXBuildFile; fileRef = 6BC30F6221DFE8CF00B9FAAE /* TextBlock.FontStyles.json */; };
 		6BC30F6721DFE8EA00B9FAAE /* Media.Sources.json in Resources */ = {isa = PBXBuildFile; fileRef = 6BC30F6521DFE8E900B9FAAE /* Media.Sources.json */; };
 		6BC30F6821DFE8EA00B9FAAE /* Media.json in Resources */ = {isa = PBXBuildFile; fileRef = 6BC30F6621DFE8E900B9FAAE /* Media.json */; };
@@ -179,6 +181,11 @@
 		30860BC020C9B5C9009F9D99 /* ColumnSet_Container.VerticalStretch.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = ColumnSet_Container.VerticalStretch.json; path = ../../../../samples/Tests/ColumnSet_Container.VerticalStretch.json; sourceTree = "<group>"; };
 		30860BC120C9B5C9009F9D99 /* ColumnSet.Input.Time.VerticalStretch.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = ColumnSet.Input.Time.VerticalStretch.json; path = ../../../../samples/Tests/ColumnSet.Input.Time.VerticalStretch.json; sourceTree = "<group>"; };
 		30A3885C20D315AA00AAEE59 /* NotificationCard.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = NotificationCard.json; path = ../../../../samples/Tests/NotificationCard.json; sourceTree = "<group>"; };
+		30C340E32214D50F009A785D /* ColumnSet.Style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = ColumnSet.Style.json; path = ../../../../samples/v1.2/Elements/ColumnSet.Style.json; sourceTree = "<group>"; };
+		6B22426421E92AF9000ACDA1 /* CustomActionNewType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomActionNewType.h; sourceTree = "<group>"; };
+		6B22426521E92AF9000ACDA1 /* CustomActionNewType.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CustomActionNewType.mm; sourceTree = "<group>"; };
+		6B22426721E94AD0000ACDA1 /* Action.CustomParsing.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = Action.CustomParsing.json; path = ../../../../samples/Tests/Action.CustomParsing.json; sourceTree = "<group>"; };
+		6B22426921FFA76D000ACDA1 /* ADCIOSVisualizerUITests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ADCIOSVisualizerUITests.mm; sourceTree = "<group>"; };
 		6B2630DA2150804500ED9207 /* ColumnSet.Media.VerticalStretch.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = ColumnSet.Media.VerticalStretch.json; path = ../../../../samples/Tests/ColumnSet.Media.VerticalStretch.json; sourceTree = "<group>"; };
 		6B2630DC215080FA00ED9207 /* ColumnSet.VerticalStretch.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = ColumnSet.VerticalStretch.json; path = ../../../../samples/Tests/ColumnSet.VerticalStretch.json; sourceTree = "<group>"; };
 		6B2630DE2151A22F00ED9207 /* FactSetWrapping.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = FactSetWrapping.json; path = ../../../../samples/Tests/FactSetWrapping.json; sourceTree = "<group>"; };
@@ -209,6 +216,7 @@
 		6B9BDF7B20E6E0C200F13155 /* Column.Explicit.Size.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = Column.Explicit.Size.json; path = ../../../../samples/Tests/Column.Explicit.Size.json; sourceTree = "<group>"; };
 		6B9BDFCB20F6D11F00F13155 /* ADCResolver.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ADCResolver.m; sourceTree = "<group>"; };
 		6B9BDFCD20F6D16E00F13155 /* ADCResolver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ADCResolver.h; sourceTree = "<group>"; };
+		6BC30F5F21DD69D800B9FAAE /* ActionSet.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = ActionSet.json; path = ../../../../samples/v1.2/Elements/ActionSet.json; sourceTree = "<group>"; };
 		6BC30F6221DFE8CF00B9FAAE /* TextBlock.FontStyles.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = TextBlock.FontStyles.json; path = ../../../../samples/v1.2/Elements/TextBlock.FontStyles.json; sourceTree = "<group>"; };
 		6BC30F6521DFE8E900B9FAAE /* Media.Sources.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = Media.Sources.json; path = ../../../../samples/v1.1/Elements/Media.Sources.json; sourceTree = "<group>"; };
 		6BC30F6621DFE8E900B9FAAE /* Media.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = Media.json; path = ../../../../samples/v1.1/Elements/Media.json; sourceTree = "<group>"; };
@@ -430,13 +438,10 @@
 		F4D33E341F045B6E00941E44 /* Jsons */ = {
 			isa = PBXGroup;
 			children = (
-				6BC30F6921DFECB400B9FAAE /* ProductVideo.json */,
-				6BC30F6621DFE8E900B9FAAE /* Media.json */,
-				6BC30F6521DFE8E900B9FAAE /* Media.Sources.json */,
-				6BC30F6221DFE8CF00B9FAAE /* TextBlock.FontStyles.json */,
-				6B616C4921D6B8D4003E29CE /* SearchResults.json */,
-				6B616C4521CB2493003E29CE /* AutoImageSet.json */,
-				6B616C3B21CB0B6C003E29CE /* Action.ToggleVisibility.json */,
+				30C340E32214D50F009A785D /* ColumnSet.Style.json */,
+				6B22426721E94AD0000ACDA1 /* Action.CustomParsing.json */,
+				6B98093E216573EE0024B79B /* Action.IconUrl.TwoActions.json */,
+				6B980944216573EF0024B79B /* Action.OpenUrl.IconUrl.json */,
 				300ECB70219A53B800371DC5 /* Action.OpenUrl.Sentiment.json */,
 				300ECB71219A53B800371DC5 /* Action.ShowCard.Sentiment.json */,
 				300ECB6F219A53B800371DC5 /* Action.Submit.Sentiment.json */,
@@ -673,6 +678,7 @@
 				F4933CDD1F79852C00F6EBFD /* Input.Date.json in Resources */,
 				30860BCB20C9B5C9009F9D99 /* ColumnSet.Input.Text.VerticalStretch.json in Resources */,
 				F4933CE91F79852C00F6EBFD /* TextBlock.MaxLines.json in Resources */,
+				30C340E42214D50F009A785D /* ColumnSet.Style.json in Resources */,
 				F4933CDA1F79852C00F6EBFD /* ImageSet.ImageSize.json in Resources */,
 				6B2630DB2150804500ED9207 /* ColumnSet.Media.VerticalStretch.json in Resources */,
 				F4933CFD1F79853B00F6EBFD /* CalendarReminder.json in Resources */,
@@ -719,6 +725,7 @@
 				F4F44B852048CDB300A2F24C /* AdditionalProperty.json in Resources */,
 				30860BC820C9B5C9009F9D99 /* ColumnSet.Input.Toggle.VerticalStretch.json in Resources */,
 				30860BCC20C9B5C9009F9D99 /* ColumnSet_Container.VerticalStretch.json in Resources */,
+				6BC30F6021DD69D800B9FAAE /* ActionSet.json in Resources */,
 				30860BC920C9B5C9009F9D99 /* ColumnSet.Input.Date.VerticalStretch.json in Resources */,
 				F4933CD61F79852C00F6EBFD /* Image.Size.json in Resources */,
 				F4D402161F7DB0BF00D0356B /* sample.json in Resources */,

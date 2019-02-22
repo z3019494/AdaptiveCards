@@ -24,10 +24,12 @@ add_library( # Sets the name of the library.
              ../../shared/cpp/ObjectModel/jsoncpp.cpp
              ../../shared/cpp/ObjectModel/ActionParserRegistration.cpp
              ../../shared/cpp/ObjectModel/AdaptiveBase64Util.cpp
+             ../../shared/cpp/ObjectModel/ActionSet.cpp
              ../../shared/cpp/ObjectModel/AdaptiveCardParseException.cpp
              ../../shared/cpp/ObjectModel/AdaptiveCardParseWarning.cpp
              ../../shared/cpp/ObjectModel/BaseActionElement.cpp
              ../../shared/cpp/ObjectModel/BaseCardElement.cpp
+             ../../shared/cpp/ObjectModel/BaseElement.cpp
              ../../shared/cpp/ObjectModel/BaseInputElement.cpp
              ../../shared/cpp/ObjectModel/ChoiceInput.cpp
              ../../shared/cpp/ObjectModel/ChoiceSetInput.cpp
