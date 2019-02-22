@@ -90,7 +90,6 @@ namespace AdaptiveCards.Rendering.Html
             ElementRenderers.Set<AdaptiveOpenUrlAction>(AdaptiveActionRender);
             ElementRenderers.Set<AdaptiveShowCardAction>(AdaptiveActionRender);
             ElementRenderers.Set<AdaptiveToggleVisibilityAction>(AdaptiveActionRender);
-        }
 
             ActionTransformers.Register<AdaptiveOpenUrlAction>((action, tag, context) => tag.Attr("data-ac-url", action.Url));
             ActionTransformers.Register<AdaptiveSubmitAction>((action, tag, context) => tag.Attr("data-ac-submitData", JsonConvert.SerializeObject(action.Data, Formatting.None)));
@@ -509,10 +508,10 @@ namespace AdaptiveCards.Rendering.Html
                 uiColumn.Style("display", "none");
             }
 
-            if (column.BackgroundImage != null)
-            {
-                ApplyBackgroundImage(column.BackgroundImage, uiColumn, context);
-            }
+            //if (column.BackgroundImage != null)
+            //{
+            //    ApplyBackgroundImage(column.BackgroundImage, uiColumn, context);
+            //}
 
             switch (column.VerticalContentAlignment)
             {
