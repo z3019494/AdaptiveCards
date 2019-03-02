@@ -87,52 +87,77 @@ namespace AdaptiveCardTestApp.ViewModels
 
             CurrentCardVisual = null;
 
-            // If no cards left
-            if (RemainingCards.Count == 0)
+            Task[] taskArray = new Task[RemainingCards.Count*RemainingHostConfigs.Count];
+            int iTask = 0;
+            foreach (FileViewModel remainingCard in RemainingCards)
             {
-                if (RemainingHostConfigs.Count != 0)
-                {
-                    RemainingHostConfigs.RemoveAt(0);
-                }
-
-                _addToTimeline = false;
-
-                // If also no host configs left, done
-                if (RemainingHostConfigs.Count == 0)
-                {
-                    GoToDoneState();
-                    return;
-                }
-
-                // Otherwise reset the cards and pop off the current host config
-                foreach (var c in _originalCards)
-                {
-                    RemainingCards.Add(c);
+                foreach (FileViewModel remainingHostConfig in RemainingHostConfigs)
+                { 
+                    taskArray[iTask++] = TestCard(remainingCard, remainingHostConfig).ContinueWith((testTask) => {
+                        RemainingCards.Remove(testTask.Result.CardFile);
+                        Results.Add(testTask.Result);
+                    });
                 }
             }
+
+            try
+            {
+                await Task.WhenAll(taskArray);
+                //Task.WaitAll(taskArray);
+            }
+            catch (AggregateException ae)
+            {
+                Console.WriteLine("One or more exceptions occurred:");
+                foreach (var ex in ae.InnerExceptions)
+                    Console.WriteLine("   {0}: {1}", ex.GetType().Name, ex.Message);
+            }
+
+            //// If no cards left
+            //if (RemainingCards.Count == 0)
+            //{
+            //    if (RemainingHostConfigs.Count != 0)
+            //    {
+            //        RemainingHostConfigs.RemoveAt(0);
+            //    }
+
+            //    _addToTimeline = false;
+
+            //    // If also no host configs left, done
+            //    if (RemainingHostConfigs.Count == 0)
+            //    {
+            //        GoToDoneState();
+            //        return;
+            //    }
+
+            //    // Otherwise reset the cards and pop off the current host config
+            //    foreach (var c in _originalCards)
+            //    {
+            //        RemainingCards.Add(c);
+            //    }
+            //}
 
             // Delay a bit to allow UI thread to update, otherwise user would never see an update
-            await Task.Delay(10);
+            //await Task.Delay(10);
 
-            var card = RemainingCards.First();
-            CurrentCard = card.Name;
+            //var card = RemainingCards.First();
+            //CurrentCard = card.Name;
 
-            if (RemainingHostConfigs.Count != 0)
-            {
-                CurrentHostConfig = RemainingHostConfigs.First().Name;
-                var testResult = await TestCard(card, RemainingHostConfigs.First());
-                Results.Add(testResult);
-            }
+            //if (RemainingHostConfigs.Count != 0)
+            //{
+            //    CurrentHostConfig = RemainingHostConfigs.First().Name;
+            //    var testResult = await TestCard(card, RemainingHostConfigs.First());
+            //    Results.Add(testResult);
+            //}
 
-            if (_addToTimeline)
-            {
-                await AddCardToTimeline(card);
-            }
+            //if (_addToTimeline)
+            //{
+            //    await AddCardToTimeline(card);
+            //}
 
-            RemainingCards.RemoveAt(0);
+            //RemainingCards.RemoveAt(0);
 
-            // And start the process again
-            Start();
+            //// And start the process again
+            //Start();
         }
 
         public async Task AddCardToTimeline(FileViewModel card)
