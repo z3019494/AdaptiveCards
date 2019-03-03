@@ -136,6 +136,10 @@ Outputs:
 * A shiny new release
 * Information about execution that can be used to refine planning for the next release
 
+Validation:
+
+* *Release report* is reviewed and shows no remaining work
+
 ## The Windows <-> ZenHub interface
 
 The [DEP engineering planning guide](https://osgwiki.com/wiki/DEP_Engineering_Planning) describes much of what's in this
