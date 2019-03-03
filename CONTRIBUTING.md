@@ -1,4 +1,5 @@
-This is an adaptation of [DEP engineering planning](https://osgwiki.com/wiki/DEP_Engineering_Planning) procedures to fit AdaptiveCards engineering.
+This is an adaptation of [DEP engineering planning](https://osgwiki.com/wiki/DEP_Engineering_Planning) procedures to fit
+AdaptiveCards engineering.
 
 ## Work Units
 
@@ -18,7 +19,7 @@ Inputs:
 
 * Possible new features
 * Features that missed the cut line in prior releases (backlog)
-* Desired ship date
+* Desired ship date (account for stabilization time)
 
 During planning, all features under consideration are given a rough spec, a rough cost estimate, and a priority, which
 is determined by customer requirements and how critical a given feature is to a successful release. Total capacity is
@@ -78,6 +79,7 @@ Inputs: Scheduling
 * Make sure documentation tasks are generated for closed epics
 * Review *Velocity tracking* and *Cumulative flow* reports
 * Triage bugs
+* Consider prereleases (alphas/betas) to gather community feedback if the amount of progress warrants it.
 
 **Issue triage/Project pulse (at least weekly):**
 
@@ -118,3 +120,29 @@ Inputs:
 Once all milestones have been executed, it's time to reexamine our current state. Triage all new bugs. Ensure all
 Epics/Tasks/Bugs for the release are completed. Any work left undone has to be reconsidered - Can we ship without it?
 How much time do we need to complete it? 
+
+Examine release collateral. We need documentation, blog posts, conversations with our partners and community, conference
+materials, etc.
+
+When we're satisfied with what's in the release (or a plan to finalize what's in the release), it's a good time to
+consider publishing a *release candidate*. We want some time to gather information about how well the release works,
+identify and ameliorate gaps in test coverage and documentation, etc. Iterate on bugs and develop a sense of quality.
+This stablization period should occur over a fixed timeframe as considered way back when the release was being planned
+initially. Additional stablization periods may need to be considered as appropriate if more certainty about quality is
+needed.
+
+Outputs:
+
+* A shiny new release
+* Information about execution that can be used to refine planning for the next release
+
+## The Windows <-> ZenHub interface
+
+The [DEP engineering planning guide](https://osgwiki.com/wiki/DEP_Engineering_Planning) describes much of what's in this
+document, with a focus on engineering from within the Windows codebase/process. As an expediency for overall Windows org
+planning, our releases and milestones are generally planned to align with Windows releases. We use a tool called
+[GitHubSync](https://mscodehub.visualstudio.com/_git/GitHubSync) to replicate our GitHub-/ZenHub-tracked Epics and tasks
+into the more traditional ADO/VSO/TFS deliverables and workitems that the Windows team is used to. At time of writing,
+this replication is one-way (`ADO <- GitHub`) and
+[runs](https://microsoft.visualstudio.com/AdaptiveCards/_release?definitionId=10) at the beginning and end of the work
+day. In this way, our team's work, capacity, planning, etc. are made visible to standard Windows org reporting tools.
