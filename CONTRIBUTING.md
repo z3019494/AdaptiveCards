@@ -121,15 +121,15 @@ Once all milestones have been executed, it's time to reexamine our current state
 Epics/Tasks/Bugs for the release are completed. Any work left undone has to be reconsidered - Can we ship without it?
 How much time do we need to complete it? 
 
-Examine release collateral. We need documentation, blog posts, conversations with our partners and community, conference
-materials, etc.
+Examine release collateral. We need documentation, samples, blog posts, conversations with our partners and community,
+conference materials, etc.
 
 When we're satisfied with what's in the release (or a plan to finalize what's in the release), it's a good time to
 consider publishing a *release candidate*. We want some time to gather information about how well the release works,
-identify and ameliorate gaps in test coverage and documentation, etc. Iterate on bugs and develop a sense of quality.
-This stablization period should occur over a fixed timeframe as considered way back when the release was being planned
-initially. Additional stablization periods may need to be considered as appropriate if more certainty about quality is
-needed.
+identify and ameliorate gaps in test coverage and documentation, etc. Iterate on bugs and develop a sense of quality. Do
+bug bashes and experiment with new features. This stablization period should occur over a fixed timeframe as considered
+way back when the release was being planned initially. Additional stablization periods may need to be considered as
+appropriate if more certainty about quality is needed.
 
 Outputs:
 
