@@ -4,19 +4,19 @@
 #include <iostream>
 #include <codecvt>
 #include "ParseContext.h"
-#include "TextBlock.h"
+#include "RichTextBlock.h"
+#include "TextRun.h"
 #include "DateTimePreparser.h"
 #include "ParseUtil.h"
 
 using namespace AdaptiveSharedNamespace;
 
-TextBlock::TextBlock() :
-    BaseCardElement(CardElementType::TextBlock), TextElement(), m_wrap(false), m_maxLines(0), m_hAlignment(HorizontalAlignment::Left)
+TextRun::TextRun() : TextElement()
 {
     PopulateKnownPropertiesSet();
 }
 
-Json::Value TextBlock::SerializeToJsonValue() const
+Json::Value TextRun::SerializeToJsonValue() const
 {
     Json::Value root = BaseCardElement::SerializeToJsonValue();
 
@@ -65,6 +65,61 @@ Json::Value TextBlock::SerializeToJsonValue() const
     return root;
 }
 
+std::string TextRun::GetText() const
+{
+    return m_text;
+}
+
+void TextRun::SetText(const std::string& value)
+{
+    m_text = value;
+}
+
+DateTimePreparser TextBlock::GetTextForDateParsing() const
+{
+    return DateTimePreparser(m_text);
+}
+
+TextSize TextBlock::GetTextSize() const
+{
+    return m_textSize;
+}
+
+void TextBlock::SetTextSize(const TextSize value)
+{
+    m_textSize = value;
+}
+
+TextWeight TextBlock::GetTextWeight() const
+{
+    return m_textWeight;
+}
+
+void TextBlock::SetTextWeight(const TextWeight value)
+{
+    m_textWeight = value;
+}
+
+FontStyle TextBlock::GetFontStyle() const
+{
+    return m_fontStyle;
+}
+
+void TextBlock::SetFontStyle(const FontStyle value)
+{
+    m_fontStyle = value;
+}
+
+ForegroundColor TextBlock::GetTextColor() const
+{
+    return m_textColor;
+}
+
+void TextBlock::SetTextColor(const ForegroundColor value)
+{
+    m_textColor = value;
+}
+
 bool TextBlock::GetWrap() const
 {
     return m_wrap;
@@ -73,6 +128,16 @@ bool TextBlock::GetWrap() const
 void TextBlock::SetWrap(const bool value)
 {
     m_wrap = value;
+}
+
+bool TextBlock::GetIsSubtle() const
+{
+    return m_isSubtle;
+}
+
+void TextBlock::SetIsSubtle(const bool value)
+{
+    m_isSubtle = value;
 }
 
 unsigned int TextBlock::GetMaxLines() const
@@ -93,6 +158,16 @@ HorizontalAlignment TextBlock::GetHorizontalAlignment() const
 void TextBlock::SetHorizontalAlignment(const HorizontalAlignment value)
 {
     m_hAlignment = value;
+}
+
+std::string TextBlock::GetLanguage() const
+{
+    return m_language;
+}
+
+void TextBlock::SetLanguage(const std::string& value)
+{
+    m_language = value;
 }
 
 std::shared_ptr<BaseCardElement> TextBlockParser::Deserialize(ParseContext& context, const Json::Value& json)
