@@ -141,6 +141,8 @@ namespace AdaptiveCards.Rendering.Wpf
                 cardContainerStyle = card.Style;
             }
             context.RenderArgs.ParentStyle = cardContainerStyle;
+            // Elements in card root can bleed toward both sides
+            context.RenderArgs.DirectionChildrenCanBleedToward = DirectionChildrenCanBleedTowardsEnum.Both;
 
             var grid = new Grid();
             grid.Style = context.GetStyle("Adaptive.InnerCard");

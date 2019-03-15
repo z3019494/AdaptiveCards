@@ -39,23 +39,41 @@ namespace AdaptiveCards.Rendering.Wpf
                 AdaptiveColumn column = columnSet.Columns[i];
 
                 var columnRenderArgs = new AdaptiveRenderArgs(elementRenderArgs);
+
                 if (columnSet.Columns.Count == 1)
                 {
-                    columnRenderArgs.ColumnRelativePosition = ColumnPositionEnum.Only;
+                    columnRenderArgs.DirectionChildrenCanBleedToward = DirectionChildrenCanBleedTowardsEnum.Both;
                 }
                 else
                 {
                     if (i == 0)
                     {
-                        columnRenderArgs.ColumnRelativePosition = ColumnPositionEnum.Begin;
+                        if ((parentRenderArgs.DirectionChildrenCanBleedToward == DirectionChildrenCanBleedTowardsEnum.Left) ||
+                            (parentRenderArgs.DirectionChildrenCanBleedToward == DirectionChildrenCanBleedTowardsEnum.Both))
+                        {
+                            columnRenderArgs.DirectionChildrenCanBleedToward = DirectionChildrenCanBleedTowardsEnum.Left;
+                        }
+                        else
+                        {
+                            columnRenderArgs.DirectionChildrenCanBleedToward = DirectionChildrenCanBleedTowardsEnum.None;
+                        }
                     }
                     else if (i == (columnSet.Columns.Count - 1))
                     {
-                        columnRenderArgs.ColumnRelativePosition = ColumnPositionEnum.End;
+                        if ((parentRenderArgs.DirectionChildrenCanBleedToward == DirectionChildrenCanBleedTowardsEnum.Right) ||
+                            (parentRenderArgs.DirectionChildrenCanBleedToward == DirectionChildrenCanBleedTowardsEnum.Both))
+                        {
+                            columnRenderArgs.DirectionChildrenCanBleedToward = DirectionChildrenCanBleedTowardsEnum.Right;
+                        }
+                        else
+                        {
+                            columnRenderArgs.DirectionChildrenCanBleedToward = DirectionChildrenCanBleedTowardsEnum.None;
+                        }
+                        
                     }
                     else
                     {
-                        columnRenderArgs.ColumnRelativePosition = ColumnPositionEnum.Intermediate;
+                        columnRenderArgs.DirectionChildrenCanBleedToward = DirectionChildrenCanBleedTowardsEnum.None;
                     }
                 }
                 context.RenderArgs = columnRenderArgs;

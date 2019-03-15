@@ -622,21 +622,38 @@ namespace AdaptiveCards.Rendering.Html
                 var columnRenderArgs = new AdaptiveRenderArgs(elementRenderArgs);
                 if (columnSet.Columns.Count == 1)
                 {
-                    columnRenderArgs.ColumnRelativePosition = ColumnPositionEnum.Only;
+                    columnRenderArgs.DirectionChildrenCanBleedToward = DirectionChildrenCanBleedTowardsEnum.Both;
                 }
                 else
                 {
                     if (i == 0)
                     {
-                        columnRenderArgs.ColumnRelativePosition = ColumnPositionEnum.Begin;
+                        if ((parentRenderArgs.DirectionChildrenCanBleedToward == DirectionChildrenCanBleedTowardsEnum.Left) ||
+                            (parentRenderArgs.DirectionChildrenCanBleedToward == DirectionChildrenCanBleedTowardsEnum.Both))
+                        {
+                            columnRenderArgs.DirectionChildrenCanBleedToward = DirectionChildrenCanBleedTowardsEnum.Left;
+                        }
+                        else
+                        {
+                            columnRenderArgs.DirectionChildrenCanBleedToward = DirectionChildrenCanBleedTowardsEnum.None;
+                        }
                     }
                     else if (i == (columnSet.Columns.Count - 1))
                     {
-                        columnRenderArgs.ColumnRelativePosition = ColumnPositionEnum.End;
+                        if ((parentRenderArgs.DirectionChildrenCanBleedToward == DirectionChildrenCanBleedTowardsEnum.Right) ||
+                            (parentRenderArgs.DirectionChildrenCanBleedToward == DirectionChildrenCanBleedTowardsEnum.Both))
+                        {
+                            columnRenderArgs.DirectionChildrenCanBleedToward = DirectionChildrenCanBleedTowardsEnum.Right;
+                        }
+                        else
+                        {
+                            columnRenderArgs.DirectionChildrenCanBleedToward = DirectionChildrenCanBleedTowardsEnum.None;
+                        }
+
                     }
                     else
                     {
-                        columnRenderArgs.ColumnRelativePosition = ColumnPositionEnum.Intermediate;
+                        columnRenderArgs.DirectionChildrenCanBleedToward = DirectionChildrenCanBleedTowardsEnum.None;
                     }
                 }
                 context.RenderArgs = columnRenderArgs;
@@ -1910,23 +1927,15 @@ namespace AdaptiveCards.Rendering.Html
                 if (element.Bleed && context.RenderArgs.HasParentWithPadding)
                 {
                     // Columns have a special rendering behaviour, only the leftmost and rightmost columns must bleed
-                    if (element is AdaptiveColumn column)
+                    if (parentRenderArgs.DirectionChildrenCanBleedToward == DirectionChildrenCanBleedTowardsEnum.Left)
                     {
-                        if (parentRenderArgs.ColumnRelativePosition == ColumnPositionEnum.Begin)
-                        {
-                            uiElement.Style("margin-left", -padding + "px");
-                        }
-                        else if (parentRenderArgs.ColumnRelativePosition == ColumnPositionEnum.End)
-                        {
-                            uiElement.Style("margin-right", -padding + "px");
-                        }
-                        else if (parentRenderArgs.ColumnRelativePosition == ColumnPositionEnum.Only)
-                        {
-                            uiElement.Style("margin-right", -padding + "px")
-                                    .Style("margin-left", -padding + "px");
-                        }
+                        uiElement.Style("margin-left", -padding + "px");
                     }
-                    else
+                    else if (parentRenderArgs.DirectionChildrenCanBleedToward == DirectionChildrenCanBleedTowardsEnum.Right)
+                    {
+                        uiElement.Style("margin-right", -padding + "px");
+                    }
+                    else if (parentRenderArgs.DirectionChildrenCanBleedToward == DirectionChildrenCanBleedTowardsEnum.Both)
                     {
                         uiElement.Style("margin-right", -padding + "px")
                                 .Style("margin-left", -padding + "px");

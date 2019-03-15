@@ -56,6 +56,11 @@ namespace AdaptiveCards.Rendering.Wpf
             // Modify context outer parent style so padding necessity can be determined
             elementRenderArgs.ParentStyle = (inheritsStyleFromParent) ? parentRenderArgs.ParentStyle : container.Style;
             elementRenderArgs.HasParentWithPadding = (hasPadding || parentRenderArgs.HasParentWithPadding);
+            // If the container has padding, then the children can bleed to the left and right, otherwise, it can bleed to where the parent can bleed
+            if (hasPadding)
+            {
+                elementRenderArgs.DirectionChildrenCanBleedToward = DirectionChildrenCanBleedTowardsEnum.Both;
+            }
             context.RenderArgs = elementRenderArgs;
 
             AddContainerElements(uiContainer, container.Items, context);
@@ -165,26 +170,21 @@ namespace AdaptiveCards.Rendering.Wpf
 
                 if (element.Bleed && context.RenderArgs.HasParentWithPadding)
                 {
-                    // Columns have a special rendering behaviour, only the leftmost and rightmost columns must bleed
-                    if (element is AdaptiveColumn column)
+                    int leftMargin = -padding, rightMargin = -padding;
+
+                    if((parentRenderArgs.DirectionChildrenCanBleedToward == DirectionChildrenCanBleedTowardsEnum.Left) ||
+                       (parentRenderArgs.DirectionChildrenCanBleedToward == DirectionChildrenCanBleedTowardsEnum.None))
                     {
-                        if (parentRenderArgs.ColumnRelativePosition == ColumnPositionEnum.Begin)
-                        {
-                            border.Margin = new Thickness { Left = -padding };
-                        }
-                        else if (parentRenderArgs.ColumnRelativePosition == ColumnPositionEnum.End)
-                        {
-                            border.Margin = new Thickness { Right = -padding };
-                        }
-                        else if (parentRenderArgs.ColumnRelativePosition == ColumnPositionEnum.Only)
-                        {
-                            border.Margin = new Thickness { Left = -padding, Right = -padding };
-                        }
+                        rightMargin = 0;
                     }
-                    else
+
+                    if ((parentRenderArgs.DirectionChildrenCanBleedToward == DirectionChildrenCanBleedTowardsEnum.Right) ||
+                       (parentRenderArgs.DirectionChildrenCanBleedToward == DirectionChildrenCanBleedTowardsEnum.None))
                     {
-                        border.Margin = new Thickness { Left = -padding, Right = -padding };
+                        leftMargin = 0;
                     }
+
+                    border.Margin = new Thickness { Left = leftMargin, Right = rightMargin };
                 }
             }
 

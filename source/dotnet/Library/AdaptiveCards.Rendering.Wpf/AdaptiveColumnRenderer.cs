@@ -35,13 +35,12 @@ namespace AdaptiveCards.Rendering.Wpf
             }
 
             elementRenderArgs.ParentStyle = (inheritsStyleFromParent) ? parentRenderArgs.ParentStyle : column.Style;
-            if ((parentRenderArgs.ColumnRelativePosition == ColumnPositionEnum.Begin) ||
-                (parentRenderArgs.ColumnRelativePosition == ColumnPositionEnum.End))
-            {
-                elementRenderArgs.ColumnRelativePosition = ColumnPositionEnum.Intermediate;
-            }
 
-            elementRenderArgs.HasParentWithPadding = columnHasPadding;
+            if (columnHasPadding)
+            {
+                elementRenderArgs.DirectionChildrenCanBleedToward = DirectionChildrenCanBleedTowardsEnum.Both;
+            }
+            elementRenderArgs.HasParentWithPadding = (columnHasPadding || parentRenderArgs.HasParentWithPadding);
             context.RenderArgs = elementRenderArgs;
 
             AdaptiveContainerRenderer.AddContainerElements(uiContainer, column.Items, context);
