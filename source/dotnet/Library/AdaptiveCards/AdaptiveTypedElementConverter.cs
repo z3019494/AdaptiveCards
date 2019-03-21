@@ -77,7 +77,7 @@ namespace AdaptiveCards
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            throw new NotImplementedException();
+            serializer.Serialize(writer, value);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -133,17 +133,52 @@ namespace AdaptiveCards
                 {
                     serializer.Populate(jObject.CreateReader(), result);
                 }
-                catch (JsonSerializationException)
-                {
-                    return result;
-                }
+                catch (JsonSerializationException) { }
 
                 HandleAdditionalProperties(result);
                 return result;
             }
+            else
+            {
+                // we're dealing with an unknown element here
 
-            Warnings.Add(new AdaptiveWarning(-1, $"Unknown element '{typeName}'"));
-            return null;
+                // continue ID Collision detection
+                string objectId = jObject.Value<string>("id");
+                if (objectId != null)
+                {
+                    if (Ids.Contains(objectId))
+                    {
+                        throw new AdaptiveSerializationException($"Duplicate 'id' found: '{objectId}'");
+                    }
+                    else
+                    {
+                        Ids.Add(objectId);
+                    }
+                }
+
+                AdaptiveTypedElement result = null;
+                if (ParseContext.Type == ParseContext.ContextType.Element)
+                {
+                    try
+                    {
+                        result = (AdaptiveTypedElement)Activator.CreateInstance(typeof(AdaptiveUnknownElement));
+                        serializer.Populate(jObject.CreateReader(), result);
+                    }
+                    catch (JsonSerializationException) { }
+                }
+                else // ParseContext.Type == ParseContext.ContextType.Action
+                {
+                    try
+                    {
+                        result = (AdaptiveTypedElement)Activator.CreateInstance(typeof(AdaptiveUnknownAction));
+                        serializer.Populate(jObject.CreateReader(), result);
+                    }
+                    catch (JsonSerializationException) { }
+                }
+
+                Warnings.Add(new AdaptiveWarning(-1, $"Unknown element '{typeName}'"));
+                return result;
+            }
         }
 
         private void HandleAdditionalProperties(AdaptiveTypedElement te)
