@@ -76,6 +76,42 @@ namespace AdaptiveCards.Rendering.Html.Test
         }
 
         [TestMethod]
+        public void UnknownElementsRender()
+        {
+            var card = new AdaptiveCard("1.2")
+            {
+                Body =
+                {
+                    new AdaptiveUnknownElement()
+                    {
+                        Type = "Graph",
+                        AdditionalProperties =
+                        {
+                            ["UnknownProperty1"] = "UnknownValue1"
+                        }
+                    }
+                },
+                Actions =
+                {
+                    new AdaptiveUnknownAction()
+                    {
+                        Type = "Action.Graph",
+                        AdditionalProperties =
+                        {
+                            ["UnknownProperty2"] = "UnknownValue2"
+                        }
+                    }
+                }
+            };
+
+            var renderer = new AdaptiveCardRenderer();
+            var result = renderer.RenderCard(card);
+            var generatedHtml = result.Html.ToString();
+
+            Assert.AreEqual("<div class='ac-adaptivecard' style='width: 100%;background-color: rgba(255, 255, 255, 1.00);padding: 15px;box-sizing: border-box;justify-content: flex-start;'></div>", generatedHtml);
+        }
+
+        [TestMethod]
         public void ContainerStyleForegroundColors()
         {
             var hostConfig = new AdaptiveHostConfig();
