@@ -16,8 +16,7 @@ namespace AdaptiveCards.Rendering.Wpf
 
             var actionsConfig = context.Config.Actions;
             var maxActions = actionsConfig.MaxActions;
-            var actionsToProcess = actions
-                .Take(maxActions).ToList();
+            var actionsToProcess = GetActionsToProcess(actions, maxActions);
 
             if (actionsToProcess.Any())
             {
@@ -69,47 +68,49 @@ namespace AdaptiveCards.Rendering.Wpf
                     // add actions
                     var uiAction = (Button)context.Render(action);
 
-
-                    if (actionsConfig.ActionsOrientation == ActionsOrientation.Horizontal)
+                    if (uiAction != null)
                     {
-                        if (uiActionBar.Children.Count > 0) // don't apply left margin to the first item
-                            uiAction.Margin = new Thickness(actionsConfig.ButtonSpacing, 0, 0, 0);
-                    }
-                    else
-                    {
-                        uiAction.Margin = new Thickness(0, actionsConfig.ButtonSpacing, 0, 0);
-                    }
-
-
-                    if (actionsConfig.ActionsOrientation == ActionsOrientation.Horizontal)
-                        Grid.SetColumn(uiAction, iPos++);
-
-                    uiActionBar.Children.Add(uiAction);
-
-                    if (action is AdaptiveShowCardAction showCardAction)
-                    {
-                        // Only support 1 level of showCard
-                        if (isInline && context.CardDepth == 1)
+                        if (actionsConfig.ActionsOrientation == ActionsOrientation.Horizontal)
                         {
-                            Grid uiShowCardContainer = new Grid();
-                            uiShowCardContainer.Style = context.GetStyle("Adaptive.Actions.ShowCard");
-                            uiShowCardContainer.DataContext = showCardAction;
-                            uiShowCardContainer.Margin = new Thickness(0, actionsConfig.ShowCard.InlineTopMargin, 0, 0);
-                            uiShowCardContainer.Visibility = Visibility.Collapsed;
+                            if (uiActionBar.Children.Count > 0) // don't apply left margin to the first item
+                                uiAction.Margin = new Thickness(actionsConfig.ButtonSpacing, 0, 0, 0);
+                        }
+                        else
+                        {
+                            uiAction.Margin = new Thickness(0, actionsConfig.ButtonSpacing, 0, 0);
+                        }
 
-                            // render the card
-                            var uiShowCardWrapper = (Grid)context.Render(showCardAction.Card);
-                            uiShowCardWrapper.Background = context.GetColorBrush("Transparent");
-                            uiShowCardWrapper.DataContext = showCardAction;
 
-                            // Remove the card padding
-                            var innerCard = (Grid)uiShowCardWrapper.Children[0];
-                            innerCard.Margin = new Thickness(0);
+                        if (actionsConfig.ActionsOrientation == ActionsOrientation.Horizontal)
+                            Grid.SetColumn(uiAction, iPos++);
 
-                            uiShowCardContainer.Children.Add(uiShowCardWrapper);
+                        uiActionBar.Children.Add(uiAction);
 
-                            // Add to the list of show cards in context
-                            context.ActionShowCards.Add(new Tuple<FrameworkElement, Button>(uiShowCardContainer, uiAction));
+                        if (action is AdaptiveShowCardAction showCardAction)
+                        {
+                            // Only support 1 level of showCard
+                            if (isInline && context.CardDepth == 1)
+                            {
+                                Grid uiShowCardContainer = new Grid();
+                                uiShowCardContainer.Style = context.GetStyle("Adaptive.Actions.ShowCard");
+                                uiShowCardContainer.DataContext = showCardAction;
+                                uiShowCardContainer.Margin = new Thickness(0, actionsConfig.ShowCard.InlineTopMargin, 0, 0);
+                                uiShowCardContainer.Visibility = Visibility.Collapsed;
+
+                                // render the card
+                                var uiShowCardWrapper = (Grid)context.Render(showCardAction.Card);
+                                uiShowCardWrapper.Background = context.GetColorBrush("Transparent");
+                                uiShowCardWrapper.DataContext = showCardAction;
+
+                                // Remove the card padding
+                                var innerCard = (Grid)uiShowCardWrapper.Children[0];
+                                innerCard.Margin = new Thickness(0);
+
+                                uiShowCardContainer.Children.Add(uiShowCardWrapper);
+
+                                // Add to the list of show cards in context
+                                context.ActionShowCards.Add(new Tuple<FrameworkElement, Button>(uiShowCardContainer, uiAction));
+                            }
                         }
                     }
                 }
@@ -117,6 +118,13 @@ namespace AdaptiveCards.Rendering.Wpf
                 // Restore the iconPlacement for the context.
                 actionsConfig.IconPlacement = oldConfigIconPlacement;
             }
+        }
+
+        private static List<AdaptiveAction> GetActionsToProcess(IList<AdaptiveAction> actions, int maxActions)
+        {
+            // only consider known actions for ActionsToProcess
+            var actionsToProcess = actions.Where(obj => obj.GetType() != typeof(AdaptiveUnknownAction)).ToList();
+            return actionsToProcess.Take(maxActions).ToList();
         }
     }
 }

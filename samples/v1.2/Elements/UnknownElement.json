@@ -1,0 +1,26 @@
+{
+	"$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+	"type": "AdaptiveCard",
+	"version": "1.0",
+	"body": [
+		{
+			"type": "Graph",
+			"unknownProperty1": "unknownValue1"
+		},
+		{
+			"type": "TextBlock",
+			"text": "The unknown element should not be rendered"
+		}
+	],
+	"actions": [
+		{
+			"type": "Action.Graph",
+			"unknownProperty2": "unknownValue2"
+		},
+		{
+			"type": "Action.OpenUrl",
+			"title": "OpenUrl",
+			"url": "http://adaptivecards.io"
+		}
+	]
+}
