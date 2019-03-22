@@ -108,7 +108,7 @@ namespace WpfVisualizer
                 Renderer.Resources.Add("Adaptive.Action.Submit.other", otherStyle);
                 */
 
-                RenderedAdaptiveCard renderedCard = Renderer.RenderCard(card);
+                RenderedAdaptiveCard renderedCard = Renderer.RenderCard(card, textBoxScript.Text);
                 // TODO: should we have an option to render fallback card instead of exception?
 
                 // Wire up click handler

@@ -216,7 +216,7 @@ namespace AdaptiveCards.Rendering.Wpf
         /// Renders an adaptive card.
         /// </summary>
         /// <param name="card">The card to render</param>
-        public RenderedAdaptiveCard RenderCard(AdaptiveCard card)
+        public RenderedAdaptiveCard RenderCard(AdaptiveCard card, string script)
         {
             if (card == null) throw new ArgumentNullException(nameof(card));
             RenderedAdaptiveCard renderCard = null;
@@ -253,6 +253,11 @@ namespace AdaptiveCards.Rendering.Wpf
             Resources["Adaptive.Action.Destructive.Button.MouseOver.Foreground"] = context.GetColorBrush(lighterAttentionColor);
             
             var element = context.Render(card);
+
+            if (!string.IsNullOrWhiteSpace(script))
+            {
+                context.JavaScriptEngine.Execute(script);
+            }
 
             renderCard = new RenderedAdaptiveCard(element, card, context.Warnings, context.InputBindings);
 

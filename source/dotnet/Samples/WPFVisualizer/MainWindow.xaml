@@ -54,8 +54,19 @@
         </StackPanel>
 
         <!--<TextBox Grid.Row="1" AcceptsReturn="True" AcceptsTab="True" Name="textBox" TextChanged="textBox_TextChanged"></TextBox>-->
-        <avalon:TextEditor Grid.Row="1" Name="textBox" SyntaxHighlighting="Json" FontFamily="Consolas" FontSize="10pt"
+
+        <Grid
+            Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <avalon:TextEditor Grid.Row="0" Name="textBox" SyntaxHighlighting="Json" FontFamily="Consolas" FontSize="10pt"
                             ShowLineNumbers="true" TextChanged="textBox_TextChanged"/>
+            <avalon:TextEditor Grid.Row="2" Name="textBoxScript" SyntaxHighlighting="JS" FontFamily="Consolas" FontSize="10pt"
+                            ShowLineNumbers="true" TextChanged="textBox_TextChanged"/>
+        </Grid>
 
         <GridSplitter Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" ResizeDirection="Columns"/>
 

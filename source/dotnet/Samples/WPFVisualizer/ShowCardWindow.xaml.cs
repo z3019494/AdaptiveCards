@@ -30,7 +30,7 @@ namespace WpfVisualizer
             {
                 Resources = _resources
             };
-            var result = renderer.RenderCard(_card.Card);
+            var result = renderer.RenderCard(_card.Card, null);
 
             if (result.FrameworkElement != null)
             {

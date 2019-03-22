@@ -1,3 +1,4 @@
+using Microsoft.ClearScript.V8;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,6 +20,8 @@ namespace AdaptiveCards.Rendering.Wpf
 
         public List<Task> AssetTasks { get; } = new List<Task>();
 
+        public V8ScriptEngine JavaScriptEngine { get; private set; }
+
         public AdaptiveRenderContext(Action<object, AdaptiveActionEventArgs> actionCallback,
             Action<object, MissingInputEventArgs> missingDataCallback,
             Action<object, AdaptiveMediaEventArgs> mediaClickCallback)
@@ -31,6 +34,27 @@ namespace AdaptiveCards.Rendering.Wpf
 
             if (mediaClickCallback != null)
                 OnMediaClick += (obj, args) => mediaClickCallback(obj, args);
+
+            JavaScriptEngine = new V8ScriptEngine();
+            JavaScriptEngine.AddHostObject("host", new HostFunctions(this));
+        }
+
+        public class HostFunctions
+        {
+            private AdaptiveRenderContext _context;
+
+            public HostFunctions(AdaptiveRenderContext context)
+            {
+                _context = context;
+            }
+
+            public void ToggleVisibility(string elementId, bool isVisible)
+            {
+                _context.ToggleVisibility(new AdaptiveTargetElement[]
+                {
+                new AdaptiveTargetElement(elementId, isVisible)
+                });
+            }
         }
 
         public AdaptiveHostConfig Config { get; set; } = new AdaptiveHostConfig();

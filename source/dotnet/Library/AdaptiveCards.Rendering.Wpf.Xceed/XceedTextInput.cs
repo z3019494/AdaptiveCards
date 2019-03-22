@@ -147,13 +147,8 @@ namespace AdaptiveCards.Rendering.Wpf
         {
             input.Value = textBox.Text;
 
-            using (var engine = new V8ScriptEngine())
-            {
-                engine.AddHostObject("input", input);
-                engine.AddHostObject("host", new HostFunctions(context));
-
-                engine.Execute(input.OnChange);
-            }
+            context.JavaScriptEngine.AddHostObject("input", input);
+            context.JavaScriptEngine.Execute(input.OnChange);
         }
     }
 
