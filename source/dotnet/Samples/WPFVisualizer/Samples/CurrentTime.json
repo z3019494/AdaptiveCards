@@ -1,0 +1,24 @@
+{
+    "type": "AdaptiveCard",
+    "body": [
+        {
+            "type": "TextBlock",
+            "text": "Change the text to update the time"
+        },
+        {
+            "type": "Input.Text",
+            "id": "name",
+            "placeholder": "Your name",
+            "onChange": "updateTime()"
+        },
+        {
+            "type": "TextBlock",
+            "id": "currentTime",
+            "weight": "Bolder",
+            "text": "Updating current time...",
+            "isVisible": false
+        }
+    ],
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.0"
+}
