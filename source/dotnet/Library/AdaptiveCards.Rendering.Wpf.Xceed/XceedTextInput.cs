@@ -1,3 +1,4 @@
+using Microsoft.ClearScript.V8;
 using System.Windows;
 using System.Windows.Controls;
 using Xceed.Wpf.Toolkit;
@@ -20,6 +21,14 @@ namespace AdaptiveCards.Rendering.Wpf
                 if (input.MaxLength > 0)
                 {
                     textBox.MaxLength = input.MaxLength;
+                }
+
+                if (input.OnChange != null)
+                {
+                    textBox.TextChanged += delegate
+                    {
+                        HandleTextChanged(textBox, input, context);
+                    };
                 }
 
                 textBox.Watermark = input.Placeholder;
@@ -132,6 +141,37 @@ namespace AdaptiveCards.Rendering.Wpf
                 textBlock.Text = XamlUtilities.GetFallbackText(input) ?? input.Placeholder;
                 return context.Render(textBlock);
             }
+        }
+
+        private static void HandleTextChanged(TextBox textBox, AdaptiveTextInput input, AdaptiveRenderContext context)
+        {
+            input.Value = textBox.Text;
+
+            using (var engine = new V8ScriptEngine())
+            {
+                engine.AddHostObject("input", input);
+                engine.AddHostObject("host", new HostFunctions(context));
+
+                engine.Execute(input.OnChange);
+            }
+        }
+    }
+
+    public class HostFunctions
+    {
+        private AdaptiveRenderContext _context;
+
+        public HostFunctions(AdaptiveRenderContext context)
+        {
+            _context = context;
+        }
+
+        public void ToggleVisibility(string elementId, bool isVisible)
+        {
+            _context.ToggleVisibility(new AdaptiveTargetElement[]
+            {
+                new AdaptiveTargetElement(elementId, isVisible)
+            });
         }
     }
 }

@@ -81,6 +81,9 @@ namespace AdaptiveCards
 #endif
         public AdaptiveAction InlineAction { get; set; }
 
+        [JsonProperty("onChange", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string OnChange { get; set; }
+
         public override string GetNonInteractiveValue()
         {
             return Value ?? $"*[{Placeholder}]*";
