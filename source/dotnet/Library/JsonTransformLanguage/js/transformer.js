@@ -35,7 +35,7 @@ function transformObject(item, parentEvaluator) {
     } else {
         item.$data = evaluator.$data;
         resolveWhenOnItem(item, evaluator);
-        if (item.$when) {
+        if (item.$when === true) {
             for (var prop in item) {
                 if (item.hasOwnProperty(prop) && !prop.startsWith('$')) {
                     var transformedPropVals = transformToken(item[prop], evaluator);
