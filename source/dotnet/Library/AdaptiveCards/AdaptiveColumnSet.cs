@@ -29,25 +29,5 @@ namespace AdaptiveCards
         [XmlElement(Type = typeof(AdaptiveColumn), ElementName = AdaptiveColumn.TypeName)]
 #endif
         public List<AdaptiveColumn> Columns { get; set; } = new List<AdaptiveColumn>();
-
-        /// <summary>
-        ///     Action for this ColumnSet (this allows a default action at the column set level)
-        /// </summary>
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-#if !NETSTANDARD1_3
-        [XmlElement]
-#endif
-        [DefaultValue(null)]
-        public AdaptiveAction SelectAction { get; set; }
-
-        public override IEnumerable<AdaptiveTypedElement> GetChildren()
-        {
-            return Columns;
-        }
-
-        public override IEnumerable<IList> GetChildrenLists()
-        {
-            yield return Columns;
-        }
     }
 }
