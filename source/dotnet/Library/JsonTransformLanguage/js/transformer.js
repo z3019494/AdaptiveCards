@@ -149,6 +149,7 @@ function evaluate(expression, evaluator) {
             this[prop] = evaluator.$data[prop];
         }
     }
+    this.$data = evaluator.$data;
     return eval(expression);
 }
 
