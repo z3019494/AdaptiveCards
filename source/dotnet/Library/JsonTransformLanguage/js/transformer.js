@@ -1,6 +1,7 @@
 function transform(templateJson, dataJson) {
     template = JSON.parse(templateJson);
     data = JSON.parse(dataJson);
+    this.$rootData = data;
 
     var transformed = transformToken(template, {
         $data: data
