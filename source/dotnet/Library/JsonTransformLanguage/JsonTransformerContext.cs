@@ -13,26 +13,13 @@ namespace JsonTransformLanguage
     {
         public JsonTransformerContext(JToken rootData, Dictionary<string, JToken> additionalReservedProperties)
         {
-            ReservedProperties = new JsonTransformerReservedProperties()
-            {
-                RootData = rootData,
-                Data = rootData,
-                Index = null,
-                Props = null,
-                AdditionalReservedProperties = additionalReservedProperties ?? new Dictionary<string, JToken>()
-            };
             ParentIsArray = false;
-            Types = new JsonTransformerTypes();
 
             ScriptEngine = new ScriptEngine();
             InitializeTransformer();
         }
 
-        public JsonTransformerReservedProperties ReservedProperties { get; set; }
-
         public bool ParentIsArray { get; set; }
-
-        public JsonTransformerTypes Types { get; set; }
 
         public JsonTransformerWarnings Warnings { get; private set; } = new JsonTransformerWarnings();
 
@@ -43,16 +30,6 @@ namespace JsonTransformLanguage
             foreach (var p in this.GetType().GetTypeInfo().DeclaredProperties)
             {
                 p.SetValue(this, p.GetValue(existingContext));
-            }
-
-            if (Types != null)
-            {
-                Types = Types.Clone();
-            }
-
-            if (ReservedProperties != null)
-            {
-                ReservedProperties = new JsonTransformerReservedProperties(ReservedProperties);
             }
         }
 
