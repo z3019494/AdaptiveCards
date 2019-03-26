@@ -1,11 +1,4 @@
-var rootData;
-
-function setRootData(dataJson) {
-    rootData = JSON.parse(dataJson);
-}
-
 function transform(templateJson, dataJson) {
-
     template = JSON.parse(templateJson);
     data = JSON.parse(dataJson);
 
@@ -128,6 +121,10 @@ function createEvaluator(item, parentEvaluator) {
     if (item.$data === undefined) {
         return {
             $data: parentEvaluator.$data
+        };
+    } else if (typeof item.$data === 'object') {
+        return {
+            $data: item.$data
         };
     } else {
         try {

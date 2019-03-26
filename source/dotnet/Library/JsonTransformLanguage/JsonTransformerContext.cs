@@ -26,7 +26,6 @@ namespace JsonTransformLanguage
 
             ScriptEngine = new ScriptEngine();
             InitializeTransformer();
-            InitializeData(rootData);
         }
 
         public JsonTransformerReservedProperties ReservedProperties { get; set; }
@@ -70,13 +69,6 @@ namespace JsonTransformLanguage
             }
 
             ScriptEngine.Execute(transformerJs);
-        }
-
-        private void InitializeData(JToken rootData)
-        {
-            string jsonData = rootData.ToString();
-            ScriptEngine.SetGlobalValue("rootDataJson", jsonData);
-            ScriptEngine.Execute("setRootData(rootDataJson);");
         }
     }
 }

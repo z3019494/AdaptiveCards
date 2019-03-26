@@ -15,7 +15,8 @@ namespace JsonTransformLanguage
         public static JToken Transform(JToken input, JToken data, Dictionary<string, JToken> additionalReservedProperties)
         {
             var context = new JsonTransformerContext(data, additionalReservedProperties);
-            context.ScriptEngine.SetGlobalValue("templateJson", input.ToString());
+            context.ScriptEngine.SetGlobalValue("rootDataJson", ToJson(data));
+            context.ScriptEngine.SetGlobalValue("templateJson", ToJson(input));
             string answer = context.ScriptEngine.Evaluate<string>("transform(templateJson, rootDataJson)");
             var tokenAnswer = JToken.Parse(answer);
 
@@ -24,6 +25,16 @@ namespace JsonTransformLanguage
             return tokenAnswer;
 
             //return Transform(input, new JsonTransformerContext(data, additionalReservedProperties));
+        }
+
+        private static string ToJson(JToken token)
+        {
+            string answer = token.ToString();
+            if (string.IsNullOrWhiteSpace(answer))
+            {
+                return "{}";
+            }
+            return answer;
         }
 
         private static void Sanitize(JToken token)
