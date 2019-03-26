@@ -58,10 +58,19 @@ function transformArray(array, evaluator) {
     for (var i = 0; i < array.length; i++) {
         var child = array[i];
         var tokens = transformToken(child, evaluator);
-        array.splice(i, 1, tokens);
+        if (tokens.length === 0) {
+            array.splice(i, 1);
+            i--;
+        } else {
+            for (var x = 0; x < tokens.length; x++) {
+                array.splice(i, 1, tokens[x]);
+                i++;
+            }
+            i--;
+        }
     }
 
-    return array;
+    return [array];
 }
 
 function transformToken(token, evaluator) {
