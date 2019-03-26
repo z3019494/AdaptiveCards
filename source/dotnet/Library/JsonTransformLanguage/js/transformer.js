@@ -76,18 +76,38 @@ function transformToken(token, evaluator) {
     } else if (typeof token === 'object') {
         return transformObject(token, evaluator);
     } else if (typeof token === 'string') {
-        return [token.replace(/{([^}]+)}/g, function (expr) {
-            try {
-                expr = expr.substring(1, expr.length - 1);
-                return evaluate(expr, evaluator);
-            }
-            catch (err) {
-                return '';
-            }
-        })];
+        return transformString(token, evaluator);
     } else {
         return [token];
     }
+}
+
+function transformString(str, evaluator) {
+    // If entire thing is expression, preserve
+    if (new RegExp('^{([^}]+)}$').test(str)) {
+        try {
+            var expr = str.substring(1, str.length - 1);
+            var answer = evaluate(expr, evaluator);
+            if (answer !== undefined) {
+                return [answer];
+            } else {
+                return [];
+            }
+        }
+        catch (err) {
+            return [];
+        }
+    }
+
+    return [str.replace(/{([^}]+)}/g, function (expr) {
+        try {
+            expr = expr.substring(1, expr.length - 1);
+            return evaluate(expr, evaluator);
+        }
+        catch (err) {
+            return '';
+        }
+    })];
 }
 
 function resolveWhenOnItem(item, evaluator) {
