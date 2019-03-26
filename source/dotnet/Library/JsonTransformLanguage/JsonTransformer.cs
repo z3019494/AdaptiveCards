@@ -14,7 +14,41 @@ namespace JsonTransformLanguage
 
         public static JToken Transform(JToken input, JToken data, Dictionary<string, JToken> additionalReservedProperties)
         {
-            return Transform(input, new JsonTransformerContext(data, additionalReservedProperties));
+            var context = new JsonTransformerContext(data, additionalReservedProperties);
+            context.ScriptEngine.SetGlobalValue("templateJson", input.ToString());
+            string answer = context.ScriptEngine.Evaluate<string>("transform(templateJson, rootDataJson)");
+            var tokenAnswer = JToken.Parse(answer);
+
+            // Remove all $data and $when
+            Sanitize(tokenAnswer);
+            return tokenAnswer;
+
+            //return Transform(input, new JsonTransformerContext(data, additionalReservedProperties));
+        }
+
+        private static void Sanitize(JToken token)
+        {
+            if (token is JObject jObj)
+            {
+                foreach (var prop in jObj.Properties().ToArray())
+                {
+                    if (prop.Name == "$data" || prop.Name == "$when")
+                    {
+                        jObj.Remove(prop.Name);
+                    }
+                    else
+                    {
+                        Sanitize(prop.Value);
+                    }
+                }
+            }
+            else if (token is JArray jArray)
+            {
+                foreach (var t in jArray.Children())
+                {
+                    Sanitize(t);
+                }
+            }
         }
 
         private static JToken Transform(JToken input,  JsonTransformerContext context)
