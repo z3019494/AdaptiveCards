@@ -1,0 +1,70 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.0",
+  "data": {
+    "name": "Thomas Fennel",
+    "reportsTo": {
+      "name": "Andrew Clinick",
+      "picture": "https://unsplash.it/64?image=1025"
+    },
+    "directReports": [
+      {
+        "name": "Adam Wilson",
+        "picture": "https://unsplash.it/64?image=804"
+      },
+      {
+        "name": "Andrew Leader",
+        "picture": "https://unsplash.it/64?image=883"
+      },
+      {
+        "name": "Mary Anne Noskowski",
+        "picture": "https://unsplash.it/64?image=1027"
+      },
+      {
+        "name": "Matt Hidinger",
+        "picture": "https://unsplash.it/64?image=669"
+      },
+      {
+        "name": "Molly Dalton",
+        "picture": "https://unsplash.it/64?image=1011"
+      }
+    ]
+  },
+  "elements": {
+    "Person": "https://raw.githubusercontent.com/andrewleader/my-adaptive-card-elements/23f7c7ccd2ee53f675b3fe7b66243f47b503d20c/elements/Person.json"
+  },
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "{name}",
+      "size": "large",
+      "weight": "bolder"
+    },
+    {
+      "type": "TextBlock",
+      "text": "Reports to",
+      "isSubtle": true,
+      "separator": true,
+      "spacing": "medium"
+    },
+    {
+      "type": "Person",
+      "name": "{reportsTo.name}",
+      "picture": "{reportsTo.picture}"
+    },
+    {
+      "type": "TextBlock",
+      "text": "Direct reports",
+      "isSubtle": true,
+      "separator": true,
+      "spacing": "medium"
+    },
+    {
+      "type": "Person",
+      "$data": "{directReports}",
+      "name": "{name}",
+      "picture": "{picture}"
+    }
+  ]
+}

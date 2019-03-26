@@ -24,7 +24,8 @@ namespace AdaptiveCards.Rendering.Wpf
 
         public AdaptiveRenderContext(Action<object, AdaptiveActionEventArgs> actionCallback,
             Action<object, MissingInputEventArgs> missingDataCallback,
-            Action<object, AdaptiveMediaEventArgs> mediaClickCallback)
+            Action<object, AdaptiveMediaEventArgs> mediaClickCallback,
+            Dictionary<string, object> elementDefinitions)
         {
             if (actionCallback != null)
                 OnAction += (obj, args) => actionCallback(obj, args);
@@ -37,6 +38,8 @@ namespace AdaptiveCards.Rendering.Wpf
 
             JavaScriptEngine = new V8ScriptEngine();
             JavaScriptEngine.AddHostObject("host", new HostFunctions(this));
+
+            ElementDefinitions = elementDefinitions;
         }
 
         public class HostFunctions
@@ -62,6 +65,7 @@ namespace AdaptiveCards.Rendering.Wpf
         public IList<AdaptiveWarning> Warnings { get; } = new List<AdaptiveWarning>();
 
         public AdaptiveElementRenderers<FrameworkElement, AdaptiveRenderContext> ElementRenderers { get; set; }
+        public Dictionary<string, object> ElementDefinitions { get; set; }
 
         public ResourceDictionary Resources { get; set; }
 
@@ -187,7 +191,7 @@ namespace AdaptiveCards.Rendering.Wpf
                 return Render(tb);
             }
 
-            var renderer = ElementRenderers.Get(element.GetType());
+            var renderer = ElementRenderers.Get(ElementDefinitions, element);
             if (renderer != null)
             {
                 // Increment card depth before rendering the inner card

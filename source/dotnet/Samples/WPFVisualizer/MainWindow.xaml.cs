@@ -20,6 +20,7 @@ using Newtonsoft.Json.Linq;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using System.Windows.Media;
+using System.Collections.ObjectModel;
 
 namespace WpfVisualizer
 {
@@ -28,6 +29,8 @@ namespace WpfVisualizer
         private bool _dirty;
         private readonly SpeechSynthesizer _synth;
         private DocumentLine _errorLine;
+
+        public ObservableCollection<string> Samples = new ObservableCollection<string>();
 
         public MainWindow()
         {
@@ -52,6 +55,12 @@ namespace WpfVisualizer
                     Tag = config
                 });
             }
+
+            foreach (var samples in Directory.GetFiles(@"Samples", "*.json"))
+            {
+                Samples.Add(Path.GetFileNameWithoutExtension(samples));
+            }
+            listBoxSamples.ItemsSource = Samples;
 
 
             Renderer = new AdaptiveCardRenderer()
@@ -91,10 +100,10 @@ namespace WpfVisualizer
 
             try
             {
-
-                AdaptiveCardParseResult parseResult = AdaptiveCard.FromJson(textBox.Text);
+                AdaptiveCardParseResult parseResult = AdaptiveCard.ResolveFromJson(textBox.Text, textBoxData.Text);
 
                 AdaptiveCard card = parseResult.Card;
+
 
                 /*
                 // Example on how to override the Action Positive and Destructive styles
@@ -381,6 +390,34 @@ namespace WpfVisualizer
         private void HostConfigEditor_OnPropertyValueChanged(object sender, PropertyValueChangedEventArgs e)
         {
             _dirty = true;
+        }
+
+        private void textBoxData_TextChanged(object sender, EventArgs e)
+        {
+            _dirty = true;
+        }
+
+        private void listBoxSamples_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                string card = File.ReadAllText(Directory.GetCurrentDirectory() + @"\Samples\" + listBoxSamples.SelectedItem + ".json");
+                var parsed = JObject.Parse(card);
+                if (parsed.TryGetValue("data", out JToken value))
+                {
+                    textBoxData.Text = value.ToString();
+                    parsed.Remove("data");
+                    textBox.Text = parsed.ToString();
+                }
+                else
+                {
+                    textBoxData.Text = "";
+                    textBox.Text = card;
+                }
+
+                _dirty = true;
+            }
+            catch { }
         }
     }
 }
