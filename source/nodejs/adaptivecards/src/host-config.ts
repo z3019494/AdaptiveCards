@@ -266,7 +266,7 @@ export interface ILineHeightDefinitions {
 }
 
 export class ContainerStyleSet {
-    private _allStyles: object = {};
+    private _allStyles: any = {};
 
     constructor(obj?: any) {
         this._allStyles[Enums.ContainerStyle.Default] = new BuiltInContainerStyleDefinition();

@@ -108,8 +108,8 @@ export function createElementInstance(
 
 export interface ICardObject {
     shouldFallback(): boolean;
-    setParent(parent: CardElement);
-    parse(json: any, errors?: Array<HostConfig.IValidationError>);
+    setParent(parent: CardElement): void;
+    parse(json: any, errors?: Array<HostConfig.IValidationError>): void;
 }
 
 export type CardElementHeight = "auto" | "stretch";
@@ -3432,6 +3432,8 @@ export abstract class Action implements ICardObject {
         if (this.id == id) {
             return this;
         }
+
+        return undefined;
     }
 
     getReferencedInputs(): Shared.Dictionary<Input> {
@@ -3477,7 +3479,7 @@ export abstract class Action implements ICardObject {
 export class SubmitAction extends Action {
     private _isPrepared: boolean = false;
     private _originalData: Object;
-    private _processedData: Object;
+    private _processedData: any;
     private _ignoreInputValidation: boolean = false;
 
     protected internalGetReferencedInputs(allInputs: Array<Input>): Shared.Dictionary<Input> {
@@ -3579,7 +3581,7 @@ export class OpenUrlAction extends Action {
 }
 
 export class ToggleVisibilityAction extends Action {
-    targetElements = {}
+    private _targetElements: object = {}
 
     getJsonTypeName(): string {
         return "Action.ToggleVisibility";
@@ -3603,7 +3605,7 @@ export class ToggleVisibilityAction extends Action {
     parse(json: any) {
         super.parse(json);
 
-        this.targetElements = {};
+        this._targetElements = {};
 
         let jsonTargetElements = json["targetElements"];
 
@@ -3627,8 +3629,12 @@ export class ToggleVisibilityAction extends Action {
         this.targetElements[elementId] = isVisible;
     }
 
-    removeTargetElement(elementId) {
+    removeTargetElement(elementId: string) {
         delete this.targetElements[elementId];
+    }
+
+    get targetElements(): any {
+        return this._targetElements;
     }
 }
 
@@ -4416,7 +4422,7 @@ export class ActionSet extends CardElement {
             return this._actionCollection.items[index];
         }
         else {
-            super.getActionAt(index);
+            return super.getActionAt(index);
         }
     }
 
@@ -5845,7 +5851,7 @@ export abstract class ContainerWithActions extends Container {
             return this._actionCollection.items[index];
         }
         else {
-            super.getActionAt(index);
+            return super.getActionAt(index);
         }
     }
 
@@ -5933,7 +5939,7 @@ export abstract class TypeRegistry<T> {
         this._items = [];
     }
 
-    abstract reset();
+    abstract reset(): void;
 
     registerType(typeName: string, createInstance: () => T) {
         var registrationInfo = this.findTypeRegistration(typeName);
@@ -6054,9 +6060,9 @@ export class AdaptiveCard extends ContainerWithActions {
         if (AdaptiveCard.onProcessMarkdown) {
             AdaptiveCard.onProcessMarkdown(text, result);
         }
-        else if (window["markdownit"]) {
+        else if ((window as any)["markdownit"]) {
             // Check for markdownit
-            result.outputHtml = window["markdownit"]().render(text);
+            result.outputHtml = (window as any)["markdownit"]().render(text);
             result.didProcess = true;
         } else {
             console.warn("Markdown processing isn't enabled. Please see https://www.npmjs.com/package/adaptivecards#supporting-markdown")

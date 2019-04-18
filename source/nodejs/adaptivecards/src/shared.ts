@@ -173,7 +173,7 @@ export interface IResourceInformation {
  * @link http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
  **/
 export class UUID {
-	private static lut = [];
+	private static lut: any[] = [];
 
 	static generate(): string {
 		let d0 = Math.random() * 0xffffffff | 0;

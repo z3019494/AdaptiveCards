@@ -157,7 +157,7 @@ export function truncate(element: HTMLElement,
 	if (fits()) return;
 
 	var fullText = element.innerHTML;
-	var truncateAt = (idx) => {
+	var truncateAt = (idx: any) => {
 		element.innerHTML = fullText.substring(0, idx) + '...';
 	}
 
