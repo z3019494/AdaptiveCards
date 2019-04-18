@@ -58,7 +58,7 @@ export class SettingsManager {
     
             return {
                 succeeded: true,
-                value: returnValue ? returnValue == "true" : defaultValue
+                value: returnValue ? returnValue === "true" : defaultValue
             };
         }
         else {

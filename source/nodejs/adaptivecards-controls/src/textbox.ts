@@ -48,7 +48,7 @@ class SingleLineEditBox extends EditBox {
     }
 
     set maxLength(value: number) {
-        if (this._inputElement.maxLength != value) {
+        if (this._inputElement.maxLength !== value) {
             this._inputElement.maxLength = value;
 
             this.value = this.value.substr(0, value);
@@ -90,7 +90,7 @@ class MultilineEditBox extends EditBox {
     }
 
     set maxLength(value: number) {
-        if (this._textareaElement.maxLength != value) {
+        if (this._textareaElement.maxLength !== value) {
             this._textareaElement.maxLength = value;
 
             this.value = this.value.substr(0, value);
@@ -120,7 +120,7 @@ export class TextBox extends InputControl {
     }
 
     private recreateEditBox() {
-        var currentValue: string = null;
+        let currentValue: string = null;
 
         if (this._editBox) {
             currentValue = this._editBox.value;
@@ -192,7 +192,7 @@ export class TextBox extends InputControl {
     }
 
     set isMultiline(value: boolean) {
-        if (this._isMultiline != value) {
+        if (this._isMultiline !== value) {
             this._isMultiline = value;
 
             this.recreateEditBox();

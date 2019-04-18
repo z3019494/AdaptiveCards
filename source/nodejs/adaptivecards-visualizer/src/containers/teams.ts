@@ -15,7 +15,7 @@ import * as teamsLightConfiguration from "../../../../../samples/HostConfig/micr
 
 export class TeamsContainer extends HostContainer {
     protected renderContainer(adaptiveCard: AdaptiveCard, target: HTMLElement): HTMLElement {
-        var element = document.createElement("div");
+        let element = document.createElement("div");
         element.style.borderTop = "1px solid #F1F1F1";
         element.style.borderRight = "1px solid #F1F1F1";
         element.style.borderBottom = "1px solid #F1F1F1";

@@ -233,13 +233,13 @@ export class Toolbar {
         separatorPosition: ToolbarElementAlignment) {
 
         for (let i = 0; i < elements.length; i++) {
-            if (elements[i].separator && separatorPosition == ToolbarElementAlignment.Left && i > 0) {
+            if (elements[i].separator && separatorPosition === ToolbarElementAlignment.Left && i > 0) {
                 container.appendChild(this.createSeparatorElement());
             }
 
             container.appendChild(elements[i].render());
 
-            if (elements[i].separator && separatorPosition == ToolbarElementAlignment.Right && i < elements.length - 1) {
+            if (elements[i].separator && separatorPosition === ToolbarElementAlignment.Right && i < elements.length - 1) {
                 container.appendChild(this.createSeparatorElement());
             }
         }
@@ -256,7 +256,7 @@ export class Toolbar {
         let rightElements: Array<ToolbarElement> = [];
 
         for (let element of this._elements) {
-            if (element.alignment == ToolbarElementAlignment.Left) {
+            if (element.alignment === ToolbarElementAlignment.Left) {
                 leftElements.push(element);
             }
             else {
@@ -291,7 +291,7 @@ export class Toolbar {
 
     insertElementAfter(element: ToolbarElement, afterElementId: string) {
         for (let i = 0; i < this._elements.length; i++) {
-            if (this._elements[i].id == afterElementId) {
+            if (this._elements[i].id === afterElementId) {
                 this._elements.splice(i + 1, 0, element);
 
                 return;
@@ -305,7 +305,7 @@ export class Toolbar {
 
     insertElementBefore(element: ToolbarElement, beforeElementId: string) {
         for (let i = this._elements.length - 1; i >= 0; i--) {
-            if (this._elements[i].id == beforeElementId) {
+            if (this._elements[i].id === beforeElementId) {
                 this._elements.splice(i, 0, element);
 
                 return;

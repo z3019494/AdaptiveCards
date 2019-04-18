@@ -2,7 +2,7 @@ export class PeerCommand {
     private _renderedElement: HTMLElement;
 
     protected internalRender(): HTMLElement {
-        var buttonElement = document.createElement("button");
+        let buttonElement = document.createElement("button");
         buttonElement.type = "button";
         buttonElement.title = this.name;
         buttonElement.classList.add("acd-peerButton");

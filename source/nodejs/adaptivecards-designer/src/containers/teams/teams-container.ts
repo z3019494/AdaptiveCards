@@ -6,17 +6,17 @@ var teamsLightConfiguration = require("../../../../../../samples/HostConfig/micr
 
 export abstract class BaseTeamsContainer extends Designer.HostContainer {
     public renderTo(hostElement: HTMLElement) {
-        var outerFrame = document.createElement("div");
+        let outerFrame = document.createElement("div");
         outerFrame.className = "teams-frame";
 
         // Draw the hexagon bot logo
-        var hexagonOuter = document.createElement("div");
+        let hexagonOuter = document.createElement("div");
         hexagonOuter.className = "teams-hexagon-outer";
 
-        var hexagonInner = document.createElement("div");
+        let hexagonInner = document.createElement("div");
         hexagonInner.className = "teams-hexagon-inner";
 
-        var botLogo = document.createElement("div");
+        let botLogo = document.createElement("div");
         botLogo.className = "teams-bot-logo";
 
         hexagonOuter.appendChild(hexagonInner);

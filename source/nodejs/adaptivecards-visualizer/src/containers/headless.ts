@@ -14,16 +14,15 @@ import {
 
 export class HeadlessContainer extends HostContainer {
     protected renderContainer(adaptiveCard: AdaptiveCard, target: HTMLElement): HTMLElement {
-        var outerElement = document.createElement("div");
+        let outerElement = document.createElement("div");
         outerElement.className = "headlessOuterContainer";
 
         window.addEventListener(
             "resize",
             () => {
                 if (outerElement.parentElement) {
-                    var bounds = outerElement.parentElement.getBoundingClientRect();
-
-                    var newWidth: string = "216px";
+                    let bounds = outerElement.parentElement.getBoundingClientRect();
+                    let newWidth: string = "216px";
 
                     if (bounds.width >= 500) {
                         newWidth = "416px";
@@ -32,13 +31,13 @@ export class HeadlessContainer extends HostContainer {
                         newWidth = "320px";
                     }
 
-                    if (outerElement.style.width != newWidth) {
+                    if (outerElement.style.width !== newWidth) {
                         outerElement.style.width = newWidth;
                     }
                 }
             });
 
-        var innerElement = document.createElement("div");
+        let innerElement = document.createElement("div");
         innerElement.className = "headlessInnerContainer";
 
         outerElement.appendChild(innerElement);

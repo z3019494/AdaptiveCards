@@ -29,7 +29,7 @@ export class DayCell {
         this._element.tabIndex = 0;
         this._element.onclick = (e) => { this.selected(); };
         this._element.onkeydown = (e) => {
-            if (e.keyCode == Constants.KEY_ENTER) {
+            if (e.keyCode === Constants.KEY_ENTER) {
                 this.selected();
                 return false;
             }
@@ -84,31 +84,32 @@ export class Calendar extends InputControl {
     private generateDayCells(baseDate: Date) {
         this._days = [];
 
-        var inputMonth = baseDate.getMonth();
-        var inputYear = baseDate.getFullYear();
+        let inputMonth = baseDate.getMonth();
+        let inputYear = baseDate.getFullYear();
 
-        var start = new Date(inputYear, inputMonth, 1);
-        var end = new Date(inputYear, inputMonth, Utils.daysInMonth(inputYear, inputMonth));
+        let start = new Date(inputYear, inputMonth, 1);
+        let end = new Date(inputYear, inputMonth, Utils.daysInMonth(inputYear, inputMonth));
 
-        var startDateDayOfWeek = start.getDay();
+        let startDateDayOfWeek = start.getDay();
 
         if ((startDateDayOfWeek - Utils.CalendarSettings.firstDayOfWeek) > 0) {
             start = Utils.addDays(start, Utils.CalendarSettings.firstDayOfWeek - startDateDayOfWeek);
         }
 
-        var endDateDayOfWeek = end.getDay();
-        var lastDayOfWeek = Utils.CalendarSettings.firstDayOfWeek + 6;
+        let endDateDayOfWeek = end.getDay();
+        let lastDayOfWeek = Utils.CalendarSettings.firstDayOfWeek + 6;
 
         if ((lastDayOfWeek - endDateDayOfWeek) > 0) {
             end = Utils.addDays(end, lastDayOfWeek - endDateDayOfWeek);
         }
 
-        var endDate = end.getDate();
-        var endMonth = end.getMonth();
-        var endYear = end.getFullYear();
+        let endDate = end.getDate();
+        let endMonth = end.getMonth();
+        let endYear = end.getFullYear();
+        let done: boolean = false;
 
         do {
-            var dayCell = new DayCell(start);
+            let dayCell = new DayCell(start);
 
             dayCell.onSelected = (clickedCell) => {
                 this.selectedDayCell = clickedCell;
@@ -120,7 +121,7 @@ export class Calendar extends InputControl {
 
             this._days.push(dayCell);
 
-            var done = start.getDate() == endDate && start.getMonth() == endMonth && start.getFullYear() == endYear;
+            done = start.getDate() === endDate && start.getMonth() === endMonth && start.getFullYear() === endYear;
 
             start = Utils.addDays(start, 1);
         } while (!done);
@@ -145,7 +146,7 @@ export class Calendar extends InputControl {
 
     private initializeSelection() {
         if (this._date) {
-            for (var i = 0; i < this._days.length; i++) {
+            for (let i = 0; i < this._days.length; i++) {
                 if (Utils.areDatesEqual(this._days[i].date, this.date)) {
                     this.selectedDayCell = this._days[i];
 
@@ -158,7 +159,7 @@ export class Calendar extends InputControl {
     private rebuildMiniCalendar(newDate: Date, oldDate: Date) {
         this.generateDayCells(newDate);
 
-        var month = newDate.getMonth();
+        let month = newDate.getMonth();
 
         this._miniCalendarElement.innerHTML = "";
 
@@ -167,12 +168,12 @@ export class Calendar extends InputControl {
             "ms-ctrl-slideLeftToRight",
             "ms-ctrl-slideRightToLeft");
 
-        var row = document.createElement("tr");
+        let row = document.createElement("tr");
 
-        var dayIndex = <number>Utils.CalendarSettings.firstDayOfWeek;
+        let dayIndex = <number>Utils.CalendarSettings.firstDayOfWeek;
 
-        for (var i = 0; i < Utils.CalendarSettings.daysInWeek; i++) {
-            var cell = document.createElement("td");
+        for (let i = 0; i < Utils.CalendarSettings.daysInWeek; i++) {
+            let cell = document.createElement("td");
             cell.className = "ms-ctrl ms-ctrl-calendarDayHeader";
             cell.innerText = Utils.CalendarSettings.getInitialDayName(dayIndex);
 
@@ -187,16 +188,16 @@ export class Calendar extends InputControl {
 
         this._miniCalendarElement.appendChild(row);
 
-        for (var i = 0; i < this._days.length; i++) {
-            if (i % 7 == 0) {
+        for (let i = 0; i < this._days.length; i++) {
+            if (i % 7 === 0) {
                 row = document.createElement("tr");
                 this._miniCalendarElement.appendChild(row);
             }
 
-            var tableCell = document.createElement("td");
+            let tableCell = document.createElement("td");
             tableCell.appendChild(this._days[i].render());
 
-            if (this._days[i].date.getMonth() != month) {
+            if (this._days[i].date.getMonth() !== month) {
                 this._days[i].isSubdued = true;
             }
 
@@ -204,7 +205,7 @@ export class Calendar extends InputControl {
         }
 
         if (oldDate) {
-            var timeDelta = newDate.getTime() - oldDate.getTime();
+            let timeDelta = newDate.getTime() - oldDate.getTime();
 
             if (timeDelta > 0) {
                 this._miniCalendarElement.classList.add("ms-ctrl-slide", "ms-ctrl-slideRightToLeft");
@@ -225,7 +226,7 @@ export class Calendar extends InputControl {
         this._miniCalendarElement.cellPadding = "0px";
         this._miniCalendarElement.cellSpacing = "0px";
 
-        var miniCalendarHeader = document.createElement("div");
+        let miniCalendarHeader = document.createElement("div");
         miniCalendarHeader.className = "ms-ctrl ms-ctrl-calendarHeader";
         miniCalendarHeader.style.display = "flex";
 
@@ -234,17 +235,17 @@ export class Calendar extends InputControl {
 
         miniCalendarHeader.appendChild(this._monthYearLabelElement);
 
-        var navButtons = document.createElement("div");
+        let navButtons = document.createElement("div");
         navButtons.style.flex = "0 0 auto";
 
-        var button = document.createElement("i");
+        let button = document.createElement("i");
         button.className = "ms-icon ms-ctrl-calendarNavButton ms-icon-chevronLeft";
         button.tabIndex = 0;
         button.onclick = (e) => {
             this.date = Utils.addMonths(this.date, -1);
         };
         button.onkeydown = (e) => {
-            if (e.keyCode == Constants.KEY_ENTER) {
+            if (e.keyCode === Constants.KEY_ENTER) {
                 this.date = Utils.addMonths(this.date, -1);
                 return false;
             }
@@ -259,7 +260,7 @@ export class Calendar extends InputControl {
             this.date = Utils.addMonths(this.date, 1);
         };
         button.onkeydown = (e) => {
-            if (e.keyCode == Constants.KEY_ENTER) {
+            if (e.keyCode === Constants.KEY_ENTER) {
                 this.date = Utils.addMonths(this.date, 1);
                 return false;
             }
@@ -295,13 +296,12 @@ export class Calendar extends InputControl {
     }
 
     set date(value: Date) {
-        var rebuildNeeded = true;
-        var timeDelta = 0;
-
-        var newDate = value ? value : new Date();
+        let rebuildNeeded = true;
+        let timeDelta = 0;
+        let newDate = value ? value : new Date();
 
         if (this._date) {
-            rebuildNeeded = !this._days || newDate.getFullYear() != this._date.getFullYear() || newDate.getMonth() != this._date.getMonth();
+            rebuildNeeded = !this._days || newDate.getFullYear() !== this._date.getFullYear() || newDate.getMonth() !== this._date.getMonth();
         }
 
         if (rebuildNeeded) {

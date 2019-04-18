@@ -67,7 +67,7 @@ export class TreeItem {
 
         let text = this.owner.getTreeItemText();
 
-        if (text && text != "") {
+        if (text && text !== "") {
             let additionalTextSpan = document.createElement("span");
             additionalTextSpan.classList.add("acd-tree-item-additionalText");
             additionalTextSpan.innerText = " [" + text + "]";

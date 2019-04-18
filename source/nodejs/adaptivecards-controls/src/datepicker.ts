@@ -12,7 +12,7 @@ export class CalendarPopupControl extends PopupControl {
     }
 
     protected renderContent(): HTMLElement {
-        var element = document.createElement("div");
+        let element = document.createElement("div");
         element.className = "ms-ctrl ms-calendarPopup";
 
         this._calendar = new Calendar();

@@ -33,7 +33,7 @@ export abstract class DesignerPeerRegistry<TSource, TPeer> {
     }
 
     findTypeRegistration(sourceType: TSource): DesignerPeers.DesignerPeerRegistration<TSource, TPeer> {
-        for (var i = 0; i < this._items.length; i++) {
+        for (let i = 0; i < this._items.length; i++) {
             if (this._items[i].sourceType === sourceType) {
                 return this._items[i];
             }
@@ -43,9 +43,9 @@ export abstract class DesignerPeerRegistry<TSource, TPeer> {
     }
 
     registerPeer(sourceType: TSource, peerType: TPeer, category: string, iconClass: string = null) {
-        var registrationInfo = this.findTypeRegistration(sourceType);
+        let registrationInfo = this.findTypeRegistration(sourceType);
 
-        if (registrationInfo != null) {
+        if (registrationInfo !== null) {
             registrationInfo.peerType = peerType;
         }
         else {
@@ -60,7 +60,7 @@ export abstract class DesignerPeerRegistry<TSource, TPeer> {
     }
 
     unregisterPeer(sourceType: TSource) {
-        for (var i = 0; i < this._items.length; i++) {
+        for (let i = 0; i < this._items.length; i++) {
             if (this._items[i].sourceType === sourceType) {
                 this._items.splice(i, 1);
 
@@ -96,9 +96,9 @@ export class CardElementPeerRegistry extends DesignerPeerRegistry<CardElementTyp
 
     createPeerInstance(designerSurface: CardDesignerSurface, parent: DesignerPeers.DesignerPeer, cardElement: Adaptive.CardElement): DesignerPeers.CardElementPeer {
         /*
-        var registrationInfo: IDesignerPeerRegistration<CardElementType, CardElementPeerType> = undefined;
+        let registrationInfo: IDesignerPeerRegistration<CardElementType, CardElementPeerType> = undefined;
 
-        for (var i = 0; i < this._items.length; i++) {
+        for (let i = 0; i < this._items.length; i++) {
             if (cardElement instanceof this._items[i].sourceType) {
                 registrationInfo = this._items[i];
 
@@ -107,9 +107,9 @@ export class CardElementPeerRegistry extends DesignerPeerRegistry<CardElementTyp
         }
         */
 
-        var registrationInfo = this.findTypeRegistration((<any>cardElement).constructor);
+        let registrationInfo = this.findTypeRegistration((<any>cardElement).constructor);
 
-        var peer = registrationInfo ? new registrationInfo.peerType(designerSurface, registrationInfo, cardElement) : new DesignerPeers.CardElementPeer(designerSurface, this.defaultRegistration, cardElement);
+        let peer = registrationInfo ? new registrationInfo.peerType(designerSurface, registrationInfo, cardElement) : new DesignerPeers.CardElementPeer(designerSurface, this.defaultRegistration, cardElement);
         peer.parent = parent;
 
         return peer;
@@ -127,9 +127,9 @@ export class ActionPeerRegistry extends DesignerPeerRegistry<ActionType, ActionP
     }
 
     createPeerInstance(designerSurface: CardDesignerSurface, parent: DesignerPeers.DesignerPeer, action: Adaptive.Action): DesignerPeers.ActionPeer {
-        var registrationInfo = this.findTypeRegistration((<any>action).constructor);
+        let registrationInfo = this.findTypeRegistration((<any>action).constructor);
 
-        var peer = registrationInfo ? new registrationInfo.peerType(designerSurface, registrationInfo, action) : new DesignerPeers.ActionPeer(designerSurface, this.defaultRegistration, action);
+        let peer = registrationInfo ? new registrationInfo.peerType(designerSurface, registrationInfo, action) : new DesignerPeers.ActionPeer(designerSurface, this.defaultRegistration, action);
         peer.parent = parent;
 
         return peer;
@@ -196,7 +196,7 @@ export class CardDesignerSurface {
     }
 
     private setSelectedPeer(value: DesignerPeers.DesignerPeer) {
-        if (this._selectedPeer != value) {
+        if (this._selectedPeer !== value) {
             if (this._selectedPeer) {
                 this._selectedPeer.isSelected = false;
             }
@@ -239,11 +239,11 @@ export class CardDesignerSurface {
     private peerRemoved(peer: DesignerPeers.DesignerPeer) {
         this._allPeers.splice(this._allPeers.indexOf(peer), 1);
 
-        if (peer == this._selectedPeer) {
+        if (peer === this._selectedPeer) {
             this.setSelectedPeer(null);
         }
 
-        if (this._updateCount == 0) {
+        if (this._updateCount === 0) {
             this.renderCard();
             this.updateLayout();
         }
@@ -282,7 +282,7 @@ export class CardDesignerSurface {
                     this.setSelectedPeer(peer);
                 }
                 else {
-                    if (this._selectedPeer == peer) {
+                    if (this._selectedPeer === peer) {
                         this.setSelectedPeer(null);
                     }
                 }
@@ -298,22 +298,22 @@ export class CardDesignerSurface {
 
             peer.addElementsToDesignerSurface(this._designerSurface);
 
-            for (var i = 0; i < peer.getChildCount(); i++) {
+            for (let i = 0; i < peer.getChildCount(); i++) {
                 this.addPeer(peer.getChildAt(i));
             }
         }
     }
 
     private internalFindDropTarget(pointerPosition: IPoint, currentPeer: DesignerPeers.DesignerPeer, forPeer: DesignerPeers.DesignerPeer): DesignerPeers.DesignerPeer {
-        if (currentPeer == forPeer) {
+        if (currentPeer === forPeer) {
             return null;
         }
 
-        var result: DesignerPeers.DesignerPeer = null;
-        var lookDeeper = currentPeer instanceof DesignerPeers.ActionPeer;
+        let result: DesignerPeers.DesignerPeer = null;
+        let lookDeeper = currentPeer instanceof DesignerPeers.ActionPeer;
 
         if (!lookDeeper) {
-            var boundingRect = currentPeer.getBoundingRect();
+            let boundingRect = currentPeer.getBoundingRect();
 
             lookDeeper = boundingRect.isInside(pointerPosition);
         }
@@ -325,8 +325,8 @@ export class CardDesignerSurface {
                 result = currentPeer;
             }
 
-            for (var i = 0; i < currentPeer.getChildCount(); i++) {
-                var deeperResult = this.internalFindDropTarget(pointerPosition, currentPeer.getChildAt(i), forPeer);
+            for (let i = 0; i < currentPeer.getChildCount(); i++) {
+                let deeperResult = this.internalFindDropTarget(pointerPosition, currentPeer.getChildAt(i), forPeer);
 
                 if (deeperResult) {
                     result = deeperResult;
@@ -340,10 +340,10 @@ export class CardDesignerSurface {
     }
 
     private findCardElementPeer(cardElement: Adaptive.CardElement): DesignerPeers.CardElementPeer {
-        for (var i = 0; i < this._allPeers.length; i++) {
-            var peer = this._allPeers[i];
+        for (let i = 0; i < this._allPeers.length; i++) {
+            let peer = this._allPeers[i];
 
-            if (peer instanceof DesignerPeers.CardElementPeer && peer.cardElement == cardElement) {
+            if (peer instanceof DesignerPeers.CardElementPeer && peer.cardElement === cardElement) {
                 return peer;
             }
         }
@@ -352,10 +352,10 @@ export class CardDesignerSurface {
     }
 
     private findActionPeer(action: Adaptive.Action): DesignerPeers.ActionPeer {
-        for (var i = 0; i < this._allPeers.length; i++) {
-            var peer = this._allPeers[i];
+        for (let i = 0; i < this._allPeers.length; i++) {
+            let peer = this._allPeers[i];
 
-            if (peer instanceof DesignerPeers.ActionPeer && peer.action == action) {
+            if (peer instanceof DesignerPeers.ActionPeer && peer.action === action) {
                 return peer;
             }
         }
@@ -399,7 +399,7 @@ export class CardDesignerSurface {
     }
 
     private set draggedPeer(value: DesignerPeers.DesignerPeer) {
-        if (this._draggedPeer != value) {
+        if (this._draggedPeer !== value) {
             if (this._draggedPeer) {
                 this._draggedPeer.dragging = false;
             }
@@ -417,7 +417,7 @@ export class CardDesignerSurface {
     constructor(parentElement: HTMLElement) {
         this.parentElement = parentElement;
 
-        var rootElement = document.createElement("div");
+        let rootElement = document.createElement("div");
         rootElement.style.position = "relative";
         rootElement.style.width = "100%";
         rootElement.style.height = "100%";
@@ -495,7 +495,7 @@ export class CardDesignerSurface {
         if (this._updateCount > 0) {
             this._updateCount--;
 
-            if (this._updateCount == 0) {
+            if (this._updateCount === 0) {
                 if (renderCard) {
                     this.renderCard();
                 }
@@ -508,10 +508,6 @@ export class CardDesignerSurface {
     render() {
         this._designerSurface.innerHTML = "";
         this._allPeers = [];
-
-        this.setSelectedPeer(null);
-
-        this.renderCard();
 
         if (this.card) {
             this._rootPeer = CardDesignerSurface.cardElementPeerRegistry.createPeerInstance(this, null, this.card);
@@ -546,6 +542,10 @@ export class CardDesignerSurface {
         this._designerSurface.appendChild(this._removeCommandElement);
         this._designerSurface.appendChild(this._peerCommandsHostElement);
 
+        this.setSelectedPeer(null);
+
+        this.renderCard();
+
         this.updateLayout();
     }
 
@@ -562,7 +562,7 @@ export class CardDesignerSurface {
     }
 
     updateLayout(isFullRefresh: boolean = true) {
-        for (var i = 0; i < this._allPeers.length; i++) {
+        for (let i = 0; i < this._allPeers.length; i++) {
             this._allPeers[i].updateLayout();
         }
 
@@ -615,14 +615,14 @@ export class CardDesignerSurface {
     }
 
     tryDrop(pointerPosition: IPoint, peer: DesignerPeers.DesignerPeer): boolean {
-        var result = false;
+        let result = false;
 
         if (peer) {
             if (this._dropTarget) {
                 this._dropTarget.renderedElement.classList.remove("dragover");
             }
 
-            var newDropTarget = this.findDropTarget(pointerPosition, peer);
+            let newDropTarget = this.findDropTarget(pointerPosition, peer);
 
             if (newDropTarget) {
                 this._dropTarget = newDropTarget;
@@ -663,7 +663,7 @@ export class CardDesignerSurface {
     }
 
     set card(value: Adaptive.AdaptiveCard) {
-        if (value != this._card) {
+        if (value !== this._card) {
             if (this._card) {
                 this._card.onInlineCardExpanded = null;
             }

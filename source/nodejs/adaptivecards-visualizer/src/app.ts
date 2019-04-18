@@ -14,16 +14,16 @@ import { BotFrameworkImageContainer } from "./containers/bf-image";
 import { adaptiveCardSchema } from "./adaptive-card-schema";
 import { CortanaContainer } from "./containers/cortana";
 
-var hostContainerOptions: Array<HostContainerOption> = [];
-var hostContainerPicker: HTMLSelectElement;
-var lastValidationErrors: Array<AdaptiveCards.IValidationError> = [];
+let hostContainerOptions: Array<HostContainerOption> = [];
+let hostContainerPicker: HTMLSelectElement;
+let lastValidationErrors: Array<AdaptiveCards.IValidationError> = [];
 
 function getSelectedHostContainer(): HostContainer {
     return hostContainerOptions[hostContainerPicker.selectedIndex].hostContainer;
 }
 
 function setContent(element) {
-    var contentContainer = document.getElementById("content");
+    let contentContainer = document.getElementById("content");
 
     contentContainer.innerHTML = '';
     contentContainer.appendChild(element);
@@ -49,14 +49,14 @@ function renderCard(target: HTMLElement): HTMLElement {
 }
 
 function tryRenderCard() {
-    var contentContainer = document.getElementById("content");
+    let contentContainer = document.getElementById("content");
     contentContainer.innerHTML = '';
 
     try {
         renderCard(contentContainer);
     }
     catch (ex) {
-        var renderedCard = document.createElement("div");
+        let renderedCard = document.createElement("div");
         renderedCard.innerText = ex.message;
         contentContainer.appendChild(renderedCard);
     }
@@ -77,9 +77,9 @@ function openFilePicker() {
 }
 
 function filePickerChanged(evt) {
-    var filePicker = document.getElementById("filePicker") as HTMLInputElement;
+    let filePicker = document.getElementById("filePicker") as HTMLInputElement;
 
-    var file = filePicker.files[0];
+    let file = filePicker.files[0];
 
     if (file) {
         let reader = new FileReader();
@@ -102,9 +102,9 @@ function filePickerChanged(evt) {
 }
 
 function loadStyleSheetAndConfig() {
-    var styleSheetLinkElement = <HTMLLinkElement>document.getElementById("adaptiveCardStylesheet");
+    let styleSheetLinkElement = <HTMLLinkElement>document.getElementById("adaptiveCardStylesheet");
 
-    if (styleSheetLinkElement == null) {
+    if (styleSheetLinkElement === null) {
         styleSheetLinkElement = document.createElement("link");
         styleSheetLinkElement.id = "adaptiveCardStylesheet";
 
@@ -114,7 +114,7 @@ function loadStyleSheetAndConfig() {
     styleSheetLinkElement.rel = "stylesheet";
     styleSheetLinkElement.type = "text/css";
 
-    var selectedHostContainer = getSelectedHostContainer();
+    let selectedHostContainer = getSelectedHostContainer();
     selectedHostContainer.initialize();
 
     styleSheetLinkElement.href = selectedHostContainer.styleSheet;
@@ -133,9 +133,9 @@ function getParameterByName(name, url) {
 
     name = name.replace(/[\[\]]/g, "\\$&");
 
-    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+    let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
 
-    var results = regex.exec(url);
+    let results = regex.exec(url);
 
     if (results && results[2]) {
         return decodeURIComponent(results[2].replace(/\+/g, " "));
@@ -155,9 +155,9 @@ class HostContainerOption {
     }
 }
 
-var currentCardPayload: string = "";
-var currentConfigPayload: string = "";
-var isLoaded = false;;
+let currentCardPayload: string = "";
+let currentConfigPayload: string = "";
+let isLoaded = false;;
 
 function hostContainerPickerChanged() {
     loadStyleSheetAndConfig();
@@ -183,8 +183,8 @@ function setupContainerPicker() {
 
     hostContainerPicker.addEventListener("change", hostContainerPickerChanged);
 
-    for (var i = 0; i < hostContainerOptions.length; i++) {
-        var option = document.createElement("option");
+    for (let i = 0; i < hostContainerOptions.length; i++) {
+        let option = document.createElement("option");
         option.value = hostContainerOptions[i].name;
         option.text = hostContainerOptions[i].name;
 
@@ -193,7 +193,7 @@ function setupContainerPicker() {
 }
 
 function setContainerAppFromUrl() {
-    var requestedHostApp = getParameterByName("hostApp", null);
+    let requestedHostApp = getParameterByName("hostApp", null);
 
     if (!requestedHostApp) {
         requestedHostApp = hostContainerOptions[0].name;
@@ -212,7 +212,7 @@ function setupFilePicker() {
 }
 
 function actionExecuted(action: AdaptiveCards.Action) {
-    var message: string = "Action executed\n";
+    let message: string = "Action executed\n";
     message += "    Title: " + action.title + "\n";
 
     if (action instanceof AdaptiveCards.OpenUrlAction) {
@@ -224,13 +224,13 @@ function actionExecuted(action: AdaptiveCards.Action) {
         message += "    Data: " + JSON.stringify((<AdaptiveCards.SubmitAction>action).data);
     }
     else if (action instanceof AdaptiveCards.HttpAction) {
-        var httpAction = <AdaptiveCards.HttpAction>action;
+        let httpAction = <AdaptiveCards.HttpAction>action;
         message += "    Type: Http\n";
         message += "    Url: " + httpAction.url + "\n";
         message += "    Method: " + httpAction.method + "\n";
         message += "    Headers:\n";
 
-        for (var i = 0; i < httpAction.headers.length; i++) {
+        for (let i = 0; i < httpAction.headers.length; i++) {
             message += "        " + httpAction.headers[i].name + ": " + httpAction.headers[i].value + "\n";
         }
 
@@ -281,7 +281,7 @@ function actionCompletedCallback(action: AdaptiveCards.Action) {
 }
 
 function showPopupCard(action: AdaptiveCards.ShowCardAction) {
-    var overlayElement = document.createElement("div");
+    let overlayElement = document.createElement("div");
     overlayElement.id = "popupOverlay";
     overlayElement.className = "popupOverlay";
     overlayElement.tabIndex = 0;
@@ -291,28 +291,28 @@ function showPopupCard(action: AdaptiveCards.ShowCardAction) {
         document.body.removeChild(overlayElement);
     };
 
-    var cardContainer = document.createElement("div");
+    let cardContainer = document.createElement("div");
     cardContainer.className = "popupCardContainer";
     cardContainer.onclick = (e) => { e.stopPropagation() };
 
-    var cardContainerBounds = cardContainer.getBoundingClientRect();
+    let cardContainerBounds = cardContainer.getBoundingClientRect();
     cardContainer.style.left = (window.innerWidth - cardContainerBounds.width) / 2 + "px";
     cardContainer.style.top = (window.innerHeight - cardContainerBounds.height) / 2 + "px";
 
     overlayElement.appendChild(cardContainer);
     document.body.appendChild(overlayElement);
 
-    var hostContainer = getSelectedHostContainer();
+    let hostContainer = getSelectedHostContainer();
     hostContainer.render(action.card, cardContainer);
 }
 
 function showValidationErrors() {
     if (lastValidationErrors.length > 0) {
-        var errorContainer = document.getElementById("errorContainer");
+        let errorContainer = document.getElementById("errorContainer");
         errorContainer.innerHTML = "";
 
-        for (var i = 0; i < lastValidationErrors.length; i++) {
-            var errorElement = document.createElement("div");
+        for (let i = 0; i < lastValidationErrors.length; i++) {
+            let errorElement = document.createElement("div");
             errorElement.innerText = lastValidationErrors[i].message;
 
             errorContainer.appendChild(errorElement);
@@ -416,16 +416,16 @@ function monacoEditorLoaded() {
 
     currentCardPayload = Constants.defaultPayload;
 
-    var initialCardLaodedAsynchronously = false;
-    var cardUrl = getParameterByName("card", null);
+    let initialCardLaodedAsynchronously = false;
+    let cardUrl = getParameterByName("card", null);
 
     if (cardUrl) {
         initialCardLaodedAsynchronously = true;
 
-        var xhttp = new XMLHttpRequest();
+        let xhttp = new XMLHttpRequest();
 
         xhttp.onload = function () {
-            if (xhttp.responseText && xhttp.responseText != "") {
+            if (xhttp.responseText && xhttp.responseText !== "") {
                 currentCardPayload = xhttp.responseText;
             }
 
@@ -441,7 +441,7 @@ function monacoEditorLoaded() {
         }
     }
     else {
-        var cachedPayload;
+        let cachedPayload;
 
         try {
             console.log("loading card from cache");
@@ -452,7 +452,7 @@ function monacoEditorLoaded() {
             console.log("Unable to load card from cache");
         }
 
-        if (cachedPayload && cachedPayload != "") {
+        if (cachedPayload && cachedPayload !== "") {
             currentCardPayload = cachedPayload;
         }
     }

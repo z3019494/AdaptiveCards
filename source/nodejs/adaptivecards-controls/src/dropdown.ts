@@ -61,18 +61,18 @@ export class DropDownPopupControl extends PopupControl {
     }
 
     protected renderContent(): HTMLElement {
-        var element = document.createElement("div");
+        let element = document.createElement("div");
         element.className = "ms-ctrl ms-popup";
 
-        var selectedIndex = this._owner.selectedIndex;
+        let selectedIndex = this._owner.selectedIndex;
 
-        for (var i = 0; i < this._owner.items.length; i++) {
-            var renderedItem = this._owner.items.get(i).render();
+        for (let i = 0; i < this._owner.items.length; i++) {
+            let renderedItem = this._owner.items.get(i).render();
             renderedItem.tabIndex = 0;
 
             element.appendChild(renderedItem);
 
-            if (i == selectedIndex) {
+            if (i === selectedIndex) {
                 renderedItem.focus();
             }
 
@@ -85,7 +85,7 @@ export class DropDownPopupControl extends PopupControl {
     keyDown(e: KeyboardEvent) {
         super.keyDown(e);
 
-        var selectedItemIndex = this._selectedIndex;
+        let selectedItemIndex = this._selectedIndex;
 
         switch (e.keyCode) {
             case Constants.KEY_TAB:
@@ -138,7 +138,7 @@ export class DropDownPopupControl extends PopupControl {
     }
 
     render(rootElementBounds: ClientRect) {
-        var renderedElement = super.render(rootElementBounds);
+        let renderedElement = super.render(rootElementBounds);
 
         renderedElement.style.minWidth = (rootElementBounds.width / 2) + "px";
         renderedElement.style.maxWidth = rootElementBounds.width + "px";
@@ -194,11 +194,11 @@ export class DropDown extends InputWithPopup<DropDownPopupControl, DropDownItem>
     attach(rootElement: HTMLElement) {
         super.attach(rootElement);
 
-        for (var i = 0; i < this.rootElement.children.length; i++) {
-            var childElement = this.rootElement.children[i];
+        for (let i = 0; i < this.rootElement.children.length; i++) {
+            let childElement = this.rootElement.children[i];
 
-            if (childElement.tagName.toLowerCase() == "ms-dropdown-item") {
-                var item = new DropDownItem(
+            if (childElement.tagName.toLowerCase() === "ms-dropdown-item") {
+                let item = new DropDownItem(
                     childElement.attributes.getNamedItem("key").value,
                     childElement.attributes.getNamedItem("value").value);
 

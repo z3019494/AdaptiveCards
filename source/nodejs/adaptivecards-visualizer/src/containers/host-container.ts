@@ -25,7 +25,7 @@ export abstract class HostContainer {
                     HostContainer.playNextTTS(output, iCurrent + 1);
                 }, current);
             } else {
-                if (current.indexOf("http") == 0) {
+                if (current.indexOf("http") === 0) {
                     let audio: any = document.getElementById('player');
                     audio.src = current;
                     audio.onended = () => {
@@ -63,25 +63,25 @@ export abstract class HostContainer {
         for (let i = 0; i < nodes.length; i++) {
             let node = nodes[i];
 
-            if (node.nodeName == "p") {
+            if (node.nodeName === "p") {
                 this.processNodes(node.childNodes, output);
                 output.push(250);
             }
-            else if (node.nodeName == "s") {
+            else if (node.nodeName === "s") {
                 this.processNodes(node.childNodes, output);
                 output.push(100);
             }
-            else if (node.nodeName == "break" && node instanceof Element) {
+            else if (node.nodeName === "break" && node instanceof Element) {
                 if (node.attributes["strength"]) {
                     let strength = node.attributes["strength"].nodeValue;
 
-                    if (strength == "weak") {
+                    if (strength === "weak") {
                         // output.push(50);
-                    } else if (strength == "medium") {
+                    } else if (strength === "medium") {
                         output.push(50);
-                    } else if (strength == "strong") {
+                    } else if (strength === "strong") {
                         output.push(100);
-                    } else if (strength == "x-strong") {
+                    } else if (strength === "x-strong") {
                         output.push(250);
                     }
                 }
@@ -89,18 +89,18 @@ export abstract class HostContainer {
                     output.push(JSON.parse(node.attributes["time"].value));
                 }
             }
-            else if (node.nodeName == "audio" && node instanceof Element) {
+            else if (node.nodeName === "audio" && node instanceof Element) {
                 if (node.attributes["src"]) {
                     output.push(node.attributes["src"].value);
                 }
             }
-            else if (node.nodeName == "say-as") {
+            else if (node.nodeName === "say-as") {
                 this.processNodes(node.childNodes, output);
             }
-            else if (node.nodeName == "w") {
+            else if (node.nodeName === "w") {
                 this.processNodes(node.childNodes, output);
             }
-            else if (node.nodeName == "phoneme") {
+            else if (node.nodeName === "phoneme") {
                 this.processNodes(node.childNodes, output);
             }
             else {
@@ -142,27 +142,27 @@ export abstract class HostContainer {
             return null;
         }
 
-        var element = document.createElement("div");
+        let element = document.createElement("div");
 
-        var button = document.createElement("button");
+        let button = document.createElement("button");
         button.className = "button";
         button.innerText = "Speak this card";
 
-        var t = document.createTextNode("Speak");
-        var output = new Array<any>();
+        let t = document.createTextNode("Speak");
+        let output = new Array<any>();
 
-        if (speechString[0] == '<') {
-            if (speechString.indexOf("<speak") != 0) {
+        if (speechString[0] === '<') {
+            if (speechString.indexOf("<speak") !== 0) {
                 speechString = '<speak>\n' + speechString + '\n</speak>\n';
             }
 
-            var parser = new DOMParser();
-            var dom = parser.parseFromString(speechString, "text/xml");
-            var nodes = dom.documentElement.childNodes;
+            let parser = new DOMParser();
+            let dom = parser.parseFromString(speechString, "text/xml");
+            let nodes = dom.documentElement.childNodes;
 
             this.processNodes(nodes, output);
 
-            var serializer = new XMLSerializer();
+            let serializer = new XMLSerializer();
 
             speechString = vkbeautify.xml(serializer.serializeToString(dom));;
         }
@@ -183,7 +183,7 @@ export abstract class HostContainer {
             element.appendChild(pre);
         }
 
-        var audio = document.createElement("audio");
+        let audio = document.createElement("audio");
         audio.id = 'player';
         audio.autoplay = true;
 
@@ -201,19 +201,19 @@ export abstract class HostContainer {
     }
 
     render(adaptiveCard: AdaptiveCard, target: HTMLElement, showSpeechXml: boolean = false): HTMLElement {
-        var element = document.createElement("div");
+        let element = document.createElement("div");
         target.appendChild(element);
 
         if (adaptiveCard) {
-            var renderedContainer = this.renderContainer(adaptiveCard, element);
+            let renderedContainer = this.renderContainer(adaptiveCard, element);
 
             if (renderedContainer) {
-                var separator = document.createElement("div");
+                let separator = document.createElement("div");
                 separator.style.height = "20px";
                 element.appendChild(separator);
             }
 
-            var renderedSpeech = this.renderSpeech(adaptiveCard.renderSpeech());
+            let renderedSpeech = this.renderSpeech(adaptiveCard.renderSpeech());
 
             if (renderedSpeech) {
                 element.appendChild(renderedSpeech);

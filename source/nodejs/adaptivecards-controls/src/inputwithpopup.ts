@@ -153,7 +153,7 @@ export abstract class InputWithPopup<TPopupControl extends PopupControl, TValue>
                 this.rootElement.focus();
             };
 
-            var rootElementBounds = this.rootElement.getBoundingClientRect();
+            let rootElementBounds = this.rootElement.getBoundingClientRect();
 
             this._popupControlElement = this._popupControl.render(rootElementBounds);
             this._popupControlElement.classList.remove(
@@ -165,17 +165,15 @@ export abstract class InputWithPopup<TPopupControl extends PopupControl, TValue>
 
             this._overlayElement.appendChild(this._popupControlElement);
 
-            var popupElementBounds = this._popupControlElement.getBoundingClientRect();
-
-            var availableSpaceBelow = window.innerHeight - rootElementBounds.bottom;
-            var availableSpaceAbove = rootElementBounds.top;
-
-            var left = rootElementBounds.left + Utils.getScrollX();
-            var top;
+            let popupElementBounds = this._popupControlElement.getBoundingClientRect();
+            let availableSpaceBelow = window.innerHeight - rootElementBounds.bottom;
+            let availableSpaceAbove = rootElementBounds.top;
+            let left = rootElementBounds.left + Utils.getScrollX();
+            let top: number;
 
             if (availableSpaceAbove < popupElementBounds.height && availableSpaceBelow < popupElementBounds.height) {
                 // Not enough space above or below root element
-                var actualPopupHeight = Math.min(popupElementBounds.height, window.innerHeight);
+                let actualPopupHeight = Math.min(popupElementBounds.height, window.innerHeight);
 
                 this._popupControlElement.style.maxHeight = actualPopupHeight + "px";
 
@@ -186,12 +184,12 @@ export abstract class InputWithPopup<TPopupControl extends PopupControl, TValue>
                     top = Utils.getScrollY() + rootElementBounds.top + (rootElementBounds.height - actualPopupHeight) /2;
                 }
 
-                var availableSpaceRight = window.innerWidth - rootElementBounds.right;
-                var availableSpaceLeft = rootElementBounds.left;
+                let availableSpaceRight = window.innerWidth - rootElementBounds.right;
+                let availableSpaceLeft = rootElementBounds.left;
 
                 if (availableSpaceLeft < popupElementBounds.width && availableSpaceRight < popupElementBounds.width) {
                     // Not enough space left or right of root element
-                    var actualPopupWidth = Math.min(popupElementBounds.width, window.innerWidth);
+                    let actualPopupWidth = Math.min(popupElementBounds.width, window.innerWidth);
 
                     this._popupControlElement.style.maxWidth = actualPopupWidth + "px";
 
@@ -264,7 +262,7 @@ export abstract class InputWithPopup<TPopupControl extends PopupControl, TValue>
     }
 
     set value(newValue: TValue) {
-        if (this._value != newValue) {
+        if (this._value !== newValue) {
             this._value = newValue;
 
             this.updateLabel();

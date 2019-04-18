@@ -148,7 +148,7 @@ export class CardDesigner {
 
             this._toolPalettePane.content.appendChild(node);
 
-            for (var i = 0; i < categorizedTypes[category].length; i++) {
+            for (let i = 0; i < categorizedTypes[category].length; i++) {
                 this.addPaletteItem(categorizedTypes[category][i], this._toolPalettePane.content);
             }
         }
@@ -206,7 +206,7 @@ export class CardDesigner {
     private recreateDesignerSurface() {
         let styleSheetLinkElement = <HTMLLinkElement>document.getElementById("adaptiveCardStylesheet");
 
-        if (styleSheetLinkElement == null) {
+        if (styleSheetLinkElement === null) {
             styleSheetLinkElement = document.createElement("link");
             styleSheetLinkElement.id = "adaptiveCardStylesheet";
 
@@ -539,7 +539,7 @@ export class CardDesigner {
         let doAdd: boolean = true;
 
         if (this._undoStack.length > 0) {
-            doAdd = this._undoStack[this._undoStack.length - 1] != payload;
+            doAdd = this._undoStack[this._undoStack.length - 1] !== payload;
         }
 
         if (doAdd) {
@@ -1130,7 +1130,7 @@ export class CardDesigner {
     }
 
     set card(value: Adaptive.AdaptiveCard) {
-        if (this._card != value) {
+        if (this._card !== value) {
             if (this._card) {
                 this._card.designMode = false;
             }

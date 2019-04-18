@@ -21,7 +21,7 @@ export class OutlookContainer extends Designer.HostContainer {
     private parsePadding(json: any): Adaptive.PaddingDefinition {
         if (json) {
             if (typeof json === "string") {
-                var uniformPadding = Adaptive.getEnumValue(Adaptive.Spacing, json, Adaptive.Spacing.None);
+                let uniformPadding = Adaptive.getEnumValue(Adaptive.Spacing, json, Adaptive.Spacing.None);
 
                 return new Adaptive.PaddingDefinition(
                     uniformPadding,
@@ -43,15 +43,15 @@ export class OutlookContainer extends Designer.HostContainer {
 
     public parseElement(element: Adaptive.CardElement, json: any) {
         if (element instanceof Adaptive.AdaptiveCard) {
-            var card = <Adaptive.AdaptiveCard>element;
-            var actionArray: Array<Adaptive.Action> = [];
+            let card = <Adaptive.AdaptiveCard>element;
+            let actionArray: Array<Adaptive.Action> = [];
 
             card["resources"] = { actions: actionArray };
 
             if (typeof json["resources"] === "object") {
-                var actionResources = json["resources"]["actions"] as Array<any>;
+                let actionResources = json["resources"]["actions"] as Array<any>;
 
-                for (var i = 0; i < actionResources.length; i++) {
+                for (let i = 0; i < actionResources.length; i++) {
                     let action = Adaptive.AdaptiveCard.actionTypeRegistry.createInstance(actionResources[i]["type"]);
 
                     if (action) {
@@ -69,7 +69,7 @@ export class OutlookContainer extends Designer.HostContainer {
         }
 
         if (element instanceof Adaptive.Container) {
-            var padding = this.parsePadding(json["padding"]);
+            let padding = this.parsePadding(json["padding"]);
 
             if (padding) {
                 (<Adaptive.Container>element).padding = padding;
@@ -77,7 +77,7 @@ export class OutlookContainer extends Designer.HostContainer {
         }
 
         if (element instanceof Adaptive.ColumnSet) {
-            var padding = this.parsePadding(json["padding"]);
+            let padding = this.parsePadding(json["padding"]);
 
             if (padding) {
                 (<Adaptive.ColumnSet>element).padding = padding;
@@ -86,18 +86,18 @@ export class OutlookContainer extends Designer.HostContainer {
     }
 
     public anchorClicked(element: Adaptive.CardElement, anchor: HTMLAnchorElement): boolean {
-        var regEx = /^action:([a-z0-9]+)$/ig;
-        var rootCard = element.getRootElement() as Adaptive.AdaptiveCard;
-        var matches = regEx.exec(anchor.href);
+        let regEx = /^action:([a-z0-9]+)$/ig;
+        let rootCard = element.getRootElement() as Adaptive.AdaptiveCard;
+        let matches = regEx.exec(anchor.href);
 
         if (matches) {
-            var actionId = matches[1];
+            let actionId = matches[1];
 
             if (rootCard) {
-                var actionArray = rootCard["resources"]["actions"] as Array<Adaptive.Action>;
+                let actionArray = rootCard["resources"]["actions"] as Array<Adaptive.Action>;
 
-                for (var i = 0; i < actionArray.length; i++) {
-                    if (actionArray[i].id == actionId) {
+                for (let i = 0; i < actionArray.length; i++) {
+                    if (actionArray[i].id === actionId) {
                         actionArray[i].execute();
 
                         return true;

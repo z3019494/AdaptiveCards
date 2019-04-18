@@ -15,11 +15,11 @@ export class SidePane {
     private _content: HTMLElement;
 
     private getDimensionSettingName(): string {
-        return this.id + (this.orientation == SidePaneOrientation.Vertical ? "Height" : "Width");
+        return this.id + (this.orientation === SidePaneOrientation.Vertical ? "Height" : "Width");
     }
 
     private updateLayout() {
-        if (this.orientation == SidePaneOrientation.Vertical) {
+        if (this.orientation === SidePaneOrientation.Vertical) {
             this._headerRootElement.classList.toggle("rotated90DegreesCounterClockwise", !this._isExpanded);
             this._headerContentElement.classList.toggle("rotated90DegreesCounterClockwise", !this._isExpanded);
         }
@@ -112,8 +112,8 @@ export class SidePane {
         
         let dimensionSetting = SettingsManager.tryLoadNumberSetting(this.getDimensionSettingName());
 
-        if (dimensionSetting.succeeded && dimensionSetting.value != undefined) {
-            if (this.orientation == SidePaneOrientation.Vertical) {
+        if (dimensionSetting.succeeded && dimensionSetting.value !== undefined) {
+            if (this.orientation === SidePaneOrientation.Vertical) {
                 this.attachedTo.style.width = dimensionSetting.value + "px";
             }
             else {
@@ -186,7 +186,7 @@ export class SidePane {
 
         SettingsManager.trySaveSetting(
             this.getDimensionSettingName(),
-            (this.orientation == SidePaneOrientation.Vertical ? boundingRect.width : boundingRect.height).toString());
+            (this.orientation === SidePaneOrientation.Vertical ? boundingRect.width : boundingRect.height).toString());
     }
 
     get content(): HTMLElement {

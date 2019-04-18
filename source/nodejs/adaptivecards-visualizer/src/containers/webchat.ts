@@ -15,14 +15,13 @@ import * as webChatConfiguration from "../../../../../samples/HostConfig/webchat
 
 export class WebChatContainer extends HostContainer {
     protected renderContainer(adaptiveCard: AdaptiveCard, target: HTMLElement): HTMLElement {
-        var outerElement = document.createElement("div");
+        let outerElement = document.createElement("div");
         outerElement.className = "webChatOuterContainer";
 
-        var resizeCard = () => {
+        let resizeCard = () => {
             if (outerElement.parentElement) {
-                var bounds = outerElement.parentElement.getBoundingClientRect();
-
-                var newWidth: string = "216px";
+                let bounds = outerElement.parentElement.getBoundingClientRect();
+                let newWidth: string = "216px";
 
                 if (bounds.width >= 500) {
                     newWidth = "416px";
@@ -31,7 +30,7 @@ export class WebChatContainer extends HostContainer {
                     newWidth = "320px";
                 }
 
-                if (outerElement.style.width != newWidth) {
+                if (outerElement.style.width !== newWidth) {
                     outerElement.style.width = newWidth;
                 }
 
@@ -41,13 +40,13 @@ export class WebChatContainer extends HostContainer {
 
         window.addEventListener("resize", resizeCard);
 
-        var innerElement = document.createElement("div");
+        let innerElement = document.createElement("div");
         innerElement.className = "webChatInnerContainer";
 
         target.appendChild(outerElement);
         outerElement.appendChild(innerElement);
 
-        var renderedCard = adaptiveCard.render();
+        let renderedCard = adaptiveCard.render();
         innerElement.appendChild(renderedCard);
         resizeCard();
 

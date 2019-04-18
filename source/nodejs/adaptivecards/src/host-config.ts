@@ -35,7 +35,7 @@ export class ImageSetConfig {
 
     constructor(obj?: any) {
         if (obj) {
-            this.imageSize = obj["imageSize"] != null ? obj["imageSize"] : this.imageSize;
+            this.imageSize = obj["imageSize"] !== null ? obj["imageSize"] : this.imageSize;
             this.maxImageHeight = Utils.getValueOrDefault<number>(obj["maxImageHeight"], 100);
         }
     }
@@ -80,7 +80,7 @@ export class FactTextDefinition {
             this.color = Utils.parseHostConfigEnum(Enums.TextColor, obj["color"], Enums.TextColor.Default);
             this.isSubtle = obj["isSubtle"] || this.isSubtle;
             this.weight = Utils.parseHostConfigEnum(Enums.TextWeight, obj["weight"], this.getDefaultWeight());
-            this.wrap = obj["wrap"] != null ? obj["wrap"] : this.wrap;
+            this.wrap = obj["wrap"] !== null ? obj["wrap"] : this.wrap;
         }
     }
 
@@ -107,7 +107,7 @@ export class FactTitleDefinition extends FactTextDefinition {
         super(obj);
 
         if (obj) {
-            this.maxWidth = obj["maxWidth"] != null ? obj["maxWidth"] : this.maxWidth;
+            this.maxWidth = obj["maxWidth"] !== null ? obj["maxWidth"] : this.maxWidth;
 			this.weight = Utils.parseHostConfigEnum(Enums.TextWeight, obj["weight"], Enums.TextWeight.Bolder);
         }
     }
@@ -126,7 +126,7 @@ export class FactSetConfig {
         if (obj) {
             this.title = new FactTitleDefinition(obj["title"]);
             this.value = new FactTextDefinition(obj["value"]);
-            this.spacing = obj.spacing && obj.spacing != null ? obj.spacing && obj.spacing : this.spacing;
+            this.spacing = obj.spacing && obj.spacing !== null ? obj.spacing && obj.spacing : this.spacing;
         }
     }
 }
@@ -139,7 +139,7 @@ export class ShowCardActionConfig {
     constructor(obj?: any) {
         if (obj) {
             this.actionMode = Utils.parseHostConfigEnum(Enums.ShowCardActionMode, obj["actionMode"], Enums.ShowCardActionMode.Inline);
-            this.inlineTopMargin = obj["inlineTopMargin"] != null ? obj["inlineTopMargin"] : this.inlineTopMargin;
+            this.inlineTopMargin = obj["inlineTopMargin"] !== null ? obj["inlineTopMargin"] : this.inlineTopMargin;
             this.style = obj["style"] && typeof obj["style"] === "string" ? obj["style"] : Enums.ContainerStyle.Emphasis;
         }
     }
@@ -167,20 +167,20 @@ export class ActionsConfig {
 
     constructor(obj?: any) {
         if (obj) {
-            this.maxActions = obj["maxActions"] != null ? obj["maxActions"] : this.maxActions;
+            this.maxActions = obj["maxActions"] !== null ? obj["maxActions"] : this.maxActions;
             this.spacing = Utils.parseHostConfigEnum(Enums.Spacing, obj.spacing && obj.spacing, Enums.Spacing.Default);
-            this.buttonSpacing = obj["buttonSpacing"] != null ? obj["buttonSpacing"] : this.buttonSpacing;
+            this.buttonSpacing = obj["buttonSpacing"] !== null ? obj["buttonSpacing"] : this.buttonSpacing;
             this.showCard = new ShowCardActionConfig(obj["showCard"]);
             this.preExpandSingleShowCardAction = Utils.getValueOrDefault<boolean>(obj["preExpandSingleShowCardAction"], false);
             this.actionsOrientation = Utils.parseHostConfigEnum(Enums.Orientation, obj["actionsOrientation"], Enums.Orientation.Horizontal);
             this.actionAlignment = Utils.parseHostConfigEnum(Enums.ActionAlignment, obj["actionAlignment"], Enums.ActionAlignment.Left);
             this.iconPlacement = Utils.parseHostConfigEnum(Enums.ActionIconPlacement, obj["iconPlacement"], Enums.ActionIconPlacement.LeftOfTitle);
-            this.allowTitleToWrap = obj["allowTitleToWrap"] != null ? obj["allowTitleToWrap"] : this.allowTitleToWrap;
+            this.allowTitleToWrap = obj["allowTitleToWrap"] !== null ? obj["allowTitleToWrap"] : this.allowTitleToWrap;
 
             try {
                 let sizeAndUnit = Shared.SizeAndUnit.parse(obj["iconSize"]);
 
-                if (sizeAndUnit.unit == Enums.SizeUnit.Pixel) {
+                if (sizeAndUnit.unit === Enums.SizeUnit.Pixel) {
                     this.iconSize = sizeAndUnit.physicalSize;
                 }
             }
@@ -287,9 +287,9 @@ export class ContainerStyleSet {
             const customStyleArray = obj["customStyles"];
 
             if (customStyleArray && Array.isArray(customStyleArray)) {
-                for (var customStyle of customStyleArray) {
+                for (let customStyle of customStyleArray) {
                     if (customStyle) {
-                        var styleName = customStyle["name"];
+                        let styleName = customStyle["name"];
 
                         if (styleName && typeof styleName === "string") {
                             if (this._allStyles.hasOwnProperty(styleName)) {
@@ -306,7 +306,7 @@ export class ContainerStyleSet {
     }
 
     toJSON() {
-        var customStyleArray: Array<any> = [];
+        let customStyleArray: Array<any> = [];
 
         Object.keys(this._allStyles).forEach(
             (key) => {
@@ -318,7 +318,7 @@ export class ContainerStyleSet {
                 }
             });
 
-        var result: any = {
+            let result: any = {
             default: this.default,
             emphasis: this.emphasis
         }
@@ -359,13 +359,13 @@ export class Version {
             return null;
         }
 
-        var result = new Version();
+        let result = new Version();
         result._versionString = versionString;
 
-        var regEx = /(\d+).(\d+)/gi;
-        var matches = regEx.exec(versionString);
+        let regEx = /(\d+).(\d+)/gi;
+        let matches = regEx.exec(versionString);
 
-        if (matches != null && matches.length == 3) {
+        if (matches !== null && matches.length === 3) {
             result._major = parseInt(matches[1]);
             result._minor = parseInt(matches[2]);
         }
@@ -443,7 +443,7 @@ export class HostCapabilities {
                 let jsonVersion = json[name];
 
                 if (typeof jsonVersion === "string") {
-                    if (jsonVersion == "*") {
+                    if (jsonVersion === "*") {
                         this.setCapability(name, "*");
                     }
                     else {
@@ -460,7 +460,7 @@ export class HostCapabilities {
 
     hasCapability(name: string, version: HostCapabilityVersion): boolean {
         if (this.capabilities && this.capabilities.hasOwnProperty(name)) {
-            if (version == "*" || this.capabilities[name] == "*") {
+            if (version === "*" || this.capabilities[name] === "*") {
                 return true;
             }
 
@@ -662,7 +662,7 @@ export class HostConfig {
             return this.fontStyles.getStyleDefinition(style);
         }
         else {
-            return style == Enums.FontStyle.Monospace ? FontStyleDefinition.monospace : this._legacyFontStyle;
+            return style === Enums.FontStyle.Monospace ? FontStyleDefinition.monospace : this._legacyFontStyle;
         }
     }
 

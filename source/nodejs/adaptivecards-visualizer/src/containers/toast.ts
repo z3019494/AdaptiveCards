@@ -17,7 +17,7 @@ export class ToastContainer extends HostContainer {
     private _width: number;
 
     protected renderContainer(adaptiveCard: AdaptiveCard, target: HTMLElement): HTMLElement {
-        var element = document.createElement("div");
+        let element = document.createElement("div");
         element.style.border = "#474747 1px solid";
         element.style.width = this._width + "px";
         element.style.overflow = "hidden";

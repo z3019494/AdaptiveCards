@@ -32,7 +32,7 @@ export class StringWithSubstitutions {
         for (let input of inputs) {
             let matches = new RegExp("\\{{2}(" + input.id + ").value\\}{2}", "gi").exec(this._original);
 
-            if (matches != null) {
+            if (matches !== null) {
                 referencedInputs[input.id] = input;
             }
         }
@@ -44,18 +44,18 @@ export class StringWithSubstitutions {
 		let regEx = /\{{2}([a-z0-9_$@]+).value\}{2}/gi;
 		let matches;
 
-		while ((matches = regEx.exec(this._original)) != null) {
+		while ((matches = regEx.exec(this._original)) !== null) {
 			let matchedInput: IInput = null;
 
 			for (let key of Object.keys(inputs)) {
-				if (key.toLowerCase() == matches[1].toLowerCase()) {
+				if (key.toLowerCase() === matches[1].toLowerCase()) {
 					matchedInput = inputs[key];
 					break;
 				}
             }
 
             if (matchedInput) {
-				var valueForReplace = "";
+				let valueForReplace = "";
 
 				if (matchedInput.value) {
 					valueForReplace = matchedInput.value;
@@ -143,8 +143,8 @@ export class SizeAndUnit {
 		if (matches && matches.length >= expectedMatchCount) {
 			result.physicalSize = parseInt(matches[1]);
 
-			if (matches.length == 3) {
-				if (matches[2] == "px") {
+			if (matches.length === 3) {
+				if (matches[2] === "px") {
 					result.unit = Enums.SizeUnit.Pixel;
 				}
 			}

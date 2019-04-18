@@ -54,7 +54,7 @@ export class CalendarSettings {
 export function daysInMonth(year: number, month: number) {
     switch (month) {
         case 1:
-            return (year % 4 == 0 && year % 100) || year % 400 == 0 ? 29 : 28;
+            return (year % 4 === 0 && year % 100) || year % 400 === 0 ? 29 : 28;
         case 3:
         case 5:
         case 8:
@@ -66,7 +66,7 @@ export function daysInMonth(year: number, month: number) {
 }
 
 export function addDays(date: Date, days: number): Date {
-    var result = new Date(date.getTime());
+    let result = new Date(date.getTime());
 
     result.setDate(result.getDate() + days);
 
@@ -74,8 +74,8 @@ export function addDays(date: Date, days: number): Date {
 }
 
 export function addMonths(date: Date, months: number): Date {
-    var result = new Date(date.getTime());
-    var newMonth = result.getMonth() + months;
+    let result = new Date(date.getTime());
+    let newMonth = result.getMonth() + months;
 
     result.setMonth(newMonth);
 
@@ -90,9 +90,9 @@ export function addMonths(date: Date, months: number): Date {
 }
 
 export function areDatesEqual(date1: Date, date2: Date): boolean {
-    return date1.getFullYear() == date2.getFullYear() &&
-           date1.getMonth() == date2.getMonth() &&
-           date1.getDate() == date2.getDate();
+    return date1.getFullYear() === date2.getFullYear() &&
+           date1.getMonth() === date2.getMonth() &&
+           date1.getDate() === date2.getDate();
 }
 
 export function getScrollX(): number {
@@ -104,7 +104,7 @@ export function getScrollY(): number {
 }
 
 export function getAttributeValueAsBool(element: HTMLElement, attributeName: string, defaultValue: boolean) {
-    var attribute = element.attributes[attributeName];
+    let attribute = element.attributes[attributeName];
 
     if (attribute) {
         return attribute.value === "true";
@@ -114,7 +114,7 @@ export function getAttributeValueAsBool(element: HTMLElement, attributeName: str
 }
 
 export function getAttributeValueAsString(element: HTMLElement, attributeName: string, defaultValue: string) {
-    var attribute = element.attributes[attributeName];
+    let attribute = element.attributes[attributeName];
 
     if (attribute) {
         return attribute.value;
@@ -124,10 +124,10 @@ export function getAttributeValueAsString(element: HTMLElement, attributeName: s
 }
 
 export function getAttributeValueAsInt(element: HTMLElement, attributeName: string, defaultValue: number) {
-    var attribute = element.attributes[attributeName];
+    let attribute = element.attributes[attributeName];
 
     if (attribute) {
-        var n = parseInt(attribute.value);
+        let n = parseInt(attribute.value);
 
         if (!isNaN(n)) {
             return n;

@@ -6,7 +6,7 @@ export class CheckBox extends InputControl {
     private static creationIndex = 0;
 
     private static createId(): number {
-        var result = CheckBox.creationIndex;
+        let result = CheckBox.creationIndex;
 
         CheckBox.creationIndex++;
 
@@ -40,13 +40,13 @@ export class CheckBox extends InputControl {
         rootElement.className = "ms-ctrl ms-ctrl-checkbox";
         rootElement.tabIndex = 0;
 
-        var labelAttribute = rootElement.attributes["label"];
+        let labelAttribute = rootElement.attributes["label"];
 
         if (labelAttribute) {
             this._label = labelAttribute.value;
         }
 
-        var isCheckedAttribute = rootElement.attributes["ischecked"];
+        let isCheckedAttribute = rootElement.attributes["ischecked"];
 
         if (isCheckedAttribute) {
             this._isChecked = isCheckedAttribute.value === "true";
@@ -59,7 +59,7 @@ export class CheckBox extends InputControl {
         this._checkboxElement.checked = this.isChecked;
         this._checkboxElement.onchange = (e) => { this.changed() };
 
-        var labelElement = document.createElement("label")
+        let labelElement = document.createElement("label")
         labelElement.htmlFor = this._checkboxElement.id;
 
         this._spanElement = document.createElement("span");
@@ -89,7 +89,7 @@ export class CheckBox extends InputControl {
     }
 
     set isChecked(value: boolean) {
-        if (this._isChecked != value) {
+        if (this._isChecked !== value) {
             this._isChecked = value;
 
             if (this._checkboxElement) {

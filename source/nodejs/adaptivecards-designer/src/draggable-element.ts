@@ -20,7 +20,7 @@ export abstract class DraggableElement {
     }
 
     protected set isPointerOver(value: boolean) {
-        if (value != this._isPointerOver) {
+        if (value !== this._isPointerOver) {
             this._isPointerOver = value;
 
             this.updateLayout();

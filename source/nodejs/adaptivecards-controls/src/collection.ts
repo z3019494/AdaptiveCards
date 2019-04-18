@@ -17,7 +17,7 @@ export class Collection<TItem> {
     }
 
     remove(item: TItem) {
-        var i = this._items.indexOf(item);
+        let i = this._items.indexOf(item);
 
         if (i >= 0) {
             this._items = this._items.splice(i, 1);

@@ -24,7 +24,7 @@ export class BotFrameworkImageContainer extends HostContainer {
     }
 
     protected renderContainer(adaptiveCard: AdaptiveCard, target: HTMLElement): HTMLElement {
-        var outerElement = document.createElement("div");
+        let outerElement = document.createElement("div");
         outerElement.className = "kikOuterContainer";
         outerElement.style.width = this._width + "px";
         target.appendChild(outerElement);

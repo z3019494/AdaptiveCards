@@ -17,16 +17,16 @@ export class PopupMenu extends PopupControl {
     }
 
     protected renderContent(): HTMLElement {
-        var element = document.createElement("div");
+        let element = document.createElement("div");
         element.className = "ms-ctrl ms-popup";
 
-        for (var i = 0; i < this._items.length; i++) {
-            var renderedItem = this._items.get(i).render();
+        for (let i = 0; i < this._items.length; i++) {
+            let renderedItem = this._items.get(i).render();
             renderedItem.tabIndex = 0;
 
             element.appendChild(renderedItem);
 
-            if (i == this.selectedIndex) {
+            if (i === this.selectedIndex) {
                 renderedItem.focus();
             }
 
@@ -39,7 +39,7 @@ export class PopupMenu extends PopupControl {
     keyDown(e: KeyboardEvent) {
         super.keyDown(e);
 
-        var selectedItemIndex = this._selectedIndex;
+        let selectedItemIndex = this._selectedIndex;
 
         switch (e.keyCode) {
             case Constants.KEY_TAB:
@@ -105,7 +105,7 @@ export class PopupMenu extends PopupControl {
 
             document.body.appendChild(this._overlayElement);
 
-            var rootElementBounds = rootElement.getBoundingClientRect();
+            let rootElementBounds = rootElement.getBoundingClientRect();
 
             this._popupControlElement = this.render(rootElementBounds);
             this._popupControlElement.classList.remove(
@@ -117,17 +117,17 @@ export class PopupMenu extends PopupControl {
 
             this._overlayElement.appendChild(this._popupControlElement);
 
-            var popupElementBounds = this._popupControlElement.getBoundingClientRect();
+            let popupElementBounds = this._popupControlElement.getBoundingClientRect();
 
-            var availableSpaceBelow = window.innerHeight - rootElementBounds.bottom;
-            var availableSpaceAbove = rootElementBounds.top;
+            let availableSpaceBelow = window.innerHeight - rootElementBounds.bottom;
+            let availableSpaceAbove = rootElementBounds.top;
 
-            var left = rootElementBounds.left + Utils.getScrollX();
-            var top;
+            let left = rootElementBounds.left + Utils.getScrollX();
+            let top;
 
             if (availableSpaceAbove < popupElementBounds.height && availableSpaceBelow < popupElementBounds.height) {
                 // Not enough space above or below root element
-                var maxPopupHeight = window.innerHeight;
+                let maxPopupHeight = window.innerHeight;
 
                 this._popupControlElement.style.maxHeight = maxPopupHeight + "px";
 
@@ -138,12 +138,12 @@ export class PopupMenu extends PopupControl {
                     top = Utils.getScrollY() + rootElementBounds.top + (rootElementBounds.height - maxPopupHeight) /2;
                 }
 
-                var availableSpaceRight = window.innerWidth - rootElementBounds.right;
-                var availableSpaceLeft = rootElementBounds.left;
+                let availableSpaceRight = window.innerWidth - rootElementBounds.right;
+                let availableSpaceLeft = rootElementBounds.left;
 
                 if (availableSpaceLeft < popupElementBounds.width && availableSpaceRight < popupElementBounds.width) {
                     // Not enough space left or right of root element
-                    var maxPopupWidth = window.innerWidth;
+                    let maxPopupWidth = window.innerWidth;
 
                     this._popupControlElement.style.maxWidth = maxPopupWidth + "px";
 

@@ -7,17 +7,17 @@ export class SkypeContainer extends Designer.HostContainer {
     public renderTo(hostElement: HTMLElement) {
         this.cardHost.classList.add("skype-card");
 
-        var frame = document.createElement("div");
+        let frame = document.createElement("div");
         frame.className = "skype-frame";
 
         // Draw the hexagon bot logo
-        var hexagonOuter = document.createElement("div");
+        let hexagonOuter = document.createElement("div");
         hexagonOuter.className = "skype-hexagon-outer";
 
-        var hexagonInner = document.createElement("div");
+        let hexagonInner = document.createElement("div");
         hexagonInner.className = "skype-hexagon-inner";
 
-        var botLogo = document.createElement("div");
+        let botLogo = document.createElement("div");
         botLogo.className = "skype-bot-logo";
 
         hexagonOuter.appendChild(hexagonInner);
