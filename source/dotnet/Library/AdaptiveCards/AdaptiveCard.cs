@@ -204,6 +204,16 @@ namespace AdaptiveCards
         public AdaptiveVerticalContentAlignment VerticalContentAlignment { get; set; }
 
         /// <summary>
+        ///     Indicates whether required fields should be marked visually
+        /// </summary>
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+#if !NETSTANDARD1_3
+        [XmlAttribute]
+#endif
+        [DefaultValue(false)]
+        public bool InputNecessityIndicators { get; set; }
+
+        /// <summary>
         ///     Action for the card (this allows a default action at the card level)
         /// </summary>
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]

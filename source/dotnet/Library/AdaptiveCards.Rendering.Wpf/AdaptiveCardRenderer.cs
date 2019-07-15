@@ -207,7 +207,8 @@ namespace AdaptiveCards.Rendering.Wpf
                 ElementRenderers = ElementRenderers,
                 FeatureRegistration = FeatureRegistration,
                 Lang = card.Lang,
-                RenderArgs = new AdaptiveRenderArgs { ForegroundColors = (HostConfig != null) ? HostConfig.ContainerStyles.Default.ForegroundColors : new ContainerStylesConfig().Default.ForegroundColors }
+                RenderArgs = new AdaptiveRenderArgs { ForegroundColors = (HostConfig != null) ? HostConfig.ContainerStyles.Default.ForegroundColors : new ContainerStylesConfig().Default.ForegroundColors },
+                InputNecessityIndicators = card.InputNecessityIndicators
             };
 
             string accentColor = HostConfig.ContainerStyles.Default.ForegroundColors.Accent.Default;

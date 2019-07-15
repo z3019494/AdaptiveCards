@@ -13,14 +13,23 @@ namespace AdaptiveCards
     public abstract class AdaptiveInput : AdaptiveElement
     {
         /// <summary>
-        ///     The input must have a value for it to be part of a Submit or Http action
+        ///     The input must have a value for it to be part of a Submit action
         /// </summary>
-        [Obsolete("Ths IsRequired property is not supported in Adaptive Cards yet and will be ignored")]
-        [JsonIgnore]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
 #if !NETSTANDARD1_3
-        [XmlIgnore]
+        [XmlAttribute]
+        [DefaultValue(false)]
 #endif
         public bool IsRequired { get; set; }
+
+        /// <summary>
+        ///     Error message displayed if input is not valid at submit
+        /// </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+#if !NETSTANDARD1_3
+        [XmlAttribute]
+#endif
+        public string ErrorMessage { get; set; }
 
         /// <summary>
         /// The string that will be rendered on a a host with "SupportsInteractivity" set to false.

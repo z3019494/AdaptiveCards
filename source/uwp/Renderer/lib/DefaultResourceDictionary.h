@@ -66,8 +66,21 @@ const PCWSTR c_defaultResourceDictionary = L"\
     </Style> \
     <Style x:Key=\"Adaptive.SelectAction\" TargetType=\"Button\" BasedOn=\"{StaticResource  Adaptive.TouchTarget}\"/> \
     <Style x:Key=\"Adaptive.Input.Text.InlineAction\" TargetType=\"Button\" BasedOn=\"{StaticResource  Adaptive.TouchTarget}\"/> \
+    <SolidColorBrush x:Key =\"Adaptive.Red\" Color=\"Red\"/> \
+    <Style x:Key=\"Adaptive.Input.Text.InputValidation\" TargetType=\"TextBox\">\
+        <Setter Property=\"TextControlBorderBrush\" Value=\"{ThemeResource Adaptive.Red}\" /> \
+    </Style> \
 </ResourceDictionary>";
 
+    //< Style x : Key =\"Adaptive.Input.Text.InputValidation\" TargetType=\"TextBox\">\
+    //    <Setter Property=\"TextControlBorderBrush\" Value=\"Red\" /> \
+    //    <Setter Property=\"TextControlBorderBrushPointerOver\" Value=\"Red\" /> \
+    //    <Setter Property=\"TextControlBorderBrushFocused\" Value=\"Red\" /> \
+    //</Style> \
+
+const PCWSTR c_inputValidationResourceDictionary = L"\
+<ResourceDictionary> \
+</ResourceDictionary>";
 
 const PCWSTR c_defaultActionSentimentResourceDictionary = L"\
 <ResourceDictionary \

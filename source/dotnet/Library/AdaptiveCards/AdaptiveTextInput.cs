@@ -72,7 +72,16 @@ namespace AdaptiveCards
         public int MaxLength { get; set; }
 
         /// <summary>
-        /// The Body elements for this card
+        ///     Regular expression that the text input must match
+        /// </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+#if !NETSTANDARD1_3
+        [XmlAttribute]
+#endif
+        public string RegEx { get; set; }
+
+        /// <summary>
+        /// Inline Action for this text input
         /// </summary>
         [JsonProperty("inlineAction", DefaultValueHandling = DefaultValueHandling.Ignore)]
 #if !NETSTANDARD1_3
