@@ -195,9 +195,11 @@ namespace AdaptiveNamespace
         RETURN_IF_FAILED(stackPanel.As(&panel));
 
         // If this expanded choice set has a label, add the label to the stack panel before the choices
-        ComPtr<IUIElement> labelControl;
         ComPtr<IAdaptiveChoiceSetInput> localChoiceSetInput(adaptiveChoiceSetInput);
         ComPtr<IAdaptiveInputElement> adaptiveChoiceSetInputAsAdaptiveInput;
+        RETURN_IF_FAILED(localChoiceSetInput.As(&adaptiveChoiceSetInputAsAdaptiveInput));
+
+        ComPtr<IUIElement> labelControl;
         RETURN_IF_FAILED(XamlHelpers::RenderInputLabel(adaptiveChoiceSetInputAsAdaptiveInput.Get(), renderContext, renderArgs, &labelControl));
         if (labelControl != nullptr)
         {

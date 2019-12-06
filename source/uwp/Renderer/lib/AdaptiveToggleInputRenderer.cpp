@@ -78,7 +78,7 @@ namespace AdaptiveNamespace
 
         XamlHelpers::AddInputValueToContext(renderContext, adaptiveCardElement, *toggleInputControl);
 
-        // Check if this toggle has a label. If so, add it to a stackPanel with the checkBox
+        // Check if this toggle has a label. If so, add it to a stackPanel with the checkBox.
         ComPtr<IAdaptiveInputElement> adaptiveToggleInputAsAdaptiveInput;
         RETURN_IF_FAILED(adaptiveToggleInput.As(&adaptiveToggleInputAsAdaptiveInput));
 

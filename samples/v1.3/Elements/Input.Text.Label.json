@@ -1,27 +1,29 @@
 {
 	"type": "AdaptiveCard",
-	"version": "1.0",
+	"version": "1.3",
 	"body": [
 		{
 			"type": "TextBlock",
 			"text": "Please fill out the following form:",
-			"size": "Medium"
+			"size": "Medium",
+			"wrap": true
+		},
+		{
+			"type": "Input.Text",
+			"id": "labelAsTextBlock",
+			"placeholder": "First Last",
+			"label": {
+				"type": "TextBlock",
+				"text": "Full Name:",
+				"weight": "Bolder"
+			}
 		},
 		{
 			"type": "Input.Text",
 			"id": "labelAsString",
-			"placeholder": "First Last",
-			"label": "Name:"
+			"label": "Nickname:"
 		},
-		{
-			"type": "Input.Date",
-			"id": "labelAsTextBlock",
-			"label": {
-				"type": "TextBlock",
-				"text": "Start Date:",
-				"weight": "Bolder"
-			}
-		},
+
 		{
 			"type": "Input.Text",
 			"placeholder": "Placeholder text",
