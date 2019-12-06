@@ -242,6 +242,10 @@ namespace AdaptiveCardsSharedModelUnitTest
         Assert::IsTrue(textInput.GetErrorMessage().empty());
         Assert::AreEqual("([A-Z])\\w+"s, textInput.GetRegex());
 
+		std::shared_ptr<BaseCardElement> cardLabel = textInput.GetLabel();
+        Assert::IsTrue(CardElementType::TextBlock == cardLabel->GetElementType());
+        Assert::AreEqual("Input.Text_label"s, std::static_pointer_cast<TextBlock>(cardLabel)->GetText());
+
         auto inlineAction = std::static_pointer_cast<SubmitAction>(textInput.GetInlineAction());
         Assert::IsTrue((bool)inlineAction);
         Assert::AreEqual("Input.Text_Action.Submit"s, inlineAction->GetTitle());
@@ -261,6 +265,11 @@ namespace AdaptiveCardsSharedModelUnitTest
         Assert::AreEqual(7, numberInput.GetValue());
         Assert::AreEqual("Input.Number_placeholder"s, numberInput.GetPlaceholder());
         Assert::IsTrue(numberInput.GetErrorMessage().empty());
+
+		std::shared_ptr<BaseCardElement> cardLabel = numberInput.GetLabel();
+        Assert::IsTrue(CardElementType::TextBlock == cardLabel->GetElementType());
+        Assert::AreEqual("Input.Number_label"s, std::static_pointer_cast<TextBlock>(cardLabel)->GetText());
+		Assert::IsTrue(TextSize::Large == std::static_pointer_cast<TextBlock>(cardLabel)->GetTextSize());
     }
 
     void ValidateInputDate(const DateInput &dateInput)
@@ -275,6 +284,16 @@ namespace AdaptiveCardsSharedModelUnitTest
         Assert::AreEqual("Input.Date_placeholder"s, dateInput.GetPlaceholder());
         Assert::IsFalse(dateInput.GetIsRequired());
         Assert::IsTrue(dateInput.GetErrorMessage().empty());
+
+		std::shared_ptr<BaseCardElement> cardLabel = dateInput.GetLabel();
+		Assert::IsTrue(CardElementType::RichTextBlock == cardLabel->GetElementType());
+        auto inlines = std::static_pointer_cast<RichTextBlock>(cardLabel)->GetInlines();
+
+        Assert::AreEqual(size_t(3), inlines.size());
+		Assert::AreEqual("Input.Date_labelPart1"s, std::static_pointer_cast<TextRun>(inlines[0])->GetText());
+        Assert::IsTrue(TextWeight::Bolder == std::static_pointer_cast<TextRun>(inlines[0])->GetTextWeight());
+		Assert::AreEqual("Input.Date_labelPart2"s, std::static_pointer_cast<TextRun>(inlines[1])->GetText());
+		Assert::AreEqual("Input.Date_labelPart3"s, std::static_pointer_cast<TextRun>(inlines[2])->GetText());
     }
 
     void ValidateInputTime(const TimeInput &timeInput)
@@ -288,6 +307,10 @@ namespace AdaptiveCardsSharedModelUnitTest
         Assert::AreEqual("13:00"s, timeInput.GetValue());
         Assert::IsTrue(timeInput.GetIsRequired());
         Assert::AreEqual("Input.Time.ErrorMessage"s, timeInput.GetErrorMessage());
+
+		std::shared_ptr<BaseCardElement> cardLabel = timeInput.GetLabel();
+        Assert::IsTrue(CardElementType::TextBlock == cardLabel->GetElementType());
+        Assert::AreEqual("Input.Time_label"s, std::static_pointer_cast<TextBlock>(cardLabel)->GetText());
     }
 
     void ValidateInputToggle(const ToggleInput &toggleInput)
@@ -302,6 +325,10 @@ namespace AdaptiveCardsSharedModelUnitTest
         Assert::AreEqual("Input.Toggle_off"s, toggleInput.GetValueOff());
         Assert::IsFalse(toggleInput.GetIsRequired());
         Assert::IsTrue(toggleInput.GetErrorMessage().empty());
+
+		std::shared_ptr<BaseCardElement> cardLabel = toggleInput.GetLabel();
+        Assert::IsTrue(CardElementType::TextBlock == cardLabel->GetElementType());
+        Assert::AreEqual("Input.Toggle_label"s, std::static_pointer_cast<TextBlock>(cardLabel)->GetText());
     }
 
     void ValidateTextBlockInInput(const TextBlock &textBlock)
@@ -337,6 +364,10 @@ namespace AdaptiveCardsSharedModelUnitTest
             expectedTitle.append("_title");
             Assert::AreEqual(expectedTitle, currChoice->GetTitle());
         }
+
+		std::shared_ptr<BaseCardElement> cardLabel = choiceSet.GetLabel();
+		Assert::IsTrue(CardElementType::TextBlock == cardLabel->GetElementType());
+		Assert::AreEqual("Input.ChoiceSet_label"s, std::static_pointer_cast<TextBlock>(cardLabel)->GetText());
     }
 
     void ValidateInputContainer(const Container &container)
