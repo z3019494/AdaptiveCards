@@ -5,6 +5,7 @@
 #include "AdaptiveDateInput.h"
 #include "AdaptiveDateInputRenderer.h"
 #include "AdaptiveElementParserRegistration.h"
+#include "XamlHelpers.h"
 
 using namespace Microsoft::WRL;
 using namespace Microsoft::WRL::Wrappers;
@@ -25,7 +26,7 @@ namespace AdaptiveNamespace
 
     HRESULT AdaptiveDateInputRenderer::Render(_In_ IAdaptiveCardElement* adaptiveCardElement,
                                               _In_ IAdaptiveRenderContext* renderContext,
-                                              _In_ IAdaptiveRenderArgs* /*renderArgs*/,
+                                              _In_ IAdaptiveRenderArgs* renderArgs,
                                               _COM_Outptr_ IUIElement** dateInputControl) noexcept
     try
     {
@@ -106,6 +107,11 @@ namespace AdaptiveNamespace
                 RETURN_IF_FAILED(datePicker->put_MaxDate(maxDate));
             }
         }
+
+        ComPtr<IAdaptiveInputElement> adapitveDateInputAsAdaptiveInput;
+        RETURN_IF_FAILED(adaptiveDateInput.As(&adapitveDateInputAsAdaptiveInput));
+        RETURN_IF_FAILED(XamlHelpers::SetXamlHeaderFromLabel(
+            adapitveDateInputAsAdaptiveInput.Get(), renderContext, renderArgs, datePicker.Get()));
 
         RETURN_IF_FAILED(XamlHelpers::SetStyleFromResourceDictionary(renderContext,
                                                                      L"Adaptive.Input.Date",

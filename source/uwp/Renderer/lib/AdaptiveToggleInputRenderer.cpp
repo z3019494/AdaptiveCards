@@ -26,7 +26,7 @@ namespace AdaptiveNamespace
 
     HRESULT AdaptiveToggleInputRenderer::Render(_In_ IAdaptiveCardElement* adaptiveCardElement,
                                                 _In_ IAdaptiveRenderContext* renderContext,
-                                                _In_ IAdaptiveRenderArgs* /*renderArgs*/,
+                                                _In_ IAdaptiveRenderArgs* renderArgs,
                                                 _COM_Outptr_ IUIElement** toggleInputControl) noexcept
     try
     {
@@ -76,8 +76,33 @@ namespace AdaptiveNamespace
         RETURN_IF_FAILED(
             XamlHelpers::SetStyleFromResourceDictionary(renderContext, L"Adaptive.Input.Toggle", frameworkElement.Get()));
 
-        RETURN_IF_FAILED(checkboxAsUIElement.CopyTo(toggleInputControl));
         XamlHelpers::AddInputValueToContext(renderContext, adaptiveCardElement, *toggleInputControl);
+
+        // Check if this toggle has a label. If so, add it to a stackPanel with the checkBox
+        ComPtr<IAdaptiveInputElement> adaptiveToggleInputAsAdaptiveInput;
+        RETURN_IF_FAILED(adaptiveToggleInput.As(&adaptiveToggleInputAsAdaptiveInput));
+
+        ComPtr<IUIElement> labelControl;
+        RETURN_IF_FAILED(XamlHelpers::RenderInputLabel(adaptiveToggleInputAsAdaptiveInput.Get(), renderContext, renderArgs, &labelControl));
+
+        if (labelControl != nullptr)
+        {
+            ComPtr<IStackPanel> stackPanel =
+                XamlHelpers::CreateXamlClass<IStackPanel>(HStringReference(RuntimeClass_Windows_UI_Xaml_Controls_StackPanel));
+
+            ComPtr<IPanel> panel;
+            RETURN_IF_FAILED(stackPanel.As(&panel));
+
+            XamlHelpers::AppendXamlElementToPanel(labelControl.Get(), panel.Get());
+            XamlHelpers::AppendXamlElementToPanel(checkBox.Get(), panel.Get());
+
+            RETURN_IF_FAILED(stackPanel.CopyTo(toggleInputControl));
+        }
+        else
+        {
+            RETURN_IF_FAILED(checkboxAsUIElement.CopyTo(toggleInputControl));
+        }
+
         return S_OK;
     }
     CATCH_RETURN;
