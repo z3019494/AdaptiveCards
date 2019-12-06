@@ -20,7 +20,7 @@ namespace AdaptiveNamespace
 
     HRESULT AdaptiveTimeInputRenderer::Render(_In_ IAdaptiveCardElement* adaptiveCardElement,
                                               _In_ IAdaptiveRenderContext* renderContext,
-                                              _In_ IAdaptiveRenderArgs* /*renderArgs*/,
+                                              _In_ IAdaptiveRenderArgs* renderArgs,
                                               _COM_Outptr_ IUIElement** timeInputControl) noexcept
     try
     {
@@ -61,6 +61,11 @@ namespace AdaptiveNamespace
             TimeSpan initialTime{(INT64)(hours * 60 + minutes) * 10000000 * 60};
             RETURN_IF_FAILED(timePicker->put_Time(initialTime));
         }
+
+        ComPtr<IAdaptiveInputElement> adaptiveTimeInputAsAdaptiveInput;
+        RETURN_IF_FAILED(adaptiveTimeInput.As(&adaptiveTimeInputAsAdaptiveInput));
+        RETURN_IF_FAILED(XamlHelpers::SetXamlHeaderFromLabel(
+            adaptiveTimeInputAsAdaptiveInput.Get(), renderContext, renderArgs, timePicker.Get()));
 
         // Note: Placeholder text and min/max are not supported by ITimePicker
 

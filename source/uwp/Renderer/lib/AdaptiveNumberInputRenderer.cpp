@@ -26,7 +26,7 @@ namespace AdaptiveNamespace
 
     HRESULT AdaptiveNumberInputRenderer::Render(_In_ IAdaptiveCardElement* adaptiveCardElement,
                                                 _In_ IAdaptiveRenderContext* renderContext,
-                                                _In_ IAdaptiveRenderArgs* /*renderArgs*/,
+                                                _In_ IAdaptiveRenderArgs* renderArgs,
                                                 _COM_Outptr_ IUIElement** numberInputControl) noexcept
     try
     {
@@ -77,6 +77,11 @@ namespace AdaptiveNamespace
         RETURN_IF_FAILED(frameworkElement->put_VerticalAlignment(ABI::Windows::UI::Xaml::VerticalAlignment_Top));
         RETURN_IF_FAILED(
             XamlHelpers::SetStyleFromResourceDictionary(renderContext, L"Adaptive.Input.Number", frameworkElement.Get()));
+
+        ComPtr<IAdaptiveInputElement> adaptiveNumberInputAsAdaptiveInput;
+        RETURN_IF_FAILED(adaptiveNumberInput.As(&adaptiveNumberInputAsAdaptiveInput));
+        RETURN_IF_FAILED(XamlHelpers::SetXamlHeaderFromLabel(
+            adaptiveNumberInputAsAdaptiveInput.Get(), renderContext, renderArgs, textBox2.Get()));
 
         // TODO: Handle max and min?
         RETURN_IF_FAILED(textBox.CopyTo(numberInputControl));

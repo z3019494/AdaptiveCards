@@ -21,7 +21,7 @@ namespace AdaptiveNamespace
 
     HRESULT AdaptiveChoiceSetInputRenderer::Render(_In_ IAdaptiveCardElement* adaptiveCardElement,
                                                    _In_ IAdaptiveRenderContext* renderContext,
-                                                   _In_ IAdaptiveRenderArgs* /*renderArgs*/,
+                                                   _In_ IAdaptiveRenderArgs* renderArgs,
                                                    _COM_Outptr_ IUIElement** choiceInputSet) noexcept
     try
     {
@@ -47,11 +47,11 @@ namespace AdaptiveNamespace
 
         if (choiceSetStyle == ABI::AdaptiveNamespace::ChoiceSetStyle_Compact && !isMultiSelect)
         {
-            BuildCompactChoiceSetInput(renderContext, adaptiveChoiceSetInput.Get(), choiceInputSet);
+            BuildCompactChoiceSetInput(renderContext, renderArgs, adaptiveChoiceSetInput.Get(), choiceInputSet);
         }
         else
         {
-            BuildExpandedChoiceSetInput(renderContext, adaptiveChoiceSetInput.Get(), isMultiSelect, choiceInputSet);
+            BuildExpandedChoiceSetInput(renderContext, renderArgs, adaptiveChoiceSetInput.Get(), isMultiSelect, choiceInputSet);
         }
 
         XamlHelpers::AddInputValueToContext(renderContext, adaptiveCardElement, *choiceInputSet);
@@ -100,6 +100,7 @@ namespace AdaptiveNamespace
     }
 
     HRESULT AdaptiveChoiceSetInputRenderer::BuildCompactChoiceSetInput(_In_ IAdaptiveRenderContext* renderContext,
+                                                                       _In_ IAdaptiveRenderArgs* renderArgs,
                                                                        _In_ IAdaptiveChoiceSetInput* adaptiveChoiceSetInput,
                                                                        _COM_Outptr_ IUIElement** choiceInputSet)
     {
@@ -161,6 +162,15 @@ namespace AdaptiveNamespace
         RETURN_IF_FAILED(comboBox.As(&comboBoxAsUIElement));
         RETURN_IF_FAILED(XamlHelpers::AddHandledTappedEvent(comboBoxAsUIElement.Get()));
 
+        ComPtr<IComboBox2> comboBox2;
+        RETURN_IF_FAILED(comboBox.As(&comboBox2));
+
+        ComPtr<IAdaptiveChoiceSetInput> localChoiceSetInput(adaptiveChoiceSetInput);
+        ComPtr<IAdaptiveInputElement> adaptiveChoiceSetInputAsAdaptiveInput;
+        RETURN_IF_FAILED(localChoiceSetInput.As(&adaptiveChoiceSetInputAsAdaptiveInput));
+        RETURN_IF_FAILED(XamlHelpers::SetXamlHeaderFromLabel(
+            adaptiveChoiceSetInputAsAdaptiveInput.Get(), renderContext, renderArgs, comboBox2.Get()));
+
         XamlHelpers::SetStyleFromResourceDictionary(renderContext,
                                                     L"Adaptive.Input.ChoiceSet.Compact",
                                                     comboBoxAsFrameworkElement.Get());
@@ -169,6 +179,7 @@ namespace AdaptiveNamespace
     }
 
     HRESULT AdaptiveChoiceSetInputRenderer::BuildExpandedChoiceSetInput(_In_ IAdaptiveRenderContext* renderContext,
+                                                                        _In_ IAdaptiveRenderArgs* renderArgs,
                                                                         _In_ IAdaptiveChoiceSetInput* adaptiveChoiceSetInput,
                                                                         boolean isMultiSelect,
                                                                         _COM_Outptr_ IUIElement** choiceInputSet)
@@ -182,6 +193,16 @@ namespace AdaptiveNamespace
 
         ComPtr<IPanel> panel;
         RETURN_IF_FAILED(stackPanel.As(&panel));
+
+        // If this expanded choice set has a label, add the label to the stack panel before the choices
+        ComPtr<IUIElement> labelControl;
+        ComPtr<IAdaptiveChoiceSetInput> localChoiceSetInput(adaptiveChoiceSetInput);
+        ComPtr<IAdaptiveInputElement> adaptiveChoiceSetInputAsAdaptiveInput;
+        RETURN_IF_FAILED(XamlHelpers::RenderInputLabel(adaptiveChoiceSetInputAsAdaptiveInput.Get(), renderContext, renderArgs, &labelControl));
+        if (labelControl != nullptr)
+        {
+            XamlHelpers::AppendXamlElementToPanel(labelControl.Get(), panel.Get());
+        }
 
         std::vector<std::string> values = GetChoiceSetValueVector(adaptiveChoiceSetInput);
 

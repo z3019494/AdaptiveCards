@@ -645,4 +645,30 @@ namespace AdaptiveNamespace::XamlHelpers
         RETURN_IF_FAILED(localElement->put_Margin(margin));
         return S_OK;
     }
+
+    HRESULT RenderInputLabel(_In_ ABI::AdaptiveNamespace::IAdaptiveInputElement* adaptiveInputElement,
+                             _In_ ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext,
+                             _In_ ABI::AdaptiveNamespace::IAdaptiveRenderArgs* renderArgs,
+                             _COM_Outptr_ ABI::Windows::UI::Xaml::IUIElement** labelControl)
+    {
+        ComPtr<IAdaptiveCardElement> labelElement;
+        RETURN_IF_FAILED(adaptiveInputElement->get_Label(&labelElement));
+
+        if (labelElement != nullptr)
+        {
+            // BECKYTODO - check type!
+            HString labelType;
+            RETURN_IF_FAILED(labelElement->get_ElementTypeString(labelType.GetAddressOf()));
+
+            ComPtr<IAdaptiveElementRendererRegistration> elementRendererRegistration;
+            RETURN_IF_FAILED(renderContext->get_ElementRenderers(&elementRendererRegistration));
+
+            ComPtr<IAdaptiveElementRenderer> labelRenderer;
+            RETURN_IF_FAILED(elementRendererRegistration->Get(labelType.Get(), &labelRenderer));
+
+            RETURN_IF_FAILED(labelRenderer->Render(labelElement.Get(), renderContext, renderArgs, labelControl));
+        }
+
+        return S_OK;
+    }
 }

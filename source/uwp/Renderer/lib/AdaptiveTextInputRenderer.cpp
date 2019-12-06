@@ -128,6 +128,12 @@ namespace AdaptiveNamespace
 
             RETURN_IF_FAILED(textBox.CopyTo(textInputControl));
         }
+
+        ComPtr<IAdaptiveInputElement> adapitveTextInputAsAdaptiveInput;
+        RETURN_IF_FAILED(adaptiveTextInput.As(&adapitveTextInputAsAdaptiveInput));
+        RETURN_IF_FAILED(XamlHelpers::SetXamlHeaderFromLabel(
+            adapitveTextInputAsAdaptiveInput.Get(), renderContext, renderArgs, textBox2.Get()));
+
         return S_OK;
     }
     CATCH_RETURN;

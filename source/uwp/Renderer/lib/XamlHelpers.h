@@ -303,6 +303,30 @@ namespace AdaptiveNamespace::XamlHelpers
         panel->SetVerticalContentAlignment(verticalContentAlignment);
     }
 
+    HRESULT RenderInputLabel(_In_ ABI::AdaptiveNamespace::IAdaptiveInputElement* adaptiveInputElement,
+                             _In_ ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext,
+                             _In_ ABI::AdaptiveNamespace::IAdaptiveRenderArgs* renderArgs,
+                             _COM_Outptr_ ABI::Windows::UI::Xaml::IUIElement** labelControl);
+
+    template<typename TXamlControl>
+    HRESULT SetXamlHeaderFromLabel(_In_ ABI::AdaptiveNamespace::IAdaptiveInputElement* adaptiveInputElement,
+                                   _In_ ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext,
+                                   _In_ ABI::AdaptiveNamespace::IAdaptiveRenderArgs* renderArgs,
+                                   _In_ TXamlControl* xamlControl)
+    {
+        ComPtr<IUIElement> labelControl;
+        RETURN_IF_FAILED(RenderInputLabel(adaptiveInputElement, renderContext, renderArgs, &labelControl));
+
+        if (labelControl != nullptr)
+        {
+            ComPtr<IInspectable> labelControlAsInspectable;
+            RETURN_IF_FAILED(labelControl.As(&labelControlAsInspectable));
+            RETURN_IF_FAILED(xamlControl->put_Header(labelControlAsInspectable.Get()));
+        }
+
+        return S_OK;
+    }
+
     HRESULT AddHandledTappedEvent(_In_ ABI::Windows::UI::Xaml::IUIElement* uiElement);
 
     void ApplyBackgroundToRoot(_In_ ABI::Windows::UI::Xaml::Controls::IPanel* rootPanel,

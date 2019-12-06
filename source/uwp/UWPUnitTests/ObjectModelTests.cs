@@ -447,6 +447,13 @@ namespace UWPUnitTests
                 Spacing = Spacing.Medium,
             };
 
+            textInput.Label = new AdaptiveTextBlock
+            {
+                Text = "LabelText"
+            };
+            Assert.IsNotNull(textInput.Label);
+            Assert.AreEqual("LabelText", (textInput.Label as AdaptiveTextBlock).Text);
+
             ValidateBaseElementProperties(textInput, "TextInputId", false, true, Spacing.Medium, HeightType.Stretch);
 
             Assert.IsFalse(textInput.IsRequired);
@@ -487,6 +494,13 @@ namespace UWPUnitTests
                 Spacing = Spacing.Medium,
             };
 
+            numberInput.Label = new AdaptiveTextBlock
+            {
+                Text = "LabelText"
+            };
+            Assert.IsNotNull(numberInput.Label);
+            Assert.AreEqual("LabelText", (numberInput.Label as AdaptiveTextBlock).Text);
+
             ValidateBaseElementProperties(numberInput, "NumberInputId", false, true, Spacing.Medium, HeightType.Stretch);
 
             Assert.IsFalse(numberInput.IsRequired);
@@ -518,6 +532,13 @@ namespace UWPUnitTests
                 Value = "2018-01-14",
             };
 
+            dateInput.Label = new AdaptiveTextBlock
+            {
+                Text = "LabelText"
+            };
+            Assert.IsNotNull(dateInput.Label);
+            Assert.AreEqual("LabelText", (dateInput.Label as AdaptiveTextBlock).Text);
+
             ValidateBaseElementProperties(dateInput, "DateInputId", false, true, Spacing.Medium, HeightType.Stretch);
 
             Assert.IsTrue(dateInput.IsRequired);
@@ -546,6 +567,13 @@ namespace UWPUnitTests
                 Separator = true,
                 Spacing = Spacing.Medium,
             };
+
+            timeInput.Label = new AdaptiveTextBlock
+            {
+                Text = "LabelText"
+            };
+            Assert.IsNotNull(timeInput.Label);
+            Assert.AreEqual("LabelText", (timeInput.Label as AdaptiveTextBlock).Text);
 
             ValidateBaseElementProperties(timeInput, "TimeInputId", false, true, Spacing.Medium, HeightType.Stretch);
 
@@ -576,6 +604,13 @@ namespace UWPUnitTests
                 Separator = true,
                 Spacing = Spacing.Medium,
             };
+
+            toggleInput.Label = new AdaptiveTextBlock
+            {
+                Text = "LabelText"
+            };
+            Assert.IsNotNull(toggleInput.Label);
+            Assert.AreEqual("LabelText", (toggleInput.Label as AdaptiveTextBlock).Text);
 
             ValidateBaseElementProperties(toggleInput, "ToggleInputId", false, true, Spacing.Medium, HeightType.Stretch);
 
@@ -622,6 +657,13 @@ namespace UWPUnitTests
                 Separator = true,
                 Spacing = Spacing.Medium,
             };
+
+            choiceSet.Label = new AdaptiveTextBlock
+            {
+                Text = "LabelText"
+            };
+            Assert.IsNotNull(choiceSet.Label);
+            Assert.AreEqual("LabelText", (choiceSet.Label as AdaptiveTextBlock).Text);
 
             ValidateBaseElementProperties(choiceSet, "ChoiceSetInputId", false, true, Spacing.Medium, HeightType.Stretch);
 
