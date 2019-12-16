@@ -21,6 +21,8 @@ namespace AdaptiveNamespace
         IFACEMETHODIMP get_InputElement(_COM_Outptr_ ABI::AdaptiveNamespace::IAdaptiveInputElement** inputElement);
         IFACEMETHODIMP get_CurrentValue(_Outptr_ HSTRING* serializedUserInput);
 
+        IFACEMETHODIMP Validate(_Out_ boolean* isInputValid);
+
     private:
         std::string SerializeChoiceSetInput() const;
         std::string SerializeDateInput() const;
@@ -33,4 +35,29 @@ namespace AdaptiveNamespace
         Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveInputElement> m_adaptiveInputElement;
         Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::IUIElement> m_uiInputElement;
     };
+
+    class TextInputValue : public InputValue
+    {
+    public:
+        HRESULT RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveTextInput* adaptiveTextInput,
+                                       _In_ ABI::Windows::UI::Xaml::Controls::ITextBox* uiTextBoxElement,
+                                       _In_ ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder)
+        {
+            m_adaptiveTextInput = adaptiveTextInput;
+            m_textBoxElement = uiTextBoxElement;
+            m_validationBorder = validationBorder;
+
+            return S_OK;
+        }
+
+        IFACEMETHODIMP get_InputElement(_COM_Outptr_ ABI::AdaptiveNamespace::IAdaptiveInputElement** inputElement) override;
+        IFACEMETHODIMP get_CurrentValue(_Outptr_ HSTRING* serializedUserInput) override;
+        IFACEMETHODIMP Validate(_Out_ boolean* isInputValid) override;
+
+    private:
+        Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveTextInput> m_adaptiveTextInput;
+        Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Controls::ITextBox> m_textBoxElement;
+        Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Controls::IBorder> m_validationBorder;
+    };
+
 }

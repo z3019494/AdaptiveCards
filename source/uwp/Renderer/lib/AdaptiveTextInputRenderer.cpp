@@ -25,6 +25,99 @@ namespace AdaptiveNamespace
     }
     CATCH_RETURN;
 
+    HRESULT HandleLabelActionAndValidation(IAdaptiveTextInput* adaptiveTextInput,
+                                           ITextBox* textBox,
+                                           _In_ IAdaptiveRenderContext* renderContext,
+                                           _In_ IAdaptiveRenderArgs* renderArgs,
+                                           IUIElement** inputLayout)
+    {
+        // Create a stack panel for the input and related controls
+        ComPtr<IStackPanel> inputStackPanel =
+            XamlHelpers::CreateXamlClass<IStackPanel>(HStringReference(RuntimeClass_Windows_UI_Xaml_Controls_StackPanel));
+
+        ComPtr<IPanel> stackPanelAsPanel;
+        inputStackPanel.As(&stackPanelAsPanel);
+
+        ComPtr<IAdaptiveTextInput> localTextInput(adaptiveTextInput);
+        ComPtr<IAdaptiveInputElement> textInputAsAdaptiveInput;
+        localTextInput.As(&textInputAsAdaptiveInput);
+
+        // Render the label and add it to the stack panel (BECKYTODO - this should be a header, but right now i
+        // can't figure out how to get a border around just the text box if i do i that way)
+        ComPtr<IUIElement> label;
+        XamlHelpers::RenderInputLabel(textInputAsAdaptiveInput.Get(), renderContext, renderArgs, &label);
+        XamlHelpers::AppendXamlElementToPanel(label.Get(), stackPanelAsPanel.Get());
+
+        ComPtr<ITextBox> localTextBox(textBox);
+        ComPtr<IUIElement> textBoxAsUIElement;
+        localTextBox.As(&textBoxAsUIElement);
+
+        // The text box may need to go into a number of parent containers to handle validation and inline actions before
+        // being added to the stack panel. textBoxParentContainer represents the current parent container.
+        ComPtr<IUIElement> textBoxParentContainer = textBoxAsUIElement;
+
+        // If there's any validation on this input, put the input inside a border
+        HString regex;
+        adaptiveTextInput->get_Regex(regex.GetAddressOf());
+        boolean isRequired;
+        textInputAsAdaptiveInput->get_IsRequired(&isRequired);
+
+        ComPtr<IBorder> validationBorder;
+        if (regex.IsValid() || isRequired)
+        {
+            // Create a border in the attention color. The thickness is 0 for now so it won't be visibile until validation is run
+            validationBorder =
+                XamlHelpers::CreateXamlClass<IBorder>(HStringReference(RuntimeClass_Windows_UI_Xaml_Controls_Border));
+
+            ComPtr<IAdaptiveHostConfig> hostConfig;
+            renderContext->get_HostConfig(&hostConfig);
+
+            ABI::Windows::UI::Color attentionColor;
+            RETURN_IF_FAILED(GetColorFromAdaptiveColor(hostConfig.Get(),
+                                                       ABI::AdaptiveNamespace::ForegroundColor_Attention,
+                                                       ABI::AdaptiveNamespace::ContainerStyle_Default,
+                                                       false, // isSubtle
+                                                       false, // highlight
+                                                       &attentionColor));
+
+            RETURN_IF_FAILED(validationBorder->put_BorderBrush(XamlHelpers::GetSolidColorBrush(attentionColor).Get()));
+
+            RETURN_IF_FAILED(validationBorder->put_Child(textBoxAsUIElement.Get()));
+            validationBorder.As(&textBoxParentContainer);
+        }
+
+        // If this input has an inline action, render it next to the input
+        ComPtr<IAdaptiveActionElement> inlineAction;
+        RETURN_IF_FAILED(adaptiveTextInput->get_InlineAction(&inlineAction));
+
+        if (inlineAction != nullptr)
+        {
+            ComPtr<IUIElement> textBoxWithInlineAction;
+            ActionHelpers::HandleInlineAction(
+                renderContext, renderArgs, textBox, textBoxParentContainer.Get(), inlineAction.Get(), &textBoxWithInlineAction);
+            textBoxParentContainer = textBoxWithInlineAction;
+        }
+
+        boolean isMultiline;
+        adaptiveTextInput->get_IsMultiline(&isMultiline);
+
+        if (!isMultiline)
+        {
+            ComPtr<IFrameworkElement> textBoxFrameworkElement;
+            textBoxParentContainer.As(&textBoxFrameworkElement);
+            RETURN_IF_FAILED(textBoxFrameworkElement->put_VerticalAlignment(ABI::Windows::UI::Xaml::VerticalAlignment_Top));
+        }
+
+        XamlHelpers::AppendXamlElementToPanel(textBoxParentContainer.Get(), stackPanelAsPanel.Get());
+
+        ComPtr<TextInputValue> input;
+        MakeAndInitialize<TextInputValue>(&input, adaptiveTextInput, textBox, validationBorder.Get());
+        renderContext->AddInputValue(input.Get());
+
+        stackPanelAsPanel.CopyTo(inputLayout);
+        return S_OK;
+    }
+
     HRESULT AdaptiveTextInputRenderer::Render(_In_ IAdaptiveCardElement* adaptiveCardElement,
                                               _In_ IAdaptiveRenderContext* renderContext,
                                               _In_ IAdaptiveRenderArgs* renderArgs,
@@ -112,63 +205,12 @@ namespace AdaptiveNamespace
 
         RETURN_IF_FAILED(textBox->put_InputScope(inputScope.Get()));
 
-        XamlHelpers::AddInputValueToContext(renderContext, adaptiveCardElement, textBoxAsUIElement.Get());
-
-        ComPtr<IAdaptiveActionElement> inlineAction;
-        RETURN_IF_FAILED(adaptiveTextInput->get_InlineAction(&inlineAction));
-
         ComPtr<IFrameworkElement> textBoxAsFrameworkElement;
         RETURN_IF_FAILED(textBox.As(&textBoxAsFrameworkElement));
         RETURN_IF_FAILED(
             XamlHelpers::SetStyleFromResourceDictionary(renderContext, L"Adaptive.Input.Text", textBoxAsFrameworkElement.Get()));
 
-
-        ComPtr<IBorder> validationBorder =
-            XamlHelpers::CreateXamlClass<IBorder>(HStringReference(RuntimeClass_Windows_UI_Xaml_Controls_Border));
-
-        ABI::Windows::UI::Color attentionColor;
-        RETURN_IF_FAILED(GetColorFromAdaptiveColor(hostConfig.Get(),
-                                                   ABI::AdaptiveNamespace::ForegroundColor_Attention,
-                                                   ABI::AdaptiveNamespace::ContainerStyle_Default,
-                                                   false, // isSubtle
-                                                   false, // highlight
-                                                   &attentionColor));
-        ComPtr<IControl> textBoxAsControl;
-        textBox.As(&textBoxAsControl);
-		textBoxAsControl->put_BorderBrush(XamlHelpers::GetSolidColorBrush(attentionColor).Get());
-
-		RETURN_IF_FAILED(textBoxAsControl->put_BorderThickness({2, 2, 2, 2}));
-
-		//RETURN_IF_FAILED(validationBorder->put_Child(textBoxAsUIElement.Get()));
-
-
-        if (inlineAction != nullptr)
-        {
-            ComPtr<IUIElement> textBoxWithInlineAction;
-            ActionHelpers::HandleInlineAction(renderContext, renderArgs, textBox.Get(), inlineAction.Get(), &textBoxWithInlineAction);
-            if (!isMultiLine)
-            {
-                RETURN_IF_FAILED(textBoxWithInlineAction.As(&textBoxAsFrameworkElement));
-                RETURN_IF_FAILED(textBoxAsFrameworkElement->put_VerticalAlignment(ABI::Windows::UI::Xaml::VerticalAlignment_Top));
-            }
-
-            RETURN_IF_FAILED(textBoxWithInlineAction.CopyTo(textInputControl));
-        }
-        else
-        {
-            if (!isMultiLine)
-            {
-                RETURN_IF_FAILED(textBoxAsFrameworkElement->put_VerticalAlignment(ABI::Windows::UI::Xaml::VerticalAlignment_Top));
-            }
-
-			//BECKYTODOD - handling the inline action case
-            RETURN_IF_FAILED(textBox.CopyTo(textInputControl));
-        }
-
-        ComPtr<IAdaptiveInputElement> adapitveTextInputAsAdaptiveInput;
-        RETURN_IF_FAILED(adaptiveTextInput.As(&adapitveTextInputAsAdaptiveInput));
-        RETURN_IF_FAILED(XamlHelpers::SetXamlHeaderFromLabel(
-            adapitveTextInputAsAdaptiveInput.Get(), renderContext, renderArgs, textBox2.Get()));
+        HandleLabelActionAndValidation(adaptiveTextInput.Get(), textBox.Get(), renderContext, renderArgs, textInputControl);
 
         return S_OK;
     }

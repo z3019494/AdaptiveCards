@@ -255,10 +255,15 @@ namespace AdaptiveNamespace
         ComPtr<IAdaptiveInputs> gatheredInputs;
         RETURN_IF_FAILED(get_UserInputs(&gatheredInputs));
 
-		boolean inputsAreValid;
+        boolean inputsAreValid;
         gatheredInputs->ValidateInputs(&inputsAreValid);
 
-		ComPtr<IAdaptiveActionEventArgs> eventArgs;
+        if (!inputsAreValid)
+        {
+            return S_OK;
+        }
+
+        ComPtr<IAdaptiveActionEventArgs> eventArgs;
         RETURN_IF_FAILED(MakeAndInitialize<AdaptiveActionEventArgs>(&eventArgs, actionElement, gatheredInputs.Get()));
 
         ABI::AdaptiveCards::Rendering::Uwp::ActionType actionType;

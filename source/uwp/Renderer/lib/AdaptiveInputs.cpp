@@ -99,7 +99,15 @@ namespace AdaptiveNamespace
 
     HRESULT AdaptiveInputs::ValidateInputs(boolean* inputsAreValid)
     {
-        *inputsAreValid = true;
+        boolean allInputsValid = true;
+        for (auto& inputValue : *m_inputValues)
+        {
+            boolean currentInputValid;
+            inputValue->Validate(&currentInputValid);
+            allInputsValid &= currentInputValid;
+        }
+
+        *inputsAreValid = allInputsValid;
         return S_OK;
     }
 }

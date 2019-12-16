@@ -255,7 +255,73 @@ HRESULT InputValue::get_CurrentValue(_Outptr_ HSTRING* result)
     return S_OK;
 }
 
+HRESULT InputValue::Validate(boolean* isInputValid)
+{
+    *isInputValid = true;
+    return S_OK;
+}
+
 HRESULT InputValue::get_InputElement(_COM_Outptr_ IAdaptiveInputElement** inputElement)
 {
     return m_adaptiveInputElement.CopyTo(inputElement);
+}
+
+HRESULT TextInputValue::get_InputElement(ABI::AdaptiveNamespace::IAdaptiveInputElement** inputElement)
+{
+    ComPtr<IAdaptiveInputElement> adaptiveTextInputAsInputElement;
+    m_adaptiveTextInput.As(&adaptiveTextInputAsInputElement);
+
+    adaptiveTextInputAsInputElement.CopyTo(inputElement);
+
+    return S_OK;
+}
+
+HRESULT TextInputValue::get_CurrentValue(HSTRING* serializedUserInput)
+{
+    HString text;
+    THROW_IF_FAILED(m_textBoxElement->get_Text(text.GetAddressOf()));
+
+    std::string textString;
+    if (text.IsValid())
+    {
+        THROW_IF_FAILED(HStringToUTF8(text.Get(), textString));
+    }
+
+    RETURN_IF_FAILED(UTF8ToHString(textString, serializedUserInput));
+
+    return S_OK;
+}
+
+HRESULT TextInputValue::Validate(_Out_ boolean* isInputValid)
+{
+    ComPtr<IAdaptiveInputElement> adaptiveInputElement;
+    m_adaptiveTextInput.As(&adaptiveInputElement);
+
+    boolean isRequired;
+    adaptiveInputElement->get_IsRequired(&isRequired);
+
+    if (isRequired)
+    {
+        HString text;
+        m_textBoxElement->get_Text(text.GetAddressOf());
+
+        *isInputValid = text.IsValid();
+    }
+    else
+    {
+        *isInputValid = true;
+    }
+
+    if (m_validationBorder)
+    {
+        if (*isInputValid)
+        {
+            m_validationBorder->put_BorderThickness({0, 0, 0, 0});
+        }
+        else
+        {
+            m_validationBorder->put_BorderThickness({2, 2, 2, 2});
+        }
+    }
+    return S_OK;
 }

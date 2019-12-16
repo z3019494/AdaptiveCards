@@ -1761,6 +1761,7 @@ AdaptiveNamespaceStart
     {
         IAdaptiveInputElement InputElement { get; };
         String CurrentValue { get; };
+        Boolean Validate();
     };
 
     [
