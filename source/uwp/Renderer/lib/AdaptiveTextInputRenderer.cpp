@@ -48,6 +48,23 @@ namespace AdaptiveNamespace
         ComPtr<ITextBox> textBox =
             XamlHelpers::CreateXamlClass<ITextBox>(HStringReference(RuntimeClass_Windows_UI_Xaml_Controls_TextBox));
 
+        EventRegistrationToken textChangedToken;
+        textBox->add_TextChanged(Callback<ITextChangedEventHandler>([](IInspectable* /*sender*/, ITextChangedEventArgs *
+                                                                       /*args*/) -> HRESULT {
+                                     return S_OK;
+                                 }).Get(),
+                                 &textChangedToken);
+
+        ComPtr<IUIElement> textBoxAsUIElement;
+        RETURN_IF_FAILED(textBox.As(&textBoxAsUIElement));
+
+        EventRegistrationToken focusLostToken;
+        textBoxAsUIElement->add_LostFocus(Callback<IRoutedEventHandler>([](IInspectable* /*sender*/, IRoutedEventArgs *
+                                                                           /*args*/) -> HRESULT {
+                                              return S_OK;
+                                          }).Get(),
+                                          &focusLostToken);
+
         boolean isMultiLine;
         RETURN_IF_FAILED(adaptiveTextInput->get_IsMultiline(&isMultiLine));
         RETURN_IF_FAILED(textBox->put_AcceptsReturn(isMultiLine));
@@ -95,8 +112,6 @@ namespace AdaptiveNamespace
 
         RETURN_IF_FAILED(textBox->put_InputScope(inputScope.Get()));
 
-        ComPtr<IUIElement> textBoxAsUIElement;
-        textBox.As(&textBoxAsUIElement);
         XamlHelpers::AddInputValueToContext(renderContext, adaptiveCardElement, textBoxAsUIElement.Get());
 
         ComPtr<IAdaptiveActionElement> inlineAction;
@@ -106,6 +121,26 @@ namespace AdaptiveNamespace
         RETURN_IF_FAILED(textBox.As(&textBoxAsFrameworkElement));
         RETURN_IF_FAILED(
             XamlHelpers::SetStyleFromResourceDictionary(renderContext, L"Adaptive.Input.Text", textBoxAsFrameworkElement.Get()));
+
+
+        ComPtr<IBorder> validationBorder =
+            XamlHelpers::CreateXamlClass<IBorder>(HStringReference(RuntimeClass_Windows_UI_Xaml_Controls_Border));
+
+        ABI::Windows::UI::Color attentionColor;
+        RETURN_IF_FAILED(GetColorFromAdaptiveColor(hostConfig.Get(),
+                                                   ABI::AdaptiveNamespace::ForegroundColor_Attention,
+                                                   ABI::AdaptiveNamespace::ContainerStyle_Default,
+                                                   false, // isSubtle
+                                                   false, // highlight
+                                                   &attentionColor));
+        ComPtr<IControl> textBoxAsControl;
+        textBox.As(&textBoxAsControl);
+		textBoxAsControl->put_BorderBrush(XamlHelpers::GetSolidColorBrush(attentionColor).Get());
+
+		RETURN_IF_FAILED(textBoxAsControl->put_BorderThickness({2, 2, 2, 2}));
+
+		//RETURN_IF_FAILED(validationBorder->put_Child(textBoxAsUIElement.Get()));
+
 
         if (inlineAction != nullptr)
         {
@@ -126,6 +161,7 @@ namespace AdaptiveNamespace
                 RETURN_IF_FAILED(textBoxAsFrameworkElement->put_VerticalAlignment(ABI::Windows::UI::Xaml::VerticalAlignment_Top));
             }
 
+			//BECKYTODOD - handling the inline action case
             RETURN_IF_FAILED(textBox.CopyTo(textInputControl));
         }
 

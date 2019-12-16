@@ -62,12 +62,12 @@ namespace AdaptiveNamespace
             return AdaptiveInputElementBase::put_ErrorMessage(errorMessage);
         }
 
-        IFACEMETHODIMP get_Label(_COM_Outptr_ IAdaptiveCardElement** label)
+        IFACEMETHODIMP get_Label(_Outptr_ HSTRING* label)
         {
             return AdaptiveInputElementBase::get_Label(label);
         }
 
-        IFACEMETHODIMP put_Label(_In_ IAdaptiveCardElement* label)
+        IFACEMETHODIMP put_Label(_In_ HSTRING label)
         {
             return AdaptiveInputElementBase::put_Label(label);
         }

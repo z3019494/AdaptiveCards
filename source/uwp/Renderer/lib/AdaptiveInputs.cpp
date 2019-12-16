@@ -96,4 +96,10 @@ namespace AdaptiveNamespace
         }
         return valueSet.CopyTo(valueSetOut);
     }
+
+    HRESULT AdaptiveInputs::ValidateInputs(boolean* inputsAreValid)
+    {
+        *inputsAreValid = true;
+        return S_OK;
+    }
 }

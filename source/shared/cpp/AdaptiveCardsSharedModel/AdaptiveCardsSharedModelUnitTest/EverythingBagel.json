@@ -200,11 +200,7 @@
 				{
 					"type": "Input.Number",
 					"id": "Input.Number_id",
-					"label": {
-						"type": "TextBlock",
-						"text": "Input.Number_label",
-						"size": "Large"
-					},
+					"label": "Input.Number_label",
 					"max": 10,
 					"min": 5,
 					"placeholder": "Input.Number_placeholder",
@@ -214,21 +210,7 @@
 				{
 					"type": "Input.Date",
 					"id": "Input.Date_id",
-					"label": {
-						"type": "RichTextBlock",
-						"inlines": [
-							{
-								"type": "TextRun",
-								"text": "Input.Date_labelPart1",
-								"weight": "Bolder"
-							},
-							{
-								"type": "TextRun",
-								"text": "Input.Date_labelPart2"
-							},
-							"Input.Date_labelPart3"
-						]
-					},
+					"label": "Input.Date_label",
 					"min": "8/1/2018",
 					"max": "1/1/2020",
 					"placeholder": "Input.Date_placeholder",

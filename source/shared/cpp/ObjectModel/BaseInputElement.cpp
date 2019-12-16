@@ -17,12 +17,12 @@ BaseInputElement::BaseInputElement(CardElementType elementType, Spacing spacing,
     PopulateKnownPropertiesSet();
 }
 
-std::shared_ptr<BaseCardElement> BaseInputElement::GetLabel() const
+std::string BaseInputElement::GetLabel() const
 {
     return m_label;
 }
 
-void BaseInputElement::SetLabel(const std::shared_ptr<BaseCardElement> label)
+void BaseInputElement::SetLabel(const std::string label)
 {
     m_label = label;
 }
@@ -61,46 +61,12 @@ Json::Value BaseInputElement::SerializeToJsonValue() const
         root[AdaptiveCardSchemaKeyToString(AdaptiveCardSchemaKey::ErrorMessage)] = m_errorMessage;
     }
 
-    if (m_label != nullptr)
+    if (!m_label.empty())
     {
-        root[AdaptiveCardSchemaKeyToString(AdaptiveCardSchemaKey::Label)] = m_label->SerializeToJsonValue();
+        root[AdaptiveCardSchemaKeyToString(AdaptiveCardSchemaKey::Label)] = m_label;
     }
 
     return root;
-}
-
-std::shared_ptr<BaseCardElement> BaseInputElement::DeserializeInputLabel(ParseContext& context, const Json::Value& json)
-{
-    std::shared_ptr<BaseCardElement> labelElement;
-
-    auto propertyValue = json.get(AdaptiveCardSchemaKeyToString(AdaptiveCardSchemaKey::Label), Json::Value());
-    if (!propertyValue.empty())
-    {
-        if (propertyValue.isString())
-        {
-            std::shared_ptr<TextBlock> stringAsTextBlock = std::make_shared<TextBlock>();
-            stringAsTextBlock->SetText(propertyValue.asString());
-            labelElement = stringAsTextBlock;
-        }
-        else if (propertyValue.isObject())
-        {
-            auto labelType =
-                propertyValue.get(AdaptiveCardSchemaKeyToString(AdaptiveCardSchemaKey::Type), Json::Value()).asString();
-
-            if (labelType.compare("TextBlock") == 0 || labelType.compare("RichTextBlock") == 0)
-            {
-                labelElement = context.elementParserRegistration->GetParser(labelType)->Deserialize(context, propertyValue);
-            }
-        }
-
-        if (labelElement == nullptr)
-        {
-            throw AdaptiveCardParseException(ErrorStatusCode::InvalidPropertyValue,
-                                             "Input Labels must be a string, a TextBlock element, or a RichTextBlockElement");
-        }
-    }
-
-    return labelElement;
 }
 
 void BaseInputElement::PopulateKnownPropertiesSet()

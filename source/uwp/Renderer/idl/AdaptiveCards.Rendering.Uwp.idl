@@ -723,7 +723,7 @@ AdaptiveNamespaceStart
     {
         Boolean IsRequired;
         String ErrorMessage;
-        IAdaptiveCardElement Label;
+        String Label;
     };
 
     [
@@ -1593,6 +1593,8 @@ AdaptiveNamespaceStart
 
         Windows.Data.Json.JsonObject AsJson();
         Windows.Foundation.Collections.ValueSet AsValueSet();
+
+		Boolean ValidateInputs();
     };
 
     [

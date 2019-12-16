@@ -647,26 +647,21 @@ namespace AdaptiveNamespace::XamlHelpers
     }
 
     HRESULT RenderInputLabel(_In_ ABI::AdaptiveNamespace::IAdaptiveInputElement* adaptiveInputElement,
-                             _In_ ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext,
-                             _In_ ABI::AdaptiveNamespace::IAdaptiveRenderArgs* renderArgs,
+                             _In_ ABI::AdaptiveNamespace::IAdaptiveRenderContext* /*renderContext*/,
+                             _In_ ABI::AdaptiveNamespace::IAdaptiveRenderArgs* /*renderArgs*/,
                              _COM_Outptr_ ABI::Windows::UI::Xaml::IUIElement** labelControl)
     {
-        ComPtr<IAdaptiveCardElement> labelElement;
-        RETURN_IF_FAILED(adaptiveInputElement->get_Label(&labelElement));
+        HString inputLabel;
+        RETURN_IF_FAILED(adaptiveInputElement->get_Label(inputLabel.GetAddressOf()));
 
-        if (labelElement != nullptr)
+        if (inputLabel != nullptr)
         {
-            // BECKYTODO - check type!
-            HString labelType;
-            RETURN_IF_FAILED(labelElement->get_ElementTypeString(labelType.GetAddressOf()));
+            ComPtr<ITextBlock> xamlTextBlock =
+                XamlHelpers::CreateXamlClass<ITextBlock>(HStringReference(RuntimeClass_Windows_UI_Xaml_Controls_TextBlock));
 
-            ComPtr<IAdaptiveElementRendererRegistration> elementRendererRegistration;
-            RETURN_IF_FAILED(renderContext->get_ElementRenderers(&elementRendererRegistration));
+			RETURN_IF_FAILED(xamlTextBlock->put_Text(inputLabel.Get()));
 
-            ComPtr<IAdaptiveElementRenderer> labelRenderer;
-            RETURN_IF_FAILED(elementRendererRegistration->Get(labelType.Get(), &labelRenderer));
-
-            RETURN_IF_FAILED(labelRenderer->Render(labelElement.Get(), renderContext, renderArgs, labelControl));
+			RETURN_IF_FAILED(xamlTextBlock.CopyTo(labelControl));
         }
 
         return S_OK;

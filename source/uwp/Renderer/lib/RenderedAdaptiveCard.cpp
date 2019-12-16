@@ -254,7 +254,11 @@ namespace AdaptiveNamespace
         // get the inputElements in Json form.
         ComPtr<IAdaptiveInputs> gatheredInputs;
         RETURN_IF_FAILED(get_UserInputs(&gatheredInputs));
-        ComPtr<IAdaptiveActionEventArgs> eventArgs;
+
+		boolean inputsAreValid;
+        gatheredInputs->ValidateInputs(&inputsAreValid);
+
+		ComPtr<IAdaptiveActionEventArgs> eventArgs;
         RETURN_IF_FAILED(MakeAndInitialize<AdaptiveActionEventArgs>(&eventArgs, actionElement, gatheredInputs.Get()));
 
         ABI::AdaptiveCards::Rendering::Uwp::ActionType actionType;
