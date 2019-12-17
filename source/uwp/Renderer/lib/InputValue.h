@@ -39,6 +39,9 @@ namespace AdaptiveNamespace
     class TextInputValue : public InputValue
     {
     public:
+
+        TextInputValue() : m_isTextChangedValidationEnabled(false){}
+
         HRESULT RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveTextInput* adaptiveTextInput,
                                        _In_ ABI::Windows::UI::Xaml::Controls::ITextBox* uiTextBoxElement,
                                        _In_ ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder)
@@ -46,6 +49,8 @@ namespace AdaptiveNamespace
             m_adaptiveTextInput = adaptiveTextInput;
             m_textBoxElement = uiTextBoxElement;
             m_validationBorder = validationBorder;
+
+            //RETURN_IF_FAILED(EnableFocusLostValidation());
 
             return S_OK;
         }
@@ -55,9 +60,13 @@ namespace AdaptiveNamespace
         IFACEMETHODIMP Validate(_Out_ boolean* isInputValid) override;
 
     private:
+        HRESULT EnableFocusLostValidation();
+        HRESULT EnableTextChangedValidation();
+
         Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveTextInput> m_adaptiveTextInput;
         Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Controls::ITextBox> m_textBoxElement;
         Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Controls::IBorder> m_validationBorder;
+        bool m_isTextChangedValidationEnabled;
     };
 
 }

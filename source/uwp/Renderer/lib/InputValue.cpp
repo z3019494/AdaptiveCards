@@ -292,7 +292,36 @@ HRESULT TextInputValue::get_CurrentValue(HSTRING* serializedUserInput)
     return S_OK;
 }
 
-HRESULT TextInputValue::Validate(_Out_ boolean* isInputValid)
+HRESULT TextInputValue::EnableFocusLostValidation()
+{
+    ComPtr<IUIElement> textBoxAsUIElement;
+    RETURN_IF_FAILED(m_textBoxElement.As(&textBoxAsUIElement));
+
+    EventRegistrationToken focusLostToken;
+    textBoxAsUIElement->add_LostFocus(Callback<IRoutedEventHandler>([this](IInspectable* /*sender*/, IRoutedEventArgs *
+                                                                           /*args*/) -> HRESULT {
+                                          return Validate(nullptr);
+                                      }).Get(),
+                                      &focusLostToken);
+
+    return S_OK;
+}
+
+HRESULT TextInputValue::EnableTextChangedValidation()
+{
+    if (!m_isTextChangedValidationEnabled)
+    {
+        EventRegistrationToken textChangedToken;
+        m_textBoxElement->add_TextChanged(Callback<ITextChangedEventHandler>([this](IInspectable* /*sender*/, ITextChangedEventArgs *
+                                                                                    /*args*/) -> HRESULT {
+                                              return Validate(nullptr);
+                                          }).Get(),
+                                          &textChangedToken);
+    }
+    return S_OK;
+}
+
+HRESULT TextInputValue::Validate(_Out_opt_ boolean* isInputValidOut)
 {
     ComPtr<IAdaptiveInputElement> adaptiveInputElement;
     m_adaptiveTextInput.As(&adaptiveInputElement);
@@ -300,21 +329,18 @@ HRESULT TextInputValue::Validate(_Out_ boolean* isInputValid)
     boolean isRequired;
     adaptiveInputElement->get_IsRequired(&isRequired);
 
+    boolean isInputValid = true;
     if (isRequired)
     {
         HString text;
         m_textBoxElement->get_Text(text.GetAddressOf());
 
-        *isInputValid = text.IsValid();
-    }
-    else
-    {
-        *isInputValid = true;
+        isInputValid = text.IsValid();
     }
 
     if (m_validationBorder)
     {
-        if (*isInputValid)
+        if (isInputValid)
         {
             m_validationBorder->put_BorderThickness({0, 0, 0, 0});
         }
@@ -323,5 +349,16 @@ HRESULT TextInputValue::Validate(_Out_ boolean* isInputValid)
             m_validationBorder->put_BorderThickness({2, 2, 2, 2});
         }
     }
+
+    if (!isInputValid)
+    {
+        EnableTextChangedValidation();
+    }
+
+    if (isInputValidOut)
+    {
+        *isInputValidOut = isInputValid;
+    }
+
     return S_OK;
 }

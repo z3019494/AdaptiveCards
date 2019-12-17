@@ -25,11 +25,11 @@ namespace AdaptiveNamespace
     }
     CATCH_RETURN;
 
-    HRESULT HandleLabelActionAndValidation(IAdaptiveTextInput* adaptiveTextInput,
-                                           ITextBox* textBox,
-                                           _In_ IAdaptiveRenderContext* renderContext,
-                                           _In_ IAdaptiveRenderArgs* renderArgs,
-                                           IUIElement** inputLayout)
+    HRESULT HandleLayoutAndValidation(IAdaptiveTextInput* adaptiveTextInput,
+                                      ITextBox* textBox,
+                                      _In_ IAdaptiveRenderContext* renderContext,
+                                      _In_ IAdaptiveRenderArgs* renderArgs,
+                                      IUIElement** inputLayout)
     {
         // Create a stack panel for the input and related controls
         ComPtr<IStackPanel> inputStackPanel =
@@ -141,23 +141,6 @@ namespace AdaptiveNamespace
         ComPtr<ITextBox> textBox =
             XamlHelpers::CreateXamlClass<ITextBox>(HStringReference(RuntimeClass_Windows_UI_Xaml_Controls_TextBox));
 
-        EventRegistrationToken textChangedToken;
-        textBox->add_TextChanged(Callback<ITextChangedEventHandler>([](IInspectable* /*sender*/, ITextChangedEventArgs *
-                                                                       /*args*/) -> HRESULT {
-                                     return S_OK;
-                                 }).Get(),
-                                 &textChangedToken);
-
-        ComPtr<IUIElement> textBoxAsUIElement;
-        RETURN_IF_FAILED(textBox.As(&textBoxAsUIElement));
-
-        EventRegistrationToken focusLostToken;
-        textBoxAsUIElement->add_LostFocus(Callback<IRoutedEventHandler>([](IInspectable* /*sender*/, IRoutedEventArgs *
-                                                                           /*args*/) -> HRESULT {
-                                              return S_OK;
-                                          }).Get(),
-                                          &focusLostToken);
-
         boolean isMultiLine;
         RETURN_IF_FAILED(adaptiveTextInput->get_IsMultiline(&isMultiLine));
         RETURN_IF_FAILED(textBox->put_AcceptsReturn(isMultiLine));
@@ -210,7 +193,7 @@ namespace AdaptiveNamespace
         RETURN_IF_FAILED(
             XamlHelpers::SetStyleFromResourceDictionary(renderContext, L"Adaptive.Input.Text", textBoxAsFrameworkElement.Get()));
 
-        HandleLabelActionAndValidation(adaptiveTextInput.Get(), textBox.Get(), renderContext, renderArgs, textInputControl);
+        HandleLayoutAndValidation(adaptiveTextInput.Get(), textBox.Get(), renderContext, renderArgs, textInputControl);
 
         return S_OK;
     }
