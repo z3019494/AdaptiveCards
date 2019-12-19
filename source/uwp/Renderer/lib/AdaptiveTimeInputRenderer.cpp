@@ -62,15 +62,42 @@ namespace AdaptiveNamespace
             RETURN_IF_FAILED(timePicker->put_Time(initialTime));
         }
 
+
+        // Note: Placeholder is not supported by ITimePicker
+
         ComPtr<IAdaptiveInputElement> adaptiveTimeInputAsAdaptiveInput;
         RETURN_IF_FAILED(adaptiveTimeInput.As(&adaptiveTimeInputAsAdaptiveInput));
-        RETURN_IF_FAILED(XamlHelpers::SetXamlHeaderFromLabel(
-            adaptiveTimeInputAsAdaptiveInput.Get(), renderContext, renderArgs, timePicker.Get()));
 
-        // Note: Placeholder text and min/max are not supported by ITimePicker
 
-        RETURN_IF_FAILED(timePicker.CopyTo(timeInputControl));
-        XamlHelpers::AddInputValueToContext(renderContext, adaptiveCardElement, *timeInputControl);
+        // If there's any validation on this input, put the input inside a border
+        HString max;
+        HString min;
+        adaptiveTimeInput->get_Max(max.GetAddressOf());
+        adaptiveTimeInput->get_Min(min.GetAddressOf());
+
+        ComPtr<IUIElement> timePickerAsUIElement;
+        timePicker.As(&timePickerAsUIElement);
+
+        ComPtr<IUIElement> inputLayout;
+        ComPtr<IBorder> validationBorder;
+        ComPtr<IUIElement> validationError;
+        XamlHelpers::HandleInputLayoutAndValidation(adaptiveTimeInputAsAdaptiveInput.Get(),
+                                                    timePickerAsUIElement.Get(),
+                                                    max.IsValid() || min.IsValid(),
+                                                    renderContext,
+                                                    renderArgs,
+                                                    &inputLayout,
+                                                    &validationBorder,
+                                                    &validationError);
+
+        // Create the InputValue and add it to the context
+        ComPtr<TimeInputValue> input;
+        MakeAndInitialize<TimeInputValue>(
+            &input, adaptiveTimeInput.Get(), timePicker.Get(), validationBorder.Get(), validationError.Get());
+        renderContext->AddInputValue(input.Get());
+
+        inputLayout.CopyTo(timeInputControl);
+
         return S_OK;
     }
     CATCH_RETURN;

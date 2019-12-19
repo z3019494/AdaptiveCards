@@ -5,6 +5,7 @@
 #include "AdaptiveElementParserRegistration.h"
 #include "AdaptiveNumberInput.h"
 #include "AdaptiveNumberInputRenderer.h"
+#include <limits>
 
 using namespace Microsoft::WRL;
 using namespace Microsoft::WRL::Wrappers;
@@ -78,14 +79,37 @@ namespace AdaptiveNamespace
         RETURN_IF_FAILED(
             XamlHelpers::SetStyleFromResourceDictionary(renderContext, L"Adaptive.Input.Number", frameworkElement.Get()));
 
-        ComPtr<IAdaptiveInputElement> adaptiveNumberInputAsAdaptiveInput;
-        RETURN_IF_FAILED(adaptiveNumberInput.As(&adaptiveNumberInputAsAdaptiveInput));
-        RETURN_IF_FAILED(XamlHelpers::SetXamlHeaderFromLabel(
-            adaptiveNumberInputAsAdaptiveInput.Get(), renderContext, renderArgs, textBox2.Get()));
+        ComPtr<IAdaptiveInputElement> numberInputAsAdaptiveInput;
+        adaptiveNumberInput.As(&numberInputAsAdaptiveInput);
 
-        // TODO: Handle max and min?
-        RETURN_IF_FAILED(textBox.CopyTo(numberInputControl));
-        XamlHelpers::AddInputValueToContext(renderContext, adaptiveCardElement, *numberInputControl);
+        ComPtr<IUIElement> textBoxAsUIElement;
+        textBox.As(&textBoxAsUIElement);
+
+        // If there's any validation on this input, put the input inside a border
+        int max;
+        int min;
+        adaptiveNumberInput->get_Max(&max);
+        adaptiveNumberInput->get_Min(&min);
+
+        ComPtr<IUIElement> inputLayout;
+        ComPtr<IBorder> validationBorder;
+        ComPtr<IUIElement> validationError;
+        XamlHelpers::HandleInputLayoutAndValidation(numberInputAsAdaptiveInput.Get(),
+                                                    textBoxAsUIElement.Get(),
+                                                    (max != MAXINT32 || min != -MAXINT32),
+                                                    renderContext,
+                                                    renderArgs,
+                                                    &inputLayout,
+                                                    &validationBorder,
+                                                    &validationError);
+
+        // Create the InputValue and add it to the context
+        ComPtr<NumberInputValue> input;
+        MakeAndInitialize<NumberInputValue>(
+            &input, adaptiveNumberInput.Get(), textBox.Get(), validationBorder.Get(), validationError.Get());
+        renderContext->AddInputValue(input.Get());
+
+        inputLayout.CopyTo(numberInputControl);
 
         return S_OK;
     }

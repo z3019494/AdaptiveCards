@@ -17,61 +17,191 @@ using namespace ABI::Windows::UI::Xaml::Controls;
 using namespace ABI::Windows::UI::Xaml::Controls::Primitives;
 using namespace AdaptiveNamespace;
 
-std::string InputValue::SerializeTextInput() const
+HRESULT TextInputBase::RuntimeClassInitialize(ABI::AdaptiveNamespace::IAdaptiveInputElement* adaptiveInput,
+                                              ABI::Windows::UI::Xaml::Controls::ITextBox* uiTextBoxElement,
+                                              ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
+                                              ABI::Windows::UI::Xaml::IUIElement* validationError)
 {
-    ComPtr<ITextBox> textBox;
-    THROW_IF_FAILED(m_uiInputElement.As(&textBox));
-
-    HString text;
-    THROW_IF_FAILED(textBox->get_Text(text.GetAddressOf()));
-
-    std::string textString;
-    if (text.IsValid())
     {
-        THROW_IF_FAILED(HStringToUTF8(text.Get(), textString));
-    }
+        m_textBoxElement = uiTextBoxElement;
 
-    return textString;
+        ComPtr<IUIElement> textBoxAsUIElement;
+        m_textBoxElement.As(&textBoxAsUIElement);
+
+        InputValue::RuntimeClassInitialize(adaptiveInput, textBoxAsUIElement.Get(), validationBorder, validationError);
+
+        return S_OK;
+    }
 }
 
-std::string InputValue::SerializeDateInput() const
+HRESULT TextInputBase::get_CurrentValue(HSTRING* serializedUserInput)
 {
-    ComPtr<ICalendarDatePicker> datePicker;
-    THROW_IF_FAILED(m_uiInputElement.As(&datePicker));
+    HString text;
+    THROW_IF_FAILED(m_textBoxElement->get_Text(text.GetAddressOf()));
 
+    text.CopyTo(serializedUserInput);
+    return S_OK;
+}
+
+HRESULT TextInputBase::EnableValueChangedValidation()
+{
+    if (!m_isTextChangedValidationEnabled)
+    {
+        EventRegistrationToken textChangedToken;
+        m_textBoxElement->add_TextChanged(Callback<ITextChangedEventHandler>([this](IInspectable* /*sender*/, ITextChangedEventArgs *
+                                                                                    /*args*/) -> HRESULT {
+                                              return Validate(nullptr);
+                                          }).Get(),
+                                          &textChangedToken);
+
+        m_isTextChangedValidationEnabled = true;
+    }
+    return S_OK;
+}
+
+HRESULT TextInputValue::RuntimeClassInitialize(ABI::AdaptiveNamespace::IAdaptiveTextInput* adaptiveTextInput,
+                                               ABI::Windows::UI::Xaml::Controls::ITextBox* uiTextBoxElement,
+                                               ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
+                                               ABI::Windows::UI::Xaml::IUIElement* validationError)
+{
+    {
+        m_adaptiveTextInput = adaptiveTextInput;
+
+        Microsoft::WRL::ComPtr<IAdaptiveInputElement> textInputAsAdaptiveInput;
+        m_adaptiveTextInput.As(&textInputAsAdaptiveInput);
+        TextInputBase::RuntimeClassInitialize(textInputAsAdaptiveInput.Get(), uiTextBoxElement, validationBorder, validationError);
+
+        return S_OK;
+    }
+}
+
+HRESULT TextInputValue::IsValueValid(_Out_ boolean* isInputValid)
+{
+    boolean isBaseValid;
+    InputValue::IsValueValid(&isBaseValid);
+
+    boolean isRegexValid = true; // TODO
+    HString regex;
+    m_adaptiveTextInput->get_Regex(regex.GetAddressOf());
+
+    *isInputValid = isBaseValid && isRegexValid;
+
+    return S_OK;
+}
+
+HRESULT NumberInputValue::RuntimeClassInitialize(ABI::AdaptiveNamespace::IAdaptiveNumberInput* adaptiveNumberInput,
+                                                 ABI::Windows::UI::Xaml::Controls::ITextBox* uiTextBoxElement,
+                                                 ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
+                                                 ABI::Windows::UI::Xaml::IUIElement* validationError)
+{
+    m_adaptiveNumberInput = adaptiveNumberInput;
+
+    Microsoft::WRL::ComPtr<IAdaptiveInputElement> numberInputAsAdaptiveInput;
+    m_adaptiveNumberInput.As(&numberInputAsAdaptiveInput);
+    TextInputBase::RuntimeClassInitialize(numberInputAsAdaptiveInput.Get(), uiTextBoxElement, validationBorder, validationError);
+    return S_OK;
+}
+
+HRESULT NumberInputValue::IsValueValid(boolean* isInputValid)
+{
+    boolean isBaseValid;
+    InputValue::IsValueValid(&isBaseValid);
+
+    // TODO
+    boolean isMaxMinValid = true;
+    // int max;
+    // m_adaptiveNumberInput->get_Max(&max);
+    // int min;
+    // m_adaptiveNumberInput->get_Max(&max);
+
+    *isInputValid = isBaseValid && isMaxMinValid;
+
+    return S_OK;
+}
+
+HRESULT DateInputValue::RuntimeClassInitialize(ABI::AdaptiveNamespace::IAdaptiveDateInput* adaptiveDateInput,
+                                               ABI::Windows::UI::Xaml::Controls::ICalendarDatePicker* uiDatePickerElement,
+                                               ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
+                                               ABI::Windows::UI::Xaml::IUIElement* validationError)
+{
+    m_adaptiveDateInput = adaptiveDateInput;
+    m_datePickerElement = uiDatePickerElement;
+
+    Microsoft::WRL::ComPtr<IAdaptiveInputElement> dateInputAsAdaptiveInput;
+    m_adaptiveDateInput.As(&dateInputAsAdaptiveInput);
+
+    ComPtr<IUIElement> datePickerAsUIElement;
+    m_datePickerElement.As(&datePickerAsUIElement);
+
+    InputValue::RuntimeClassInitialize(dateInputAsAdaptiveInput.Get(), datePickerAsUIElement.Get(), validationBorder, validationError);
+    return S_OK;
+}
+
+HRESULT DateInputValue::get_CurrentValue(HSTRING* serializedUserInput)
+{
     ComPtr<IReference<DateTime>> dateRef;
-    THROW_IF_FAILED(datePicker->get_Date(&dateRef));
+    RETURN_IF_FAILED(m_datePickerElement->get_Date(&dateRef));
 
-    std::string value;
+    HString formattedDate;
     if (dateRef != nullptr)
     {
         DateTime date;
-        THROW_IF_FAILED(dateRef->get_Value(&date));
+        RETURN_IF_FAILED(dateRef->get_Value(&date));
 
         ComPtr<IDateTimeFormatterFactory> dateTimeFactory;
-        THROW_IF_FAILED(GetActivationFactory(
+        RETURN_IF_FAILED(GetActivationFactory(
             HStringReference(RuntimeClass_Windows_Globalization_DateTimeFormatting_DateTimeFormatter).Get(), &dateTimeFactory));
 
         ComPtr<IDateTimeFormatter> dateTimeFormatter;
-        THROW_IF_FAILED(dateTimeFactory->CreateDateTimeFormatter(
+        RETURN_IF_FAILED(dateTimeFactory->CreateDateTimeFormatter(
             HStringReference(L"{year.full}-{month.integer(2)}-{day.integer(2)}").Get(), &dateTimeFormatter));
 
-        HString formattedDate;
-        THROW_IF_FAILED(dateTimeFormatter->Format(date, formattedDate.GetAddressOf()));
-
-        THROW_IF_FAILED(HStringToUTF8(formattedDate.Get(), value));
-        return value;
+        RETURN_IF_FAILED(dateTimeFormatter->Format(date, formattedDate.GetAddressOf()));
     }
-    return "";
+
+    formattedDate.CopyTo(serializedUserInput);
+
+    return S_OK;
 }
 
-std::string InputValue::SerializeTimeInput() const
+HRESULT DateInputValue::EnableValueChangedValidation()
 {
-    ComPtr<ITimePicker> timePicker;
-    THROW_IF_FAILED(m_uiInputElement.As(&timePicker));
+    if (!m_isDateChangedValidationEnabled)
+    {
+        EventRegistrationToken dateChangedToken;
+        m_datePickerElement->add_DateChanged(Callback<ITypedEventHandler<CalendarDatePicker*, CalendarDatePickerDateChangedEventArgs*>>(
+                                                 [this](IInspectable* /*sender*/, ICalendarDatePickerDateChangedEventArgs *
+                                                        /*args*/) -> HRESULT { return Validate(nullptr); })
+                                                 .Get(),
+                                             &dateChangedToken);
 
+        m_isDateChangedValidationEnabled = true;
+    }
+    return S_OK;
+}
+
+HRESULT TimeInputValue::RuntimeClassInitialize(ABI::AdaptiveNamespace::IAdaptiveTimeInput* adaptiveTimeInput,
+                                               ABI::Windows::UI::Xaml::Controls::ITimePicker* uiTimePickerElement,
+                                               ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
+                                               ABI::Windows::UI::Xaml::IUIElement* validationError)
+{
+    m_adaptiveTimeInput = adaptiveTimeInput;
+    m_timePickerElement = uiTimePickerElement;
+
+    Microsoft::WRL::ComPtr<IAdaptiveInputElement> timeInputAsAdaptiveInput;
+    m_adaptiveTimeInput.As(&timeInputAsAdaptiveInput);
+
+    ComPtr<IUIElement> timePickerAsUIElement;
+    m_timePickerElement.As(&timePickerAsUIElement);
+
+    InputValue::RuntimeClassInitialize(timeInputAsAdaptiveInput.Get(), timePickerAsUIElement.Get(), validationBorder, validationError);
+    return S_OK;
+}
+
+HRESULT TimeInputValue::get_CurrentValue(HSTRING* serializedUserInput)
+{
     TimeSpan timeSpan;
-    THROW_IF_FAILED(timePicker->get_Time(&timeSpan));
+    RETURN_IF_FAILED(m_timePickerElement->get_Time(&timeSpan));
 
     UINT64 totalMinutes = timeSpan.Duration / 10000000 / 60;
     UINT64 hours = totalMinutes / 60;
@@ -80,7 +210,42 @@ std::string InputValue::SerializeTimeInput() const
     char buffer[6];
     sprintf_s(buffer, sizeof(buffer), "%02llu:%02llu", hours, minutesPastTheHour);
 
-    return std::string(buffer);
+    RETURN_IF_FAILED(UTF8ToHString(std::string(buffer), serializedUserInput));
+
+    return S_OK;
+}
+
+HRESULT TimeInputValue::IsValueValid(boolean* isInputValid)
+{
+    boolean isBaseValid;
+    InputValue::IsValueValid(&isBaseValid);
+
+    // TODO
+    boolean isMaxMinValid = true;
+    // int max;
+    // m_adaptiveNumberInput->get_Max(&max);
+    // int min;
+    // m_adaptiveNumberInput->get_Max(&max);
+
+    *isInputValid = isBaseValid && isMaxMinValid;
+
+    return S_OK;
+}
+
+HRESULT TimeInputValue::EnableValueChangedValidation()
+{
+    if (!m_isTimeChangedValidationEnabled)
+    {
+        EventRegistrationToken dateChangedToken;
+        m_timePickerElement->add_TimeChanged(Callback<IEventHandler<TimePickerValueChangedEventArgs*>>([this](IInspectable* /*sender*/, ITimePickerValueChangedEventArgs *
+                                                                                                              /*args*/) -> HRESULT {
+                                                 return Validate(nullptr);
+                                             }).Get(),
+                                             &dateChangedToken);
+
+        m_isTimeChangedValidationEnabled = true;
+    }
+    return S_OK;
 }
 
 std::string InputValue::SerializeToggleInput() const
@@ -219,22 +384,6 @@ HRESULT InputValue::get_CurrentValue(_Outptr_ HSTRING* result)
     std::string serializedInput;
     switch (elementType)
     {
-    case ElementType_TextInput:
-    case ElementType_NumberInput:
-    {
-        serializedInput = SerializeTextInput();
-        break;
-    }
-    case ElementType_DateInput:
-    {
-        serializedInput = SerializeDateInput();
-        break;
-    }
-    case ElementType_TimeInput:
-    {
-        serializedInput = SerializeTimeInput();
-        break;
-    }
     case ElementType_ToggleInput:
     {
         serializedInput = SerializeToggleInput();
@@ -257,108 +406,80 @@ HRESULT InputValue::get_CurrentValue(_Outptr_ HSTRING* result)
 
 HRESULT InputValue::Validate(boolean* isInputValid)
 {
-    *isInputValid = true;
+    boolean isValid;
+    IsValueValid(&isValid);
+
+    SetValidation(isValid);
+
+    if (isInputValid)
+    {
+        *isInputValid = isValid;
+    }
+
+    return S_OK;
+}
+
+HRESULT InputValue::IsValueValid(boolean* isInputValid)
+{
+    boolean isRequired;
+    m_adaptiveInputElement->get_IsRequired(&isRequired);
+
+    bool isRequiredValid = true;
+    if (isRequired)
+    {
+        HString currentValue;
+        get_CurrentValue(currentValue.GetAddressOf());
+
+        isRequiredValid = currentValue.IsValid();
+    }
+
+    *isInputValid = isRequiredValid;
+    return S_OK;
+}
+
+HRESULT AdaptiveNamespace::InputValue::SetValidation(boolean isInputValid)
+{
+    // Show or hide the border
+    if (m_validationBorder)
+    {
+        isInputValid ? m_validationBorder->put_BorderThickness({0, 0, 0, 0}) :
+                       m_validationBorder->put_BorderThickness({2, 2, 2, 2});
+    }
+
+    // Show or hide the error message
+    if (m_validationError)
+    {
+        isInputValid ? m_validationError->put_Visibility(Visibility_Collapsed) :
+                       m_validationError->put_Visibility(Visibility_Visible);
+    }
+
+    // Once this has been marked invalid once, we should validate on all value changess
+    if (!isInputValid)
+    {
+        EnableValueChangedValidation();
+    }
+
+    return S_OK;
+}
+
+HRESULT InputValue::EnableFocusLostValidation()
+{
+    EventRegistrationToken focusLostToken;
+    m_uiInputElement->add_LostFocus(Callback<IRoutedEventHandler>([this](IInspectable* /*sender*/, IRoutedEventArgs *
+                                                                         /*args*/) -> HRESULT {
+                                        return Validate(nullptr);
+                                    }).Get(),
+                                    &focusLostToken);
+
+    return S_OK;
+}
+
+HRESULT InputValue::EnableValueChangedValidation()
+{
     return S_OK;
 }
 
 HRESULT InputValue::get_InputElement(_COM_Outptr_ IAdaptiveInputElement** inputElement)
 {
     return m_adaptiveInputElement.CopyTo(inputElement);
-}
-
-HRESULT TextInputValue::get_InputElement(ABI::AdaptiveNamespace::IAdaptiveInputElement** inputElement)
-{
-    ComPtr<IAdaptiveInputElement> adaptiveTextInputAsInputElement;
-    m_adaptiveTextInput.As(&adaptiveTextInputAsInputElement);
-
-    adaptiveTextInputAsInputElement.CopyTo(inputElement);
-
-    return S_OK;
-}
-
-HRESULT TextInputValue::get_CurrentValue(HSTRING* serializedUserInput)
-{
-    HString text;
-    THROW_IF_FAILED(m_textBoxElement->get_Text(text.GetAddressOf()));
-
-    std::string textString;
-    if (text.IsValid())
-    {
-        THROW_IF_FAILED(HStringToUTF8(text.Get(), textString));
-    }
-
-    RETURN_IF_FAILED(UTF8ToHString(textString, serializedUserInput));
-
-    return S_OK;
-}
-
-HRESULT TextInputValue::EnableFocusLostValidation()
-{
-    ComPtr<IUIElement> textBoxAsUIElement;
-    RETURN_IF_FAILED(m_textBoxElement.As(&textBoxAsUIElement));
-
-    EventRegistrationToken focusLostToken;
-    textBoxAsUIElement->add_LostFocus(Callback<IRoutedEventHandler>([this](IInspectable* /*sender*/, IRoutedEventArgs *
-                                                                           /*args*/) -> HRESULT {
-                                          return Validate(nullptr);
-                                      }).Get(),
-                                      &focusLostToken);
-
-    return S_OK;
-}
-
-HRESULT TextInputValue::EnableTextChangedValidation()
-{
-    if (!m_isTextChangedValidationEnabled)
-    {
-        EventRegistrationToken textChangedToken;
-        m_textBoxElement->add_TextChanged(Callback<ITextChangedEventHandler>([this](IInspectable* /*sender*/, ITextChangedEventArgs *
-                                                                                    /*args*/) -> HRESULT {
-                                              return Validate(nullptr);
-                                          }).Get(),
-                                          &textChangedToken);
-    }
-    return S_OK;
-}
-
-HRESULT TextInputValue::Validate(_Out_opt_ boolean* isInputValidOut)
-{
-    ComPtr<IAdaptiveInputElement> adaptiveInputElement;
-    m_adaptiveTextInput.As(&adaptiveInputElement);
-
-    boolean isRequired;
-    adaptiveInputElement->get_IsRequired(&isRequired);
-
-    boolean isInputValid = true;
-    if (isRequired)
-    {
-        HString text;
-        m_textBoxElement->get_Text(text.GetAddressOf());
-
-        isInputValid = text.IsValid();
-    }
-
-    if (m_validationBorder)
-    {
-        if (isInputValid)
-        {
-            m_validationBorder->put_BorderThickness({0, 0, 0, 0});
-        }
-        else
-        {
-            m_validationBorder->put_BorderThickness({2, 2, 2, 2});
-        }
-    }
-
-    if (!isInputValid)
-    {
-        EnableTextChangedValidation();
-    }
-
-    if (isInputValidOut)
-    {
-        *isInputValidOut = isInputValid;
-    }
-
-    return S_OK;
 }

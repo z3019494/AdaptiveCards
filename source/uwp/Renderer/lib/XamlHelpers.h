@@ -308,6 +308,23 @@ namespace AdaptiveNamespace::XamlHelpers
                              _In_ ABI::AdaptiveNamespace::IAdaptiveRenderArgs* renderArgs,
                              _COM_Outptr_ ABI::Windows::UI::Xaml::IUIElement** labelControl);
 
+    HRESULT RenderInputErrorMessage(ABI::AdaptiveNamespace::IAdaptiveInputElement* adaptiveInputElement,
+                                    ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext,
+                                    ABI::Windows::UI::Xaml::IUIElement** errorMessageControl);
+
+    HRESULT CreateValidationBorder(ABI::Windows::UI::Xaml::IUIElement* childElement,
+                                   ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext,
+                                   ABI::Windows::UI::Xaml::Controls::IBorder** elementWithBorder);
+
+    HRESULT HandleInputLayoutAndValidation(ABI::AdaptiveNamespace::IAdaptiveInputElement* adaptiveInput,
+                                           ABI::Windows::UI::Xaml::IUIElement* inputUIElement,
+                                           boolean hasTypeSpecificValidation,
+                                           ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext,
+                                           ABI::AdaptiveNamespace::IAdaptiveRenderArgs* renderArgs,
+                                           ABI::Windows::UI::Xaml::IUIElement** inputLayout,
+                                           ABI::Windows::UI::Xaml::Controls::IBorder** validationBorderOut,
+                                           ABI::Windows::UI::Xaml::IUIElement** validationErrorOut);
+
     template<typename TXamlControl>
     HRESULT SetXamlHeaderFromLabel(_In_ ABI::AdaptiveNamespace::IAdaptiveInputElement* adaptiveInputElement,
                                    _In_ ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext,

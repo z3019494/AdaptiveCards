@@ -110,14 +110,36 @@ namespace AdaptiveNamespace
 
         ComPtr<IAdaptiveInputElement> adapitveDateInputAsAdaptiveInput;
         RETURN_IF_FAILED(adaptiveDateInput.As(&adapitveDateInputAsAdaptiveInput));
-        RETURN_IF_FAILED(XamlHelpers::SetXamlHeaderFromLabel(
-            adapitveDateInputAsAdaptiveInput.Get(), renderContext, renderArgs, datePicker.Get()));
 
         RETURN_IF_FAILED(XamlHelpers::SetStyleFromResourceDictionary(renderContext,
                                                                      L"Adaptive.Input.Date",
                                                                      datePickerAsFrameworkElement.Get()));
 
-        XamlHelpers::AddInputValueToContext(renderContext, adaptiveCardElement, *dateInputControl);
+
+        ComPtr<IUIElement> datePickerAsUIElement;
+        datePicker.As(&datePickerAsUIElement);
+
+
+        ComPtr<IUIElement> inputLayout;
+        ComPtr<IBorder> validationBorder;
+        ComPtr<IUIElement> validationError;
+        XamlHelpers::HandleInputLayoutAndValidation(adapitveDateInputAsAdaptiveInput.Get(),
+                                                    datePickerAsUIElement.Get(),
+                                                    false,
+                                                    renderContext,
+                                                    renderArgs,
+                                                    &inputLayout,
+                                                    &validationBorder,
+                                                    &validationError);
+
+        // Create the InputValue and add it to the context
+        ComPtr<DateInputValue> input;
+        MakeAndInitialize<DateInputValue>(
+            &input, adaptiveDateInput.Get(), datePicker.Get(), validationBorder.Get(), validationError.Get());
+        renderContext->AddInputValue(input.Get());
+
+        inputLayout.CopyTo(dateInputControl);
+
         return S_OK;
     }
     CATCH_RETURN;

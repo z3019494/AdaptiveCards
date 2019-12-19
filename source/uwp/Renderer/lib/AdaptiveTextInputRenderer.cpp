@@ -25,11 +25,11 @@ namespace AdaptiveNamespace
     }
     CATCH_RETURN;
 
-    HRESULT HandleLayoutAndValidation(IAdaptiveTextInput* adaptiveTextInput,
-                                      ITextBox* textBox,
-                                      _In_ IAdaptiveRenderContext* renderContext,
-                                      _In_ IAdaptiveRenderArgs* renderArgs,
-                                      IUIElement** inputLayout)
+    HRESULT AdaptiveTextInputRenderer::HandleLayoutAndValidation(IAdaptiveTextInput* adaptiveTextInput,
+                                                                 ITextBox* textBox,
+                                                                 _In_ IAdaptiveRenderContext* renderContext,
+                                                                 _In_ IAdaptiveRenderArgs* renderArgs,
+                                                                 IUIElement** inputLayout)
     {
         // Create a stack panel for the input and related controls
         ComPtr<IStackPanel> inputStackPanel =
@@ -42,8 +42,8 @@ namespace AdaptiveNamespace
         ComPtr<IAdaptiveInputElement> textInputAsAdaptiveInput;
         localTextInput.As(&textInputAsAdaptiveInput);
 
-        // Render the label and add it to the stack panel (BECKYTODO - this should be a header, but right now i
-        // can't figure out how to get a border around just the text box if i do i that way)
+        // Render the label and add it to the stack panel (TODO - this should be a header, but right now i
+        // can't figure out how to get a border around just the text box if i do it that way)
         ComPtr<IUIElement> label;
         XamlHelpers::RenderInputLabel(textInputAsAdaptiveInput.Get(), renderContext, renderArgs, &label);
         XamlHelpers::AppendXamlElementToPanel(label.Get(), stackPanelAsPanel.Get());
@@ -65,24 +65,7 @@ namespace AdaptiveNamespace
         ComPtr<IBorder> validationBorder;
         if (regex.IsValid() || isRequired)
         {
-            // Create a border in the attention color. The thickness is 0 for now so it won't be visibile until validation is run
-            validationBorder =
-                XamlHelpers::CreateXamlClass<IBorder>(HStringReference(RuntimeClass_Windows_UI_Xaml_Controls_Border));
-
-            ComPtr<IAdaptiveHostConfig> hostConfig;
-            renderContext->get_HostConfig(&hostConfig);
-
-            ABI::Windows::UI::Color attentionColor;
-            RETURN_IF_FAILED(GetColorFromAdaptiveColor(hostConfig.Get(),
-                                                       ABI::AdaptiveNamespace::ForegroundColor_Attention,
-                                                       ABI::AdaptiveNamespace::ContainerStyle_Default,
-                                                       false, // isSubtle
-                                                       false, // highlight
-                                                       &attentionColor));
-
-            RETURN_IF_FAILED(validationBorder->put_BorderBrush(XamlHelpers::GetSolidColorBrush(attentionColor).Get()));
-
-            RETURN_IF_FAILED(validationBorder->put_Child(textBoxAsUIElement.Get()));
+            RETURN_IF_FAILED(XamlHelpers::CreateValidationBorder(textBoxAsUIElement.Get(), renderContext, &validationBorder));
             validationBorder.As(&textBoxParentContainer);
         }
 
@@ -110,8 +93,19 @@ namespace AdaptiveNamespace
 
         XamlHelpers::AppendXamlElementToPanel(textBoxParentContainer.Get(), stackPanelAsPanel.Get());
 
+        // Add the error message if present
+        ComPtr<IUIElement> errorMessageControl;
+        XamlHelpers::RenderInputErrorMessage(textInputAsAdaptiveInput.Get(), renderContext, &errorMessageControl);
+
+        if (errorMessageControl != nullptr)
+        {
+            XamlHelpers::AppendXamlElementToPanel(errorMessageControl.Get(), stackPanelAsPanel.Get());
+        }
+
+        // Create the InputValue and add it to the context
         ComPtr<TextInputValue> input;
-        MakeAndInitialize<TextInputValue>(&input, adaptiveTextInput, textBox, validationBorder.Get());
+        MakeAndInitialize<TextInputValue>(
+            &input, adaptiveTextInput, textBox, validationBorder.Get(), errorMessageControl.Get());
         renderContext->AddInputValue(input.Get());
 
         stackPanelAsPanel.CopyTo(inputLayout);

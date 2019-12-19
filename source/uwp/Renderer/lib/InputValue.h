@@ -11,6 +11,21 @@ namespace AdaptiveNamespace
     {
     public:
         HRESULT RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveInputElement* adaptiveInputElement,
+                                       _In_ ABI::Windows::UI::Xaml::IUIElement* uiInputElement,
+                                       _In_ ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
+                                       _In_ ABI::Windows::UI::Xaml::IUIElement* validationError)
+        {
+            m_adaptiveInputElement = adaptiveInputElement;
+            m_uiInputElement = uiInputElement;
+            m_validationError = validationError;
+            m_validationBorder = validationBorder;
+
+            // RETURN_IF_FAILED(EnableFocusLostValidation());
+
+            return S_OK;
+        }
+
+        HRESULT RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveInputElement* adaptiveInputElement,
                                        _In_ ABI::Windows::UI::Xaml::IUIElement* uiInputElement)
         {
             m_adaptiveInputElement = adaptiveInputElement;
@@ -23,50 +38,114 @@ namespace AdaptiveNamespace
 
         IFACEMETHODIMP Validate(_Out_ boolean* isInputValid);
 
-    private:
+    protected:
+        virtual HRESULT IsValueValid(_Out_ boolean* isInputValid);
+        virtual HRESULT SetValidation(boolean isValid);
+
+        HRESULT EnableFocusLostValidation();
+        virtual HRESULT EnableValueChangedValidation();
+
         std::string SerializeChoiceSetInput() const;
-        std::string SerializeDateInput() const;
-        std::string SerializeTextInput() const;
-        std::string SerializeTimeInput() const;
         std::string SerializeToggleInput() const;
 
         std::string GetChoiceValue(_In_ ABI::AdaptiveNamespace::IAdaptiveChoiceSetInput* choiceInput, INT32 selectedIndex) const;
 
         Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveInputElement> m_adaptiveInputElement;
         Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::IUIElement> m_uiInputElement;
+        Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Controls::IBorder> m_validationBorder;
+        Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::IUIElement> m_validationError;
     };
 
-    class TextInputValue : public InputValue
+    class TextInputBase : public InputValue
     {
     public:
+        TextInputBase() : m_isTextChangedValidationEnabled(false) {}
 
-        TextInputValue() : m_isTextChangedValidationEnabled(false){}
-
-        HRESULT RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveTextInput* adaptiveTextInput,
+        HRESULT RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveInputElement* adaptiveInputElement,
                                        _In_ ABI::Windows::UI::Xaml::Controls::ITextBox* uiTextBoxElement,
-                                       _In_ ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder)
-        {
-            m_adaptiveTextInput = adaptiveTextInput;
-            m_textBoxElement = uiTextBoxElement;
-            m_validationBorder = validationBorder;
+                                       _In_ ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
+                                       _In_ ABI::Windows::UI::Xaml::IUIElement* validationError);
 
-            //RETURN_IF_FAILED(EnableFocusLostValidation());
-
-            return S_OK;
-        }
-
-        IFACEMETHODIMP get_InputElement(_COM_Outptr_ ABI::AdaptiveNamespace::IAdaptiveInputElement** inputElement) override;
         IFACEMETHODIMP get_CurrentValue(_Outptr_ HSTRING* serializedUserInput) override;
-        IFACEMETHODIMP Validate(_Out_ boolean* isInputValid) override;
+
+    protected:
+        virtual HRESULT EnableValueChangedValidation() override;
 
     private:
-        HRESULT EnableFocusLostValidation();
-        HRESULT EnableTextChangedValidation();
-
-        Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveTextInput> m_adaptiveTextInput;
         Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Controls::ITextBox> m_textBoxElement;
-        Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Controls::IBorder> m_validationBorder;
         bool m_isTextChangedValidationEnabled;
     };
 
+    class TextInputValue : public TextInputBase
+    {
+    public:
+        HRESULT RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveTextInput* adaptiveTextInput,
+                                       _In_ ABI::Windows::UI::Xaml::Controls::ITextBox* uiTextBoxElement,
+                                       _In_ ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
+                                       _In_ ABI::Windows::UI::Xaml::IUIElement* validationError);
+
+    protected:
+        virtual HRESULT IsValueValid(_Out_ boolean* isInputValid) override;
+
+    private:
+        Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveTextInput> m_adaptiveTextInput;
+    };
+
+    class NumberInputValue : public TextInputBase
+    {
+    public:
+        HRESULT RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveNumberInput* adaptiveNumberInput,
+                                       _In_ ABI::Windows::UI::Xaml::Controls::ITextBox* uiTextBoxElement,
+                                       _In_ ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
+                                       _In_ ABI::Windows::UI::Xaml::IUIElement* validationError);
+
+    protected:
+        virtual HRESULT IsValueValid(_Out_ boolean* isInputValid) override;
+
+    private:
+        Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveNumberInput> m_adaptiveNumberInput;
+    };
+
+    class DateInputValue : public InputValue
+    {
+    public:
+        DateInputValue() : m_isDateChangedValidationEnabled(false) {}
+
+        HRESULT RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveDateInput* adaptiveDateInput,
+                                       _In_ ABI::Windows::UI::Xaml::Controls::ICalendarDatePicker* uiDatePickerElement,
+                                       _In_ ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
+                                       _In_ ABI::Windows::UI::Xaml::IUIElement* validationError);
+
+        IFACEMETHODIMP get_CurrentValue(_Outptr_ HSTRING* serializedUserInput) override;
+
+    protected:
+        virtual HRESULT EnableValueChangedValidation() override;
+
+    private:
+        Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveDateInput> m_adaptiveDateInput;
+        Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Controls::ICalendarDatePicker> m_datePickerElement;
+        bool m_isDateChangedValidationEnabled;
+    };
+
+    class TimeInputValue : public InputValue
+    {
+    public:
+        TimeInputValue() : m_isTimeChangedValidationEnabled(false) {}
+
+        HRESULT RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveTimeInput* adaptiveTimeInput,
+                                       _In_ ABI::Windows::UI::Xaml::Controls::ITimePicker* uiTimePickerElement,
+                                       _In_ ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
+                                       _In_ ABI::Windows::UI::Xaml::IUIElement* validationError);
+
+        IFACEMETHODIMP get_CurrentValue(_Outptr_ HSTRING* serializedUserInput) override;
+
+    protected:
+        virtual HRESULT IsValueValid(_Out_ boolean* isInputValid) override;
+        virtual HRESULT EnableValueChangedValidation() override;
+
+    private:
+        Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveTimeInput> m_adaptiveTimeInput;
+        Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Controls::ITimePicker> m_timePickerElement;
+        bool m_isTimeChangedValidationEnabled;
+    };
 }
