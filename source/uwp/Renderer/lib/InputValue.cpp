@@ -57,6 +57,17 @@ HRESULT InputValue::Validate(_Out_ boolean* isInputValid)
     return S_OK;
 }
 
+IFACEMETHODIMP InputValue::SetFocus()
+{
+    ComPtr<IControl> inputAsControl;
+    RETURN_IF_FAILED(m_uiInputElement.As(&inputAsControl));
+
+    boolean isFocused;
+    RETURN_IF_FAILED(inputAsControl->Focus(FocusState_Programmatic, &isFocused));
+
+    return S_OK;
+}
+
 HRESULT InputValue::IsValueValid(_Out_ boolean* isInputValid)
 {
     boolean isRequired;

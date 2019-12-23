@@ -21,6 +21,7 @@ namespace AdaptiveNamespace
         IFACEMETHODIMP get_CurrentValue(_Outptr_ HSTRING* serializedUserInput) = 0;
 
         IFACEMETHODIMP Validate(_Out_ boolean* isInputValid);
+        IFACEMETHODIMP SetFocus();
 
     protected:
         virtual HRESULT IsValueValid(_Out_ boolean* isInputValid);
