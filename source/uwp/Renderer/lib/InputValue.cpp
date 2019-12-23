@@ -17,7 +17,8 @@ using namespace ABI::Windows::UI::Xaml::Controls;
 using namespace ABI::Windows::UI::Xaml::Controls::Primitives;
 using namespace AdaptiveNamespace;
 
-HRESULT TextInputBase::RuntimeClassInitialize(ABI::AdaptiveNamespace::IAdaptiveInputElement* adaptiveInput,
+HRESULT TextInputBase::RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext,
+                                              ABI::AdaptiveNamespace::IAdaptiveInputElement* adaptiveInput,
                                               ABI::Windows::UI::Xaml::Controls::ITextBox* uiTextBoxElement,
                                               ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
                                               ABI::Windows::UI::Xaml::IUIElement* validationError)
@@ -28,7 +29,7 @@ HRESULT TextInputBase::RuntimeClassInitialize(ABI::AdaptiveNamespace::IAdaptiveI
         ComPtr<IUIElement> textBoxAsUIElement;
         m_textBoxElement.As(&textBoxAsUIElement);
 
-        InputValue::RuntimeClassInitialize(adaptiveInput, textBoxAsUIElement.Get(), validationBorder, validationError);
+        InputValue::RuntimeClassInitialize(renderContext, adaptiveInput, textBoxAsUIElement.Get(), validationBorder, validationError);
 
         return S_OK;
     }
@@ -59,7 +60,8 @@ HRESULT TextInputBase::EnableValueChangedValidation()
     return S_OK;
 }
 
-HRESULT TextInputValue::RuntimeClassInitialize(ABI::AdaptiveNamespace::IAdaptiveTextInput* adaptiveTextInput,
+HRESULT TextInputValue::RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext,
+                                               ABI::AdaptiveNamespace::IAdaptiveTextInput* adaptiveTextInput,
                                                ABI::Windows::UI::Xaml::Controls::ITextBox* uiTextBoxElement,
                                                ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
                                                ABI::Windows::UI::Xaml::IUIElement* validationError)
@@ -69,7 +71,7 @@ HRESULT TextInputValue::RuntimeClassInitialize(ABI::AdaptiveNamespace::IAdaptive
 
         Microsoft::WRL::ComPtr<IAdaptiveInputElement> textInputAsAdaptiveInput;
         m_adaptiveTextInput.As(&textInputAsAdaptiveInput);
-        TextInputBase::RuntimeClassInitialize(textInputAsAdaptiveInput.Get(), uiTextBoxElement, validationBorder, validationError);
+        TextInputBase::RuntimeClassInitialize(renderContext, textInputAsAdaptiveInput.Get(), uiTextBoxElement, validationBorder, validationError);
 
         return S_OK;
     }
@@ -104,7 +106,8 @@ HRESULT TextInputValue::IsValueValid(_Out_ boolean* isInputValid)
     return S_OK;
 }
 
-HRESULT NumberInputValue::RuntimeClassInitialize(ABI::AdaptiveNamespace::IAdaptiveNumberInput* adaptiveNumberInput,
+HRESULT NumberInputValue::RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext,
+                                                 ABI::AdaptiveNamespace::IAdaptiveNumberInput* adaptiveNumberInput,
                                                  ABI::Windows::UI::Xaml::Controls::ITextBox* uiTextBoxElement,
                                                  ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
                                                  ABI::Windows::UI::Xaml::IUIElement* validationError)
@@ -113,7 +116,7 @@ HRESULT NumberInputValue::RuntimeClassInitialize(ABI::AdaptiveNamespace::IAdapti
 
     Microsoft::WRL::ComPtr<IAdaptiveInputElement> numberInputAsAdaptiveInput;
     m_adaptiveNumberInput.As(&numberInputAsAdaptiveInput);
-    TextInputBase::RuntimeClassInitialize(numberInputAsAdaptiveInput.Get(), uiTextBoxElement, validationBorder, validationError);
+    TextInputBase::RuntimeClassInitialize(renderContext, numberInputAsAdaptiveInput.Get(), uiTextBoxElement, validationBorder, validationError);
     return S_OK;
 }
 
@@ -126,7 +129,7 @@ HRESULT NumberInputValue::IsValueValid(boolean* isInputValid)
     // Check that min and max are satisfied
     int max, min;
     RETURN_IF_FAILED(m_adaptiveNumberInput->get_Max(&max));
-    RETURN_IF_FAILED(m_adaptiveNumberInput->get_Max(&max));
+    RETURN_IF_FAILED(m_adaptiveNumberInput->get_Min(&min));
 
     // For now we're only validating if min or max was set. Theoretically we should probably validate that the input is
     // a number either way, but since we haven't enforced that in the past and the card author likely hasn't set an
@@ -155,7 +158,8 @@ HRESULT NumberInputValue::IsValueValid(boolean* isInputValid)
     return S_OK;
 }
 
-HRESULT DateInputValue::RuntimeClassInitialize(ABI::AdaptiveNamespace::IAdaptiveDateInput* adaptiveDateInput,
+HRESULT DateInputValue::RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext,
+                                               ABI::AdaptiveNamespace::IAdaptiveDateInput* adaptiveDateInput,
                                                ABI::Windows::UI::Xaml::Controls::ICalendarDatePicker* uiDatePickerElement,
                                                ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
                                                ABI::Windows::UI::Xaml::IUIElement* validationError)
@@ -169,7 +173,7 @@ HRESULT DateInputValue::RuntimeClassInitialize(ABI::AdaptiveNamespace::IAdaptive
     ComPtr<IUIElement> datePickerAsUIElement;
     m_datePickerElement.As(&datePickerAsUIElement);
 
-    InputValue::RuntimeClassInitialize(dateInputAsAdaptiveInput.Get(), datePickerAsUIElement.Get(), validationBorder, validationError);
+    InputValue::RuntimeClassInitialize(renderContext, dateInputAsAdaptiveInput.Get(), datePickerAsUIElement.Get(), validationBorder, validationError);
     return S_OK;
 }
 
@@ -216,7 +220,8 @@ HRESULT DateInputValue::EnableValueChangedValidation()
     return S_OK;
 }
 
-HRESULT TimeInputValue::RuntimeClassInitialize(ABI::AdaptiveNamespace::IAdaptiveTimeInput* adaptiveTimeInput,
+HRESULT TimeInputValue::RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext,
+                                               ABI::AdaptiveNamespace::IAdaptiveTimeInput* adaptiveTimeInput,
                                                ABI::Windows::UI::Xaml::Controls::ITimePicker* uiTimePickerElement,
                                                ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
                                                ABI::Windows::UI::Xaml::IUIElement* validationError)
@@ -230,7 +235,7 @@ HRESULT TimeInputValue::RuntimeClassInitialize(ABI::AdaptiveNamespace::IAdaptive
     ComPtr<IUIElement> timePickerAsUIElement;
     m_timePickerElement.As(&timePickerAsUIElement);
 
-    InputValue::RuntimeClassInitialize(timeInputAsAdaptiveInput.Get(), timePickerAsUIElement.Get(), validationBorder, validationError);
+    InputValue::RuntimeClassInitialize(renderContext, timeInputAsAdaptiveInput.Get(), timePickerAsUIElement.Get(), validationBorder, validationError);
     return S_OK;
 }
 
@@ -263,11 +268,11 @@ HRESULT TimeInputValue::IsValueValid(boolean* isInputValid)
     // Validate max and min time
     boolean isMaxMinValid = true;
 
-    HString minTime;
-    RETURN_IF_FAILED(m_adaptiveTimeInput->get_Min(minTime.GetAddressOf()));
-    if (minTime.IsValid())
+    HString minTimeString;
+    RETURN_IF_FAILED(m_adaptiveTimeInput->get_Min(minTimeString.GetAddressOf()));
+    if (minTimeString.IsValid())
     {
-        std::string minTimeStdString = HStringToUTF8(minTime.Get());
+        std::string minTimeStdString = HStringToUTF8(minTimeString.Get());
         unsigned int minHours, minMinutes;
         if (DateTimePreparser::TryParseSimpleTime(minTimeStdString, minHours, minMinutes))
         {
@@ -276,11 +281,11 @@ HRESULT TimeInputValue::IsValueValid(boolean* isInputValid)
         }
     }
 
-    HString maxTime;
-    RETURN_IF_FAILED(m_adaptiveTimeInput->get_Max(maxTime.GetAddressOf()));
-    if (maxTime.IsValid())
+    HString maxTimeString;
+    RETURN_IF_FAILED(m_adaptiveTimeInput->get_Max(maxTimeString.GetAddressOf()));
+    if (maxTimeString.IsValid())
     {
-        std::string maxTimeStdString = HStringToUTF8(maxTime.Get());
+        std::string maxTimeStdString = HStringToUTF8(maxTimeString.Get());
         unsigned int maxHours, maxMinutes;
         if (DateTimePreparser::TryParseSimpleTime(maxTimeStdString, maxHours, maxMinutes))
         {
@@ -310,7 +315,8 @@ HRESULT TimeInputValue::EnableValueChangedValidation()
     return S_OK;
 }
 
-HRESULT ToggleInputValue::RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveToggleInput* adaptiveToggleInput,
+HRESULT ToggleInputValue::RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext,
+                                                 _In_ ABI::AdaptiveNamespace::IAdaptiveToggleInput* adaptiveToggleInput,
                                                  _In_ ABI::Windows::UI::Xaml::Controls::ICheckBox* uiCheckBoxElement,
                                                  _In_ ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
                                                  _In_ ABI::Windows::UI::Xaml::IUIElement* validationError)
@@ -324,7 +330,7 @@ HRESULT ToggleInputValue::RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IA
     ComPtr<IUIElement> checkBoxAsUIElement;
     m_checkBoxElement.As(&checkBoxAsUIElement);
 
-    InputValue::RuntimeClassInitialize(toggleInputAsAdaptiveInput.Get(), checkBoxAsUIElement.Get(), validationBorder, validationError);
+    InputValue::RuntimeClassInitialize(renderContext, toggleInputAsAdaptiveInput.Get(), checkBoxAsUIElement.Get(), validationBorder, validationError);
     return S_OK;
 }
 
@@ -407,7 +413,8 @@ std::string ChoiceSetInputValue::GetChoiceValue(_In_ IAdaptiveChoiceSetInput* ch
     return "";
 }
 
-HRESULT ChoiceSetInputValue::RuntimeClassInitialize(ABI::AdaptiveNamespace::IAdaptiveChoiceSetInput* adaptiveChoiceSetInput,
+HRESULT ChoiceSetInputValue::RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext,
+                                                    ABI::AdaptiveNamespace::IAdaptiveChoiceSetInput* adaptiveChoiceSetInput,
                                                     ABI::Windows::UI::Xaml::IUIElement* uiChoiceSetElement,
                                                     ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
                                                     ABI::Windows::UI::Xaml::IUIElement* validationError)
@@ -417,7 +424,7 @@ HRESULT ChoiceSetInputValue::RuntimeClassInitialize(ABI::AdaptiveNamespace::IAda
     Microsoft::WRL::ComPtr<IAdaptiveInputElement> choiceSetInputAsAdaptiveInput;
     RETURN_IF_FAILED(m_adaptiveChoiceSetInput.As(&choiceSetInputAsAdaptiveInput));
 
-    InputValue::RuntimeClassInitialize(choiceSetInputAsAdaptiveInput.Get(), uiChoiceSetElement, validationBorder, validationError);
+    InputValue::RuntimeClassInitialize(renderContext, choiceSetInputAsAdaptiveInput.Get(), uiChoiceSetElement, validationBorder, validationError);
     return S_OK;
 }
 
@@ -562,6 +569,69 @@ HRESULT ChoiceSetInputValue::EnableValueChangedValidation()
     return S_OK;
 }
 
+HRESULT ChoiceSetInputValue::EnableFocusLostValidation()
+{
+    ABI::AdaptiveNamespace::ChoiceSetStyle choiceSetStyle;
+    RETURN_IF_FAILED(m_adaptiveChoiceSetInput->get_ChoiceSetStyle(&choiceSetStyle));
+
+    boolean isMultiSelect;
+    RETURN_IF_FAILED(m_adaptiveChoiceSetInput->get_IsMultiSelect(&isMultiSelect));
+
+    if (choiceSetStyle == ABI::AdaptiveNamespace::ChoiceSetStyle_Compact && !isMultiSelect)
+    {
+        // Compact style can use the base class implementation
+        RETURN_IF_FAILED(InputValue::EnableFocusLostValidation());
+    }
+    else
+    {
+        // For expanded style, put a focus lost handler on the last choice in the choice set
+        ComPtr<IPanel> panel;
+        RETURN_IF_FAILED(m_uiInputElement.As(&panel));
+
+        ComPtr<IVector<UIElement*>> panelChildren;
+        RETURN_IF_FAILED(panel->get_Children(panelChildren.ReleaseAndGetAddressOf()));
+
+        UINT size;
+        RETURN_IF_FAILED(panelChildren->get_Size(&size));
+
+        ComPtr<IUIElement> lastElement;
+        RETURN_IF_FAILED(panelChildren->GetAt(size - 1, &lastElement));
+
+        EventRegistrationToken focusLostToken;
+        RETURN_IF_FAILED(lastElement->add_LostFocus(Callback<IRoutedEventHandler>([this](IInspectable* /*sender*/, IRoutedEventArgs *
+                                                                                         /*args*/) -> HRESULT {
+                                                        return Validate(nullptr);
+                                                    }).Get(),
+                                                    &focusLostToken));
+    }
+
+    return S_OK;
+}
+
+HRESULT InputValue::RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext,
+                                           _In_ ABI::AdaptiveNamespace::IAdaptiveInputElement* adaptiveInputElement,
+                                           _In_ ABI::Windows::UI::Xaml::IUIElement* uiInputElement,
+                                           _In_ ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
+                                           _In_ ABI::Windows::UI::Xaml::IUIElement* validationError)
+{
+    m_adaptiveInputElement = adaptiveInputElement;
+    m_uiInputElement = uiInputElement;
+    m_validationError = validationError;
+    m_validationBorder = validationBorder;
+
+    ComPtr<AdaptiveRenderContext> renderContextPeek = PeekInnards<AdaptiveRenderContext>(renderContext);
+
+    boolean inlineValidation;
+    RETURN_IF_FAILED(renderContextPeek->GetInlineValidation(&inlineValidation));
+
+    if (inlineValidation)
+    {
+        RETURN_IF_FAILED(EnableFocusLostValidation());
+    }
+
+    return S_OK;
+}
+
 HRESULT InputValue::Validate(boolean* isInputValid)
 {
     boolean isValid;
@@ -629,11 +699,6 @@ HRESULT InputValue::EnableFocusLostValidation()
                                     }).Get(),
                                     &focusLostToken);
 
-    return S_OK;
-}
-
-HRESULT InputValue::EnableValueChangedValidation()
-{
     return S_OK;
 }
 

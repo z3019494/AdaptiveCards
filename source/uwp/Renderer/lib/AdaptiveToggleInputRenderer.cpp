@@ -86,7 +86,7 @@ namespace AdaptiveNamespace
 
         ComPtr<ToggleInputValue> input;
         RETURN_IF_FAILED(MakeAndInitialize<ToggleInputValue>(
-            &input, adaptiveToggleInput.Get(), checkBox.Get(), nullptr, validationError.Get()));
+            &input, renderContext, adaptiveToggleInput.Get(), checkBox.Get(), nullptr, validationError.Get()));
         RETURN_IF_FAILED(renderContext->AddInputValue(input.Get()));
 
         RETURN_IF_FAILED(inputLayout.CopyTo(toggleInputControl));

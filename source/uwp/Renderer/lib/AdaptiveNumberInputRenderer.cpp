@@ -109,7 +109,7 @@ namespace AdaptiveNamespace
         // Create the InputValue and add it to the context
         ComPtr<NumberInputValue> input;
         MakeAndInitialize<NumberInputValue>(
-            &input, adaptiveNumberInput.Get(), textBox.Get(), validationBorder.Get(), validationError.Get());
+            &input, renderContext, adaptiveNumberInput.Get(), textBox.Get(), validationBorder.Get(), validationError.Get());
         RETURN_IF_FAILED(renderContext->AddInputValue(input.Get()));
 
         RETURN_IF_FAILED(inputLayout.CopyTo(numberInputControl));

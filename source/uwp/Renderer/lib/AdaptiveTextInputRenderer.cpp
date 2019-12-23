@@ -89,7 +89,8 @@ namespace AdaptiveNamespace
 
         // Create the InputValue and add it to the context
         ComPtr<TextInputValue> input;
-        MakeAndInitialize<TextInputValue>(&input, adaptiveTextInput, textBox, validationBorder.Get(), validationError.Get());
+        MakeAndInitialize<TextInputValue>(
+            &input, renderContext, adaptiveTextInput, textBox, validationBorder.Get(), validationError.Get());
         renderContext->AddInputValue(input.Get());
 
         inputLayout.CopyTo(textInputLayout);
