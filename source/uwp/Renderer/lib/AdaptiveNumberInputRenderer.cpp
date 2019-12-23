@@ -35,9 +35,9 @@ namespace AdaptiveNamespace
         RETURN_IF_FAILED(renderContext->get_HostConfig(&hostConfig));
         if (!XamlHelpers::SupportsInteractivity(hostConfig.Get()))
         {
-            renderContext->AddWarning(
+            RETURN_IF_FAILED(renderContext->AddWarning(
                 ABI::AdaptiveNamespace::WarningStatusCode::InteractivityNotSupported,
-                HStringReference(L"Number input was stripped from card because interactivity is not supported").Get());
+                HStringReference(L"Number input was stripped from card because interactivity is not supported").Get()));
             return S_OK;
         }
 
@@ -63,8 +63,11 @@ namespace AdaptiveNamespace
         INT32 value;
         RETURN_IF_FAILED(adaptiveNumberInput->get_Value(&value));
 
-        std::wstring stringValue = std::to_wstring(value);
-        RETURN_IF_FAILED(textBox->put_Text(HStringReference(stringValue.c_str()).Get()));
+        if (value != MAXINT32)
+        {
+            std::wstring stringValue = std::to_wstring(value);
+            RETURN_IF_FAILED(textBox->put_Text(HStringReference(stringValue.c_str()).Get()));
+        }
 
         ComPtr<ITextBox2> textBox2;
         RETURN_IF_FAILED(textBox.As(&textBox2));
@@ -80,37 +83,36 @@ namespace AdaptiveNamespace
             XamlHelpers::SetStyleFromResourceDictionary(renderContext, L"Adaptive.Input.Number", frameworkElement.Get()));
 
         ComPtr<IAdaptiveInputElement> numberInputAsAdaptiveInput;
-        adaptiveNumberInput.As(&numberInputAsAdaptiveInput);
+        RETURN_IF_FAILED(adaptiveNumberInput.As(&numberInputAsAdaptiveInput));
 
         ComPtr<IUIElement> textBoxAsUIElement;
-        textBox.As(&textBoxAsUIElement);
+        RETURN_IF_FAILED(textBox.As(&textBoxAsUIElement));
 
         // If there's any validation on this input, put the input inside a border
         int max;
         int min;
-        adaptiveNumberInput->get_Max(&max);
-        adaptiveNumberInput->get_Min(&min);
+        RETURN_IF_FAILED(adaptiveNumberInput->get_Max(&max));
+        RETURN_IF_FAILED(adaptiveNumberInput->get_Min(&min));
 
         ComPtr<IUIElement> inputLayout;
         ComPtr<IBorder> validationBorder;
         ComPtr<IUIElement> validationError;
-        XamlHelpers::HandleInputLayoutAndValidation(numberInputAsAdaptiveInput.Get(),
-                                                    textBoxAsUIElement.Get(),
-                                                    (max != MAXINT32 || min != -MAXINT32),
-                                                    renderContext,
-                                                    renderArgs,
-                                                    &inputLayout,
-                                                    &validationBorder,
-                                                    &validationError);
+        RETURN_IF_FAILED(XamlHelpers::HandleInputLayoutAndValidation(numberInputAsAdaptiveInput.Get(),
+                                                                     textBoxAsUIElement.Get(),
+                                                                     (max != MAXINT32 || min != -MAXINT32),
+                                                                     renderContext,
+                                                                     renderArgs,
+                                                                     &inputLayout,
+                                                                     &validationBorder,
+                                                                     &validationError));
 
         // Create the InputValue and add it to the context
         ComPtr<NumberInputValue> input;
         MakeAndInitialize<NumberInputValue>(
             &input, adaptiveNumberInput.Get(), textBox.Get(), validationBorder.Get(), validationError.Get());
-        renderContext->AddInputValue(input.Get());
+        RETURN_IF_FAILED(renderContext->AddInputValue(input.Get()));
 
-        inputLayout.CopyTo(numberInputControl);
-
+        RETURN_IF_FAILED(inputLayout.CopyTo(numberInputControl));
         return S_OK;
     }
     CATCH_RETURN;
