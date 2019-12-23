@@ -68,13 +68,12 @@ namespace AdaptiveNamespace
         RETURN_IF_FAILED(adaptiveTimeInput.As(&adaptiveTimeInputAsAdaptiveInput));
 
         // If there's any validation on this input, put the input inside a border
-        HString max;
-        HString min;
-        adaptiveTimeInput->get_Max(max.GetAddressOf());
-        adaptiveTimeInput->get_Min(min.GetAddressOf());
+        HString max, min;
+        RETURN_IF_FAILED(adaptiveTimeInput->get_Max(max.GetAddressOf()));
+        RETURN_IF_FAILED(adaptiveTimeInput->get_Min(min.GetAddressOf()));
 
         ComPtr<IUIElement> timePickerAsUIElement;
-        timePicker.As(&timePickerAsUIElement);
+        RETURN_IF_FAILED(timePicker.As(&timePickerAsUIElement));
 
         ComPtr<IUIElement> inputLayout;
         ComPtr<IBorder> validationBorder;

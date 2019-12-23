@@ -787,8 +787,10 @@ namespace AdaptiveNamespace::XamlHelpers
         ComPtr<IPanel> stackPanelAsPanel;
         inputStackPanel.As(&stackPanelAsPanel);
 
-        // Render the label and add it to the stack panel (TODO - this should be a header, but right now i
-        // can't figure out how to get a border around just the text box if i do it that way)
+        // Render the label and add it to the stack panel
+        // TODO - Ideally the label would use the control's header property if one exists. Unfortunately, that causes
+        // the error border to surround the label and the control rather than just the control. This should hopefully be
+        // fixable once we're using WinUI 3.0's input validation to handle validation UI.
         ComPtr<IUIElement> label;
         XamlHelpers::RenderInputLabel(adaptiveInput, renderContext, renderArgs, &label);
         XamlHelpers::AppendXamlElementToPanel(label.Get(), stackPanelAsPanel.Get());
@@ -797,36 +799,39 @@ namespace AdaptiveNamespace::XamlHelpers
         // inputUIElementParentContainer represents the current parent container.
         ComPtr<IUIElement> inputUIElementParentContainer = inputUIElement;
 
-        // If there's any validation on this input, put the input inside a border
+        // If there's any validation on this input, and the caller has requested a validation border by passing
+        // validationBorderOut, put the input inside a border
         boolean isRequired;
-        adaptiveInput->get_IsRequired(&isRequired);
+        RETURN_IF_FAILED(adaptiveInput->get_IsRequired(&isRequired));
+
+        boolean hasValidation = (hasTypeSpecificValidation || isRequired);
 
         ComPtr<IBorder> validationBorder;
-        if (validationBorderOut && (hasTypeSpecificValidation || isRequired))
+        if (validationBorderOut && hasValidation)
         {
             RETURN_IF_FAILED(XamlHelpers::CreateValidationBorder(inputUIElement, renderContext, &validationBorder));
-            validationBorder.As(&inputUIElementParentContainer);
+            RETURN_IF_FAILED(validationBorder.As(&inputUIElementParentContainer));
         }
 
         XamlHelpers::AppendXamlElementToPanel(inputUIElementParentContainer.Get(), stackPanelAsPanel.Get());
 
-        // Add the error message if present
-        // BECKYTODO - don't do this if there's no validation!
+        // Add the error message if there's validation and one exists
         ComPtr<IUIElement> errorMessageControl;
-        XamlHelpers::RenderInputErrorMessage(adaptiveInput, renderContext, &errorMessageControl);
-
-        if (errorMessageControl != nullptr)
+        if (hasValidation)
         {
-            XamlHelpers::AppendXamlElementToPanel(errorMessageControl.Get(), stackPanelAsPanel.Get());
+            RETURN_IF_FAILED(XamlHelpers::RenderInputErrorMessage(adaptiveInput, renderContext, &errorMessageControl));
+            if (errorMessageControl != nullptr)
+            {
+                XamlHelpers::AppendXamlElementToPanel(errorMessageControl.Get(), stackPanelAsPanel.Get());
+            }
         }
 
-        // Create the InputValue and add it to the context
-        stackPanelAsPanel.CopyTo(inputLayout);
-        errorMessageControl.CopyTo(validationErrorOut);
+        RETURN_IF_FAILED(stackPanelAsPanel.CopyTo(inputLayout));
+        RETURN_IF_FAILED(errorMessageControl.CopyTo(validationErrorOut));
 
         if (validationBorderOut)
         {
-            validationBorder.CopyTo(validationBorderOut);
+            RETURN_IF_FAILED(validationBorder.CopyTo(validationBorderOut));
         }
 
         return S_OK;

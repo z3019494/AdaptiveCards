@@ -77,12 +77,27 @@ HRESULT TextInputValue::RuntimeClassInitialize(ABI::AdaptiveNamespace::IAdaptive
 
 HRESULT TextInputValue::IsValueValid(_Out_ boolean* isInputValid)
 {
+    // Call the base class to validate isRequired
     boolean isBaseValid;
-    InputValue::IsValueValid(&isBaseValid);
+    RETURN_IF_FAILED(InputValue::IsValueValid(&isBaseValid));
 
-    boolean isRegexValid = true; // TODO
+    // Validate the regex if one exists
     HString regex;
-    m_adaptiveTextInput->get_Regex(regex.GetAddressOf());
+    RETURN_IF_FAILED(m_adaptiveTextInput->get_Regex(regex.GetAddressOf()));
+
+    boolean isRegexValid = true;
+    if (regex.IsValid())
+    {
+        std::string stringPattern = HStringToUTF8(regex.Get());
+        std::regex pattern(stringPattern);
+
+        HString currentValue;
+        RETURN_IF_FAILED(get_CurrentValue(currentValue.GetAddressOf()));
+        std::string currentValueStdString = HStringToUTF8(currentValue.Get());
+
+        std::smatch matches;
+        isRegexValid = std::regex_match(currentValueStdString, matches, pattern);
+    }
 
     *isInputValid = isBaseValid && isRegexValid;
 
@@ -104,17 +119,38 @@ HRESULT NumberInputValue::RuntimeClassInitialize(ABI::AdaptiveNamespace::IAdapti
 
 HRESULT NumberInputValue::IsValueValid(boolean* isInputValid)
 {
+    // Call the base class to validate isRequired
     boolean isBaseValid;
-    InputValue::IsValueValid(&isBaseValid);
+    RETURN_IF_FAILED(InputValue::IsValueValid(&isBaseValid));
 
-    // TODO
-    boolean isMaxMinValid = true;
-    // int max;
-    // m_adaptiveNumberInput->get_Max(&max);
-    // int min;
-    // m_adaptiveNumberInput->get_Max(&max);
+    // Check that min and max are satisfied
+    int max, min;
+    RETURN_IF_FAILED(m_adaptiveNumberInput->get_Max(&max));
+    RETURN_IF_FAILED(m_adaptiveNumberInput->get_Max(&max));
 
-    *isInputValid = isBaseValid && isMaxMinValid;
+    // For now we're only validating if min or max was set. Theoretically we should probably validate that the input is
+    // a number either way, but since we haven't enforced that in the past and the card author likely hasn't set an
+    // error message in that case, dont't fail validation for non-numbers unless min or max is set.
+    boolean minMaxValid = true;
+    if ((min != -MAXINT32) && (max != MAXINT32))
+    {
+        HString currentValue;
+        RETURN_IF_FAILED(get_CurrentValue(currentValue.GetAddressOf()));
+
+        int currentInt;
+        try
+        {
+            std::string currentValueStdString = HStringToUTF8(currentValue.Get());
+            currentInt = std::stoi(currentValueStdString);
+            minMaxValid = (currentInt < max) && (currentInt > min);
+        }
+        catch (...)
+        {
+            minMaxValid = false;
+        }
+    }
+
+    *isInputValid = isBaseValid;
 
     return S_OK;
 }
@@ -217,15 +253,41 @@ HRESULT TimeInputValue::get_CurrentValue(HSTRING* serializedUserInput)
 
 HRESULT TimeInputValue::IsValueValid(boolean* isInputValid)
 {
+    // Call the base class to validate isRequired
     boolean isBaseValid;
     InputValue::IsValueValid(&isBaseValid);
 
-    // TODO
+    TimeSpan currentTime;
+    RETURN_IF_FAILED(m_timePickerElement->get_Time(&currentTime));
+
+    // Validate max and min time
     boolean isMaxMinValid = true;
-    // int max;
-    // m_adaptiveNumberInput->get_Max(&max);
-    // int min;
-    // m_adaptiveNumberInput->get_Max(&max);
+
+    HString minTime;
+    RETURN_IF_FAILED(m_adaptiveTimeInput->get_Min(minTime.GetAddressOf()));
+    if (minTime.IsValid())
+    {
+        std::string minTimeStdString = HStringToUTF8(minTime.Get());
+        unsigned int minHours, minMinutes;
+        if (DateTimePreparser::TryParseSimpleTime(minTimeStdString, minHours, minMinutes))
+        {
+            TimeSpan minTime{(INT64)(minHours * 60 + minMinutes) * 10000000 * 60};
+            isMaxMinValid |= currentTime.Duration > minTime.Duration;
+        }
+    }
+
+    HString maxTime;
+    RETURN_IF_FAILED(m_adaptiveTimeInput->get_Max(maxTime.GetAddressOf()));
+    if (maxTime.IsValid())
+    {
+        std::string maxTimeStdString = HStringToUTF8(maxTime.Get());
+        unsigned int maxHours, maxMinutes;
+        if (DateTimePreparser::TryParseSimpleTime(maxTimeStdString, maxHours, maxMinutes))
+        {
+            TimeSpan maxTime{(INT64)(maxHours * 60 + maxMinutes) * 10000000 * 60};
+            isMaxMinValid |= currentTime.Duration < maxTime.Duration;
+        }
+    }
 
     *isInputValid = isBaseValid && isMaxMinValid;
 
