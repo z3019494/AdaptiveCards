@@ -6,6 +6,7 @@
 
 namespace AdaptiveNamespace
 {
+    // Base class for input values. The InputValue is responsible for getting the current value and submit time, and also handles input validation.
     class DECLSPEC_UUID("BB1D1269-2243-4F34-B4EC-5216296EBBA0") InputValue
         : public Microsoft::WRL::RuntimeClass<Microsoft::WRL::RuntimeClassFlags<Microsoft::WRL::RuntimeClassType::WinRtClassicComMix>, ABI::AdaptiveNamespace::IAdaptiveInputValue>
     {
@@ -34,6 +35,7 @@ namespace AdaptiveNamespace
         Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::IUIElement> m_validationError;
     };
 
+    // Base class for input value types that use ITextBox (Input.Text and Input.Number)
     class TextInputBase : public InputValue
     {
     public:
@@ -50,11 +52,11 @@ namespace AdaptiveNamespace
     protected:
         virtual HRESULT EnableValueChangedValidation() override;
 
-    private:
         Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Controls::ITextBox> m_textBoxElement;
         bool m_isTextChangedValidationEnabled;
     };
 
+    // Input value for Input.Text
     class TextInputValue : public TextInputBase
     {
     public:
@@ -64,13 +66,13 @@ namespace AdaptiveNamespace
                                        _In_ ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
                                        _In_ ABI::Windows::UI::Xaml::IUIElement* validationError);
 
-    protected:
+    private:
         virtual HRESULT IsValueValid(_Out_ boolean* isInputValid) override;
 
-    private:
         Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveTextInput> m_adaptiveTextInput;
     };
 
+    // Input value for Input.Number
     class NumberInputValue : public TextInputBase
     {
     public:
@@ -80,13 +82,13 @@ namespace AdaptiveNamespace
                                        _In_ ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
                                        _In_ ABI::Windows::UI::Xaml::IUIElement* validationError);
 
-    protected:
+    private:
         virtual HRESULT IsValueValid(_Out_ boolean* isInputValid) override;
 
-    private:
         Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveNumberInput> m_adaptiveNumberInput;
     };
 
+    // Input value for Input.Date
     class DateInputValue : public InputValue
     {
     public:
@@ -100,15 +102,15 @@ namespace AdaptiveNamespace
 
         IFACEMETHODIMP get_CurrentValue(_Outptr_ HSTRING* serializedUserInput) override;
 
-    protected:
+    private:
         virtual HRESULT EnableValueChangedValidation() override;
 
-    private:
         Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveDateInput> m_adaptiveDateInput;
         Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Controls::ICalendarDatePicker> m_datePickerElement;
         bool m_isDateChangedValidationEnabled;
     };
 
+    // Input value for Input.Time
     class TimeInputValue : public InputValue
     {
     public:
@@ -122,16 +124,16 @@ namespace AdaptiveNamespace
 
         IFACEMETHODIMP get_CurrentValue(_Outptr_ HSTRING* serializedUserInput) override;
 
-    protected:
+    private:
         virtual HRESULT IsValueValid(_Out_ boolean* isInputValid) override;
         virtual HRESULT EnableValueChangedValidation() override;
 
-    private:
         Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveTimeInput> m_adaptiveTimeInput;
         Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Controls::ITimePicker> m_timePickerElement;
         bool m_isTimeChangedValidationEnabled;
     };
 
+    // Input value for Input.Toggle
     class ToggleInputValue : public InputValue
     {
     public:
@@ -145,16 +147,16 @@ namespace AdaptiveNamespace
 
         IFACEMETHODIMP get_CurrentValue(_Outptr_ HSTRING* serializedUserInput) override;
 
-    protected:
+    private:
         virtual HRESULT IsValueValid(_Out_ boolean* isInputValid) override;
         virtual HRESULT EnableValueChangedValidation() override;
 
-    private:
         Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveToggleInput> m_adaptiveToggleInput;
         Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Controls::ICheckBox> m_checkBoxElement;
         bool m_isToggleChangedValidationEnabled;
     };
 
+    // Input value for Input.ChoiceSet
     class ChoiceSetInputValue : public InputValue
     {
     public:
@@ -168,11 +170,10 @@ namespace AdaptiveNamespace
 
         IFACEMETHODIMP get_CurrentValue(_Outptr_ HSTRING* serializedUserInput) override;
 
-    protected:
+    private:
         virtual HRESULT EnableValueChangedValidation() override;
         virtual HRESULT EnableFocusLostValidation() override;
 
-    private:
         std::string GetChoiceValue(_In_ ABI::AdaptiveNamespace::IAdaptiveChoiceSetInput* choiceInput, INT32 selectedIndex) const;
 
         Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveChoiceSetInput> m_adaptiveChoiceSetInput;
