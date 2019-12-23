@@ -34,7 +34,7 @@ namespace AdaptiveNamespace
         }
 
         IFACEMETHODIMP get_InputElement(_COM_Outptr_ ABI::AdaptiveNamespace::IAdaptiveInputElement** inputElement);
-        IFACEMETHODIMP get_CurrentValue(_Outptr_ HSTRING* serializedUserInput);
+        IFACEMETHODIMP get_CurrentValue(_Outptr_ HSTRING* serializedUserInput) = 0;
 
         IFACEMETHODIMP Validate(_Out_ boolean* isInputValid);
 
@@ -44,11 +44,6 @@ namespace AdaptiveNamespace
 
         HRESULT EnableFocusLostValidation();
         virtual HRESULT EnableValueChangedValidation();
-
-        std::string SerializeChoiceSetInput() const;
-        std::string SerializeToggleInput() const;
-
-        std::string GetChoiceValue(_In_ ABI::AdaptiveNamespace::IAdaptiveChoiceSetInput* choiceInput, INT32 selectedIndex) const;
 
         Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveInputElement> m_adaptiveInputElement;
         Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::IUIElement> m_uiInputElement;
@@ -147,5 +142,50 @@ namespace AdaptiveNamespace
         Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveTimeInput> m_adaptiveTimeInput;
         Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Controls::ITimePicker> m_timePickerElement;
         bool m_isTimeChangedValidationEnabled;
+    };
+
+    class ToggleInputValue : public InputValue
+    {
+    public:
+        ToggleInputValue() : m_isToggleChangedValidationEnabled(false) {}
+
+        HRESULT RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveToggleInput* adaptiveTimeInput,
+                                       _In_ ABI::Windows::UI::Xaml::Controls::ICheckBox* uiCheckBoxElement,
+                                       _In_ ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
+                                       _In_ ABI::Windows::UI::Xaml::IUIElement* validationError);
+
+        IFACEMETHODIMP get_CurrentValue(_Outptr_ HSTRING* serializedUserInput) override;
+
+    protected:
+        virtual HRESULT IsValueValid(_Out_ boolean* isInputValid) override;
+        virtual HRESULT EnableValueChangedValidation() override;
+
+    private:
+        Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveToggleInput> m_adaptiveToggleInput;
+        Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Controls::ICheckBox> m_checkBoxElement;
+        bool m_isToggleChangedValidationEnabled;
+    };
+
+    class ChoiceSetInputValue : public InputValue
+    {
+    public:
+        ChoiceSetInputValue() : m_isChoiceSetChangedValidationEnabled(false) {}
+
+        HRESULT RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveChoiceSetInput* adaptiveChoiceSetInput,
+                                       _In_ ABI::Windows::UI::Xaml::IUIElement* uiChoiceSetElement,
+                                       _In_ ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
+                                       _In_ ABI::Windows::UI::Xaml::IUIElement* validationError);
+
+        IFACEMETHODIMP get_CurrentValue(_Outptr_ HSTRING* serializedUserInput) override;
+
+    protected:
+        virtual HRESULT EnableValueChangedValidation() override;
+
+    private:
+
+        std::string GetChoiceValue(_In_ ABI::AdaptiveNamespace::IAdaptiveChoiceSetInput* choiceInput, INT32 selectedIndex) const;
+
+        Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveChoiceSetInput> m_adaptiveChoiceSetInput;
+        bool m_isChoiceSetChangedValidationEnabled;
     };
 }

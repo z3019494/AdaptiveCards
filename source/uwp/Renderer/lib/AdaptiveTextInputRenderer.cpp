@@ -29,44 +29,33 @@ namespace AdaptiveNamespace
                                                                  ITextBox* textBox,
                                                                  _In_ IAdaptiveRenderContext* renderContext,
                                                                  _In_ IAdaptiveRenderArgs* renderArgs,
-                                                                 IUIElement** inputLayout)
+                                                                 IUIElement** textInputLayout)
     {
-        // Create a stack panel for the input and related controls
-        ComPtr<IStackPanel> inputStackPanel =
-            XamlHelpers::CreateXamlClass<IStackPanel>(HStringReference(RuntimeClass_Windows_UI_Xaml_Controls_StackPanel));
-
-        ComPtr<IPanel> stackPanelAsPanel;
-        inputStackPanel.As(&stackPanelAsPanel);
-
-        ComPtr<IAdaptiveTextInput> localTextInput(adaptiveTextInput);
-        ComPtr<IAdaptiveInputElement> textInputAsAdaptiveInput;
-        localTextInput.As(&textInputAsAdaptiveInput);
-
-        // Render the label and add it to the stack panel (TODO - this should be a header, but right now i
-        // can't figure out how to get a border around just the text box if i do it that way)
-        ComPtr<IUIElement> label;
-        XamlHelpers::RenderInputLabel(textInputAsAdaptiveInput.Get(), renderContext, renderArgs, &label);
-        XamlHelpers::AppendXamlElementToPanel(label.Get(), stackPanelAsPanel.Get());
-
         ComPtr<ITextBox> localTextBox(textBox);
         ComPtr<IUIElement> textBoxAsUIElement;
         localTextBox.As(&textBoxAsUIElement);
 
-        // The text box may need to go into a number of parent containers to handle validation and inline actions before
-        // being added to the stack panel. textBoxParentContainer represents the current parent container.
+        // The text box may need to go into a number of parent containers to handle validation and inline actions.
+        // textBoxParentContainer represents the current parent container.
         ComPtr<IUIElement> textBoxParentContainer = textBoxAsUIElement;
 
-        // If there's any validation on this input, put the input inside a border
+        // If there's any validation on this input, put the input inside a border. We don't use
+        // XamlHelpers::HandleInputLayoutAndValidation validation border because that would wrap any inline action as
+        // well as the text input, which is not the desired behavior.
+        ComPtr<IAdaptiveTextInput> localTextInput(adaptiveTextInput);
+        ComPtr<IAdaptiveInputElement> textInputAsAdaptiveInput;
+        RETURN_IF_FAILED(localTextInput.As(&textInputAsAdaptiveInput));
+
         HString regex;
-        adaptiveTextInput->get_Regex(regex.GetAddressOf());
+        RETURN_IF_FAILED(adaptiveTextInput->get_Regex(regex.GetAddressOf()));
         boolean isRequired;
-        textInputAsAdaptiveInput->get_IsRequired(&isRequired);
+        RETURN_IF_FAILED(textInputAsAdaptiveInput->get_IsRequired(&isRequired));
 
         ComPtr<IBorder> validationBorder;
         if (regex.IsValid() || isRequired)
         {
             RETURN_IF_FAILED(XamlHelpers::CreateValidationBorder(textBoxAsUIElement.Get(), renderContext, &validationBorder));
-            validationBorder.As(&textBoxParentContainer);
+            RETURN_IF_FAILED(validationBorder.As(&textBoxParentContainer));
         }
 
         // If this input has an inline action, render it next to the input
@@ -87,28 +76,23 @@ namespace AdaptiveNamespace
         if (!isMultiline)
         {
             ComPtr<IFrameworkElement> textBoxFrameworkElement;
-            textBoxParentContainer.As(&textBoxFrameworkElement);
+            RETURN_IF_FAILED(textBoxParentContainer.As(&textBoxFrameworkElement));
             RETURN_IF_FAILED(textBoxFrameworkElement->put_VerticalAlignment(ABI::Windows::UI::Xaml::VerticalAlignment_Top));
         }
 
-        XamlHelpers::AppendXamlElementToPanel(textBoxParentContainer.Get(), stackPanelAsPanel.Get());
-
-        // Add the error message if present
-        ComPtr<IUIElement> errorMessageControl;
-        XamlHelpers::RenderInputErrorMessage(textInputAsAdaptiveInput.Get(), renderContext, &errorMessageControl);
-
-        if (errorMessageControl != nullptr)
-        {
-            XamlHelpers::AppendXamlElementToPanel(errorMessageControl.Get(), stackPanelAsPanel.Get());
-        }
+        // Call XamlHelpers::HandleInputLayoutAndValidation to handle label and error message. Pass nullptr for
+        // validationBorder as we've already handled that above.
+        ComPtr<IUIElement> inputLayout;
+        ComPtr<IUIElement> validationError;
+        RETURN_IF_FAILED(XamlHelpers::HandleInputLayoutAndValidation(
+            textInputAsAdaptiveInput.Get(), textBoxParentContainer.Get(), regex.IsValid(), renderContext, renderArgs, &inputLayout, nullptr, &validationError));
 
         // Create the InputValue and add it to the context
         ComPtr<TextInputValue> input;
-        MakeAndInitialize<TextInputValue>(
-            &input, adaptiveTextInput, textBox, validationBorder.Get(), errorMessageControl.Get());
+        MakeAndInitialize<TextInputValue>(&input, adaptiveTextInput, textBox, validationBorder.Get(), validationError.Get());
         renderContext->AddInputValue(input.Get());
 
-        stackPanelAsPanel.CopyTo(inputLayout);
+        inputLayout.CopyTo(textInputLayout);
         return S_OK;
     }
 

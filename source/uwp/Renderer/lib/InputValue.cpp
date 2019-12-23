@@ -248,31 +248,86 @@ HRESULT TimeInputValue::EnableValueChangedValidation()
     return S_OK;
 }
 
-std::string InputValue::SerializeToggleInput() const
+HRESULT ToggleInputValue::RuntimeClassInitialize(_In_ ABI::AdaptiveNamespace::IAdaptiveToggleInput* adaptiveToggleInput,
+                                                 _In_ ABI::Windows::UI::Xaml::Controls::ICheckBox* uiCheckBoxElement,
+                                                 _In_ ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
+                                                 _In_ ABI::Windows::UI::Xaml::IUIElement* validationError)
+{
+    m_adaptiveToggleInput = adaptiveToggleInput;
+    m_checkBoxElement = uiCheckBoxElement;
+
+    Microsoft::WRL::ComPtr<IAdaptiveInputElement> toggleInputAsAdaptiveInput;
+    m_adaptiveToggleInput.As(&toggleInputAsAdaptiveInput);
+
+    ComPtr<IUIElement> checkBoxAsUIElement;
+    m_checkBoxElement.As(&checkBoxAsUIElement);
+
+    InputValue::RuntimeClassInitialize(toggleInputAsAdaptiveInput.Get(), checkBoxAsUIElement.Get(), validationBorder, validationError);
+    return S_OK;
+}
+
+HRESULT ToggleInputValue::get_CurrentValue(HSTRING* serializedUserInput)
 {
     boolean checkedValue = false;
-    XamlHelpers::GetToggleValue(m_uiInputElement.Get(), &checkedValue);
-
-    ComPtr<IAdaptiveToggleInput> toggleInput;
-    THROW_IF_FAILED(m_adaptiveInputElement.As(&toggleInput));
+    XamlHelpers::GetToggleValue(m_checkBoxElement.Get(), &checkedValue);
 
     HString value;
     if (checkedValue)
     {
-        THROW_IF_FAILED(toggleInput->get_ValueOn(value.GetAddressOf()));
+        RETURN_IF_FAILED(m_adaptiveToggleInput->get_ValueOn(value.GetAddressOf()));
     }
     else
     {
-        THROW_IF_FAILED(toggleInput->get_ValueOff(value.GetAddressOf()));
+        RETURN_IF_FAILED(m_adaptiveToggleInput->get_ValueOff(value.GetAddressOf()));
     }
 
-    std::string utf8Value;
-    THROW_IF_FAILED(HStringToUTF8(value.Get(), utf8Value));
+    RETURN_IF_FAILED(value.CopyTo(serializedUserInput));
 
-    return utf8Value;
+    return S_OK;
 }
 
-std::string InputValue::GetChoiceValue(_In_ IAdaptiveChoiceSetInput* choiceInput, INT32 selectedIndex) const
+HRESULT ToggleInputValue::IsValueValid(boolean* isInputValid)
+{
+    // Don't use the base class IsValueValid to validate required. That method counts required as set if any value is set,
+    // but for toggle, required means the check box is checked. An unchecked value will still have a value (either false, or whatever's in valueOff).
+    boolean isRequired;
+    RETURN_IF_FAILED(m_adaptiveInputElement->get_IsRequired(&isRequired));
+
+    boolean meetsRequirement = true;
+    if (isRequired)
+    {
+        boolean isToggleChecked = false;
+        XamlHelpers::GetToggleValue(m_checkBoxElement.Get(), &isToggleChecked);
+
+        meetsRequirement = isToggleChecked;
+    }
+
+    *isInputValid = meetsRequirement;
+
+    return S_OK;
+}
+
+HRESULT ToggleInputValue::EnableValueChangedValidation()
+{
+    if (!m_isToggleChangedValidationEnabled)
+    {
+        ComPtr<IButtonBase> checkBoxAsButtonBase;
+        RETURN_IF_FAILED(m_checkBoxElement.As(&checkBoxAsButtonBase));
+
+        EventRegistrationToken toggleChangedToken;
+        RETURN_IF_FAILED(checkBoxAsButtonBase->add_Click(Callback<IRoutedEventHandler>([this](IInspectable* /*sender*/, IRoutedEventArgs *
+                                                                                              /*args*/) -> HRESULT {
+                                                             return Validate(nullptr);
+                                                         }).Get(),
+                                                         &toggleChangedToken));
+
+        m_isToggleChangedValidationEnabled = true;
+    }
+
+    return S_OK;
+}
+
+std::string ChoiceSetInputValue::GetChoiceValue(_In_ IAdaptiveChoiceSetInput* choiceInput, INT32 selectedIndex) const
 {
     if (selectedIndex != -1)
     {
@@ -290,40 +345,52 @@ std::string InputValue::GetChoiceValue(_In_ IAdaptiveChoiceSetInput* choiceInput
     return "";
 }
 
-std::string InputValue::SerializeChoiceSetInput() const
+HRESULT ChoiceSetInputValue::RuntimeClassInitialize(ABI::AdaptiveNamespace::IAdaptiveChoiceSetInput* adaptiveChoiceSetInput,
+                                                    ABI::Windows::UI::Xaml::IUIElement* uiChoiceSetElement,
+                                                    ABI::Windows::UI::Xaml::Controls::IBorder* validationBorder,
+                                                    ABI::Windows::UI::Xaml::IUIElement* validationError)
 {
-    ComPtr<IAdaptiveChoiceSetInput> choiceInput;
-    THROW_IF_FAILED(m_adaptiveInputElement.As(&choiceInput));
+    m_adaptiveChoiceSetInput = adaptiveChoiceSetInput;
 
+    Microsoft::WRL::ComPtr<IAdaptiveInputElement> choiceSetInputAsAdaptiveInput;
+    RETURN_IF_FAILED(m_adaptiveChoiceSetInput.As(&choiceSetInputAsAdaptiveInput));
+
+    InputValue::RuntimeClassInitialize(choiceSetInputAsAdaptiveInput.Get(), uiChoiceSetElement, validationBorder, validationError);
+    return S_OK;
+}
+
+HRESULT ChoiceSetInputValue::get_CurrentValue(HSTRING* serializedUserInput)
+try
+{
     ABI::AdaptiveNamespace::ChoiceSetStyle choiceSetStyle;
-    THROW_IF_FAILED(choiceInput->get_ChoiceSetStyle(&choiceSetStyle));
+    RETURN_IF_FAILED(m_adaptiveChoiceSetInput->get_ChoiceSetStyle(&choiceSetStyle));
 
     boolean isMultiSelect;
-    THROW_IF_FAILED(choiceInput->get_IsMultiSelect(&isMultiSelect));
+    RETURN_IF_FAILED(m_adaptiveChoiceSetInput->get_IsMultiSelect(&isMultiSelect));
 
     if (choiceSetStyle == ABI::AdaptiveNamespace::ChoiceSetStyle_Compact && !isMultiSelect)
     {
         // Handle compact style
         ComPtr<ISelector> selector;
-        THROW_IF_FAILED(m_uiInputElement.As(&selector));
+        RETURN_IF_FAILED(m_uiInputElement.As(&selector));
 
         INT32 selectedIndex;
-        THROW_IF_FAILED(selector->get_SelectedIndex(&selectedIndex));
+        RETURN_IF_FAILED(selector->get_SelectedIndex(&selectedIndex));
 
-        std::string choiceValue;
-        return GetChoiceValue(choiceInput.Get(), selectedIndex);
+        std::string choiceValue = GetChoiceValue(m_adaptiveChoiceSetInput.Get(), selectedIndex);
+        RETURN_IF_FAILED(UTF8ToHString(choiceValue, serializedUserInput));
     }
     else
     {
         // For expanded style, get the panel children
         ComPtr<IPanel> panel;
-        THROW_IF_FAILED(m_uiInputElement.As(&panel));
+        RETURN_IF_FAILED(m_uiInputElement.As(&panel));
 
         ComPtr<IVector<UIElement*>> panelChildren;
-        THROW_IF_FAILED(panel->get_Children(panelChildren.ReleaseAndGetAddressOf()));
+        RETURN_IF_FAILED(panel->get_Children(panelChildren.ReleaseAndGetAddressOf()));
 
         UINT size;
-        THROW_IF_FAILED(panelChildren->get_Size(&size));
+        RETURN_IF_FAILED(panelChildren->get_Size(&size));
 
         if (isMultiSelect)
         {
@@ -332,14 +399,14 @@ std::string InputValue::SerializeChoiceSetInput() const
             for (UINT i = 0; i < size; i++)
             {
                 ComPtr<IUIElement> currentElement;
-                THROW_IF_FAILED(panelChildren->GetAt(i, &currentElement));
+                RETURN_IF_FAILED(panelChildren->GetAt(i, &currentElement));
 
                 boolean checkedValue = false;
                 XamlHelpers::GetToggleValue(currentElement.Get(), &checkedValue);
 
                 if (checkedValue)
                 {
-                    std::string choiceValue = GetChoiceValue(choiceInput.Get(), i);
+                    std::string choiceValue = GetChoiceValue(m_adaptiveChoiceSetInput.Get(), i);
                     multiSelectValues += choiceValue + ",";
                 }
             }
@@ -348,7 +415,7 @@ std::string InputValue::SerializeChoiceSetInput() const
             {
                 multiSelectValues = multiSelectValues.substr(0, (multiSelectValues.size() - 1));
             }
-            return multiSelectValues;
+            RETURN_IF_FAILED(UTF8ToHString(multiSelectValues, serializedUserInput));
         }
         else
         {
@@ -357,7 +424,7 @@ std::string InputValue::SerializeChoiceSetInput() const
             for (UINT i = 0; i < size; i++)
             {
                 ComPtr<IUIElement> currentElement;
-                THROW_IF_FAILED(panelChildren->GetAt(i, &currentElement));
+                RETURN_IF_FAILED(panelChildren->GetAt(i, &currentElement));
 
                 boolean checkedValue = false;
                 XamlHelpers::GetToggleValue(currentElement.Get(), &checkedValue);
@@ -368,38 +435,67 @@ std::string InputValue::SerializeChoiceSetInput() const
                     break;
                 }
             }
-            return GetChoiceValue(choiceInput.Get(), selectedIndex);
+            std::string choiceValue = GetChoiceValue(m_adaptiveChoiceSetInput.Get(), selectedIndex);
+            RETURN_IF_FAILED(UTF8ToHString(choiceValue, serializedUserInput));
         }
     }
+    return S_OK;
 }
+CATCH_RETURN;
 
-HRESULT InputValue::get_CurrentValue(_Outptr_ HSTRING* result)
+HRESULT ChoiceSetInputValue::EnableValueChangedValidation()
 {
-    ComPtr<IAdaptiveCardElement> cardElement;
-    RETURN_IF_FAILED(m_adaptiveInputElement.As(&cardElement));
-
-    ABI::AdaptiveNamespace::ElementType elementType;
-    RETURN_IF_FAILED(cardElement->get_ElementType(&elementType));
-
-    std::string serializedInput;
-    switch (elementType)
+    if (!m_isChoiceSetChangedValidationEnabled)
     {
-    case ElementType_ToggleInput:
-    {
-        serializedInput = SerializeToggleInput();
-        break;
-    }
-    case ElementType_ChoiceSetInput:
-    {
-        serializedInput = SerializeChoiceSetInput();
-        break;
-    }
-    default:
-        serializedInput = "";
-        break;
-    }
+        ABI::AdaptiveNamespace::ChoiceSetStyle choiceSetStyle;
+        RETURN_IF_FAILED(m_adaptiveChoiceSetInput->get_ChoiceSetStyle(&choiceSetStyle));
 
-    RETURN_IF_FAILED(UTF8ToHString(serializedInput, result));
+        boolean isMultiSelect;
+        RETURN_IF_FAILED(m_adaptiveChoiceSetInput->get_IsMultiSelect(&isMultiSelect));
+
+        if (choiceSetStyle == ABI::AdaptiveNamespace::ChoiceSetStyle_Compact && !isMultiSelect)
+        {
+            // Handle compact style
+            ComPtr<ISelector> selector;
+            RETURN_IF_FAILED(m_uiInputElement.As(&selector));
+
+            EventRegistrationToken toggleChangedToken;
+            RETURN_IF_FAILED(selector->add_SelectionChanged(Callback<ISelectionChangedEventHandler>([this](IInspectable* /*sender*/, ISelectionChangedEventArgs *
+                                                                                                           /*args*/) -> HRESULT {
+                                                                return Validate(nullptr);
+                                                            }).Get(),
+                                                            &toggleChangedToken));
+        }
+        else
+        {
+            // For expanded style, put click handlers to validate on all the choices
+            ComPtr<IPanel> panel;
+            RETURN_IF_FAILED(m_uiInputElement.As(&panel));
+
+            ComPtr<IVector<UIElement*>> panelChildren;
+            RETURN_IF_FAILED(panel->get_Children(panelChildren.ReleaseAndGetAddressOf()));
+
+            UINT size;
+            RETURN_IF_FAILED(panelChildren->get_Size(&size));
+
+            for (UINT i = 0; i < size; i++)
+            {
+                ComPtr<IUIElement> currentElement;
+                RETURN_IF_FAILED(panelChildren->GetAt(i, &currentElement));
+
+                ComPtr<IButtonBase> elementAsButtonBase;
+                RETURN_IF_FAILED(currentElement.As(&elementAsButtonBase));
+
+                EventRegistrationToken elementChangedToken;
+                RETURN_IF_FAILED(elementAsButtonBase->add_Click(Callback<IRoutedEventHandler>([this](IInspectable* /*sender*/, IRoutedEventArgs *
+                                                                                                     /*args*/) -> HRESULT {
+                                                                    return Validate(nullptr);
+                                                                }).Get(),
+                                                                &elementChangedToken));
+            }
+        }
+        m_isChoiceSetChangedValidationEnabled = true;
+    }
 
     return S_OK;
 }
@@ -437,13 +533,13 @@ HRESULT InputValue::IsValueValid(boolean* isInputValid)
     return S_OK;
 }
 
-HRESULT AdaptiveNamespace::InputValue::SetValidation(boolean isInputValid)
+HRESULT InputValue::SetValidation(boolean isInputValid)
 {
     // Show or hide the border
     if (m_validationBorder)
     {
         isInputValid ? m_validationBorder->put_BorderThickness({0, 0, 0, 0}) :
-                       m_validationBorder->put_BorderThickness({2, 2, 2, 2});
+                       m_validationBorder->put_BorderThickness({1, 1, 1, 1});
     }
 
     // Show or hide the error message
@@ -453,7 +549,7 @@ HRESULT AdaptiveNamespace::InputValue::SetValidation(boolean isInputValid)
                        m_validationError->put_Visibility(Visibility_Visible);
     }
 
-    // Once this has been marked invalid once, we should validate on all value changess
+    // Once this has been marked invalid once, we should validate on all value changess going forward
     if (!isInputValid)
     {
         EnableValueChangedValidation();

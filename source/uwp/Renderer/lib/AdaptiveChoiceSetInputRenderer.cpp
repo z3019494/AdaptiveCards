@@ -47,14 +47,13 @@ namespace AdaptiveNamespace
 
         if (choiceSetStyle == ABI::AdaptiveNamespace::ChoiceSetStyle_Compact && !isMultiSelect)
         {
-            BuildCompactChoiceSetInput(renderContext, renderArgs, adaptiveChoiceSetInput.Get(), choiceInputSet);
+            RETURN_IF_FAILED(BuildCompactChoiceSetInput(renderContext, renderArgs, adaptiveChoiceSetInput.Get(), choiceInputSet));
         }
         else
         {
-            BuildExpandedChoiceSetInput(renderContext, renderArgs, adaptiveChoiceSetInput.Get(), isMultiSelect, choiceInputSet);
+            RETURN_IF_FAILED(BuildExpandedChoiceSetInput(renderContext, renderArgs, adaptiveChoiceSetInput.Get(), isMultiSelect, choiceInputSet));
         }
 
-        XamlHelpers::AddInputValueToContext(renderContext, adaptiveCardElement, *choiceInputSet);
         return S_OK;
     }
     CATCH_RETURN;
@@ -162,20 +161,33 @@ namespace AdaptiveNamespace
         RETURN_IF_FAILED(comboBox.As(&comboBoxAsUIElement));
         RETURN_IF_FAILED(XamlHelpers::AddHandledTappedEvent(comboBoxAsUIElement.Get()));
 
-        ComPtr<IComboBox2> comboBox2;
-        RETURN_IF_FAILED(comboBox.As(&comboBox2));
-
-        ComPtr<IAdaptiveChoiceSetInput> localChoiceSetInput(adaptiveChoiceSetInput);
-        ComPtr<IAdaptiveInputElement> adaptiveChoiceSetInputAsAdaptiveInput;
-        RETURN_IF_FAILED(localChoiceSetInput.As(&adaptiveChoiceSetInputAsAdaptiveInput));
-        RETURN_IF_FAILED(XamlHelpers::SetXamlHeaderFromLabel(
-            adaptiveChoiceSetInputAsAdaptiveInput.Get(), renderContext, renderArgs, comboBox2.Get()));
-
         XamlHelpers::SetStyleFromResourceDictionary(renderContext,
                                                     L"Adaptive.Input.ChoiceSet.Compact",
                                                     comboBoxAsFrameworkElement.Get());
 
-        return comboBoxAsUIElement.CopyTo(choiceInputSet);
+        ComPtr<IAdaptiveChoiceSetInput> localAdaptiveChoiceSetInput(adaptiveChoiceSetInput);
+        ComPtr<IAdaptiveInputElement> adaptiveChoiceSetInputAsAdaptiveInput;
+        RETURN_IF_FAILED(localAdaptiveChoiceSetInput.As(&adaptiveChoiceSetInputAsAdaptiveInput));
+
+        ComPtr<IUIElement> inputLayout;
+        ComPtr<IBorder> validationBorder;
+        ComPtr<IUIElement> validationError;
+        XamlHelpers::HandleInputLayoutAndValidation(adaptiveChoiceSetInputAsAdaptiveInput.Get(),
+                                                    comboBoxAsUIElement.Get(),
+                                                    false,
+                                                    renderContext,
+                                                    renderArgs,
+                                                    &inputLayout,
+                                                    &validationBorder,
+                                                    &validationError);
+
+        // Create the InputValue and add it to the context
+        ComPtr<ChoiceSetInputValue> input;
+        MakeAndInitialize<ChoiceSetInputValue>(
+            &input, adaptiveChoiceSetInput, comboBoxAsUIElement.Get(), validationBorder.Get(), validationError.Get());
+        RETURN_IF_FAILED(renderContext->AddInputValue(input.Get()));
+
+        return inputLayout.CopyTo(choiceInputSet);
     }
 
     HRESULT AdaptiveChoiceSetInputRenderer::BuildExpandedChoiceSetInput(_In_ IAdaptiveRenderContext* renderContext,
@@ -193,18 +205,6 @@ namespace AdaptiveNamespace
 
         ComPtr<IPanel> panel;
         RETURN_IF_FAILED(stackPanel.As(&panel));
-
-        // If this expanded choice set has a label, add the label to the stack panel before the choices
-        ComPtr<IAdaptiveChoiceSetInput> localChoiceSetInput(adaptiveChoiceSetInput);
-        ComPtr<IAdaptiveInputElement> adaptiveChoiceSetInputAsAdaptiveInput;
-        RETURN_IF_FAILED(localChoiceSetInput.As(&adaptiveChoiceSetInputAsAdaptiveInput));
-
-        ComPtr<IUIElement> labelControl;
-        RETURN_IF_FAILED(XamlHelpers::RenderInputLabel(adaptiveChoiceSetInputAsAdaptiveInput.Get(), renderContext, renderArgs, &labelControl));
-        if (labelControl != nullptr)
-        {
-            XamlHelpers::AppendXamlElementToPanel(labelControl.Get(), panel.Get());
-        }
 
         std::vector<std::string> values = GetChoiceSetValueVector(adaptiveChoiceSetInput);
 
@@ -264,6 +264,30 @@ namespace AdaptiveNamespace
                                                                      L"Adaptive.Input.ChoiceSet.Expanded",
                                                                      choiceSetAsFrameworkElement.Get()));
 
-        return stackPanel.CopyTo(choiceInputSet);
+        ComPtr<IAdaptiveChoiceSetInput> localAdaptiveChoiceSetInput(adaptiveChoiceSetInput);
+        ComPtr<IAdaptiveInputElement> adaptiveChoiceSetInputAsAdaptiveInput;
+        RETURN_IF_FAILED(localAdaptiveChoiceSetInput.As(&adaptiveChoiceSetInputAsAdaptiveInput));
+
+        ComPtr<IUIElement> choiceSetAsUIElement;
+        RETURN_IF_FAILED(stackPanel.As(&choiceSetAsUIElement));
+
+        ComPtr<IUIElement> inputLayout;
+        ComPtr<IUIElement> validationError;
+        XamlHelpers::HandleInputLayoutAndValidation(adaptiveChoiceSetInputAsAdaptiveInput.Get(),
+                                                    choiceSetAsUIElement.Get(),
+                                                    false,
+                                                    renderContext,
+                                                    renderArgs,
+                                                    &inputLayout,
+                                                    nullptr,
+                                                    &validationError);
+
+        // Create the InputValue and add it to the context
+        ComPtr<ChoiceSetInputValue> input;
+        MakeAndInitialize<ChoiceSetInputValue>(
+            &input, adaptiveChoiceSetInput, choiceSetAsUIElement.Get(), nullptr, validationError.Get());
+        RETURN_IF_FAILED(renderContext->AddInputValue(input.Get()));
+
+        return inputLayout.CopyTo(choiceInputSet);
     }
 }

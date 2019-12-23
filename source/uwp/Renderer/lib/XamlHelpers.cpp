@@ -223,19 +223,6 @@ namespace AdaptiveNamespace::XamlHelpers
         return S_OK;
     }
 
-    void AddInputValueToContext(_In_ IAdaptiveRenderContext* renderContext,
-                                _In_ IAdaptiveCardElement* adaptiveCardElement,
-                                _In_ IUIElement* inputUiElement)
-    {
-        ComPtr<IAdaptiveCardElement> cardElement(adaptiveCardElement);
-        ComPtr<IAdaptiveInputElement> inputElement;
-        THROW_IF_FAILED(cardElement.As(&inputElement));
-
-        ComPtr<InputValue> input;
-        THROW_IF_FAILED(MakeAndInitialize<InputValue>(&input, inputElement.Get(), inputUiElement));
-        THROW_IF_FAILED(renderContext->AddInputValue(input.Get()));
-    }
-
     bool SupportsInteractivity(_In_ IAdaptiveHostConfig* hostConfig)
     {
         boolean supportsInteractivity;
@@ -815,7 +802,7 @@ namespace AdaptiveNamespace::XamlHelpers
         adaptiveInput->get_IsRequired(&isRequired);
 
         ComPtr<IBorder> validationBorder;
-        if (hasTypeSpecificValidation || isRequired)
+        if (validationBorderOut && (hasTypeSpecificValidation || isRequired))
         {
             RETURN_IF_FAILED(XamlHelpers::CreateValidationBorder(inputUIElement, renderContext, &validationBorder));
             validationBorder.As(&inputUIElementParentContainer);
@@ -824,6 +811,7 @@ namespace AdaptiveNamespace::XamlHelpers
         XamlHelpers::AppendXamlElementToPanel(inputUIElementParentContainer.Get(), stackPanelAsPanel.Get());
 
         // Add the error message if present
+        // BECKYTODO - don't do this if there's no validation!
         ComPtr<IUIElement> errorMessageControl;
         XamlHelpers::RenderInputErrorMessage(adaptiveInput, renderContext, &errorMessageControl);
 
@@ -834,9 +822,13 @@ namespace AdaptiveNamespace::XamlHelpers
 
         // Create the InputValue and add it to the context
         stackPanelAsPanel.CopyTo(inputLayout);
-        validationBorder.CopyTo(validationBorderOut);
         errorMessageControl.CopyTo(validationErrorOut);
+
+        if (validationBorderOut)
+        {
+            validationBorder.CopyTo(validationBorderOut);
+        }
+
         return S_OK;
     }
 }
-

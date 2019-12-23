@@ -76,32 +76,20 @@ namespace AdaptiveNamespace
         RETURN_IF_FAILED(
             XamlHelpers::SetStyleFromResourceDictionary(renderContext, L"Adaptive.Input.Toggle", frameworkElement.Get()));
 
-        XamlHelpers::AddInputValueToContext(renderContext, adaptiveCardElement, *toggleInputControl);
+        ComPtr<IAdaptiveInputElement> adapitveToggleInputAsAdaptiveInput;
+        RETURN_IF_FAILED(adaptiveToggleInput.As(&adapitveToggleInputAsAdaptiveInput));
 
-        // Check if this toggle has a label. If so, add it to a stackPanel with the checkBox.
-        ComPtr<IAdaptiveInputElement> adaptiveToggleInputAsAdaptiveInput;
-        RETURN_IF_FAILED(adaptiveToggleInput.As(&adaptiveToggleInputAsAdaptiveInput));
+        ComPtr<IUIElement> inputLayout;
+        ComPtr<IUIElement> validationError;
+        RETURN_IF_FAILED(XamlHelpers::HandleInputLayoutAndValidation(
+            adapitveToggleInputAsAdaptiveInput.Get(), checkboxAsUIElement.Get(), false, renderContext, renderArgs, &inputLayout, nullptr, &validationError));
 
-        ComPtr<IUIElement> labelControl;
-        RETURN_IF_FAILED(XamlHelpers::RenderInputLabel(adaptiveToggleInputAsAdaptiveInput.Get(), renderContext, renderArgs, &labelControl));
+        ComPtr<ToggleInputValue> input;
+        RETURN_IF_FAILED(MakeAndInitialize<ToggleInputValue>(
+            &input, adaptiveToggleInput.Get(), checkBox.Get(), nullptr, validationError.Get()));
+        RETURN_IF_FAILED(renderContext->AddInputValue(input.Get()));
 
-        if (labelControl != nullptr)
-        {
-            ComPtr<IStackPanel> stackPanel =
-                XamlHelpers::CreateXamlClass<IStackPanel>(HStringReference(RuntimeClass_Windows_UI_Xaml_Controls_StackPanel));
-
-            ComPtr<IPanel> panel;
-            RETURN_IF_FAILED(stackPanel.As(&panel));
-
-            XamlHelpers::AppendXamlElementToPanel(labelControl.Get(), panel.Get());
-            XamlHelpers::AppendXamlElementToPanel(checkBox.Get(), panel.Get());
-
-            RETURN_IF_FAILED(stackPanel.CopyTo(toggleInputControl));
-        }
-        else
-        {
-            RETURN_IF_FAILED(checkboxAsUIElement.CopyTo(toggleInputControl));
-        }
+        RETURN_IF_FAILED(inputLayout.CopyTo(toggleInputControl));
 
         return S_OK;
     }

@@ -370,10 +370,6 @@ namespace AdaptiveNamespace::XamlHelpers
                                        _Out_ ABI::Windows::UI::Color* separatorColor,
                                        _Out_ bool* needsSeparator);
 
-    void AddInputValueToContext(_In_ ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext,
-                                _In_ ABI::AdaptiveNamespace::IAdaptiveCardElement* adaptiveCardElement,
-                                _In_ ABI::Windows::UI::Xaml::IUIElement* inputUiElement);
-
     inline HRESULT WarnFallbackString(_In_ ABI::AdaptiveNamespace::IAdaptiveRenderContext* renderContext, const std::string& warning)
     {
         HString warningMsg;

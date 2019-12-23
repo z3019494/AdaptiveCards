@@ -115,10 +115,8 @@ namespace AdaptiveNamespace
                                                                      L"Adaptive.Input.Date",
                                                                      datePickerAsFrameworkElement.Get()));
 
-
         ComPtr<IUIElement> datePickerAsUIElement;
         datePicker.As(&datePickerAsUIElement);
-
 
         ComPtr<IUIElement> inputLayout;
         ComPtr<IBorder> validationBorder;

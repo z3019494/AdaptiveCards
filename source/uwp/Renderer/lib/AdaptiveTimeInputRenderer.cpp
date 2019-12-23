@@ -62,12 +62,10 @@ namespace AdaptiveNamespace
             RETURN_IF_FAILED(timePicker->put_Time(initialTime));
         }
 
-
         // Note: Placeholder is not supported by ITimePicker
 
         ComPtr<IAdaptiveInputElement> adaptiveTimeInputAsAdaptiveInput;
         RETURN_IF_FAILED(adaptiveTimeInput.As(&adaptiveTimeInputAsAdaptiveInput));
-
 
         // If there's any validation on this input, put the input inside a border
         HString max;
