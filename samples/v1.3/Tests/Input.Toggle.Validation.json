@@ -12,7 +12,9 @@
 			"type": "Input.Toggle",
 			"label": "Required",
 			"title": "Toggle!",
-			"id": "required"
+			"id": "required",
+			"isRequired": true,
+			"errorMessage": "This toggle is required!"
 		}
 	],
 	"actions": [
