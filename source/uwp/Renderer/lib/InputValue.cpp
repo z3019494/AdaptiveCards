@@ -276,7 +276,7 @@ HRESULT NumberInputValue::IsValueValid(_Out_ boolean* isInputValid)
         }
     }
 
-    *isInputValid = isBaseValid;
+    *isInputValid = isBaseValid && minMaxValid;
 
     return S_OK;
 }
@@ -368,15 +368,24 @@ HRESULT TimeInputValue::RuntimeClassInitialize(_In_ IAdaptiveRenderContext* rend
 
 HRESULT TimeInputValue::get_CurrentValue(_Outptr_ HSTRING* serializedUserInput)
 {
-    TimeSpan timeSpan;
-    RETURN_IF_FAILED(m_timePickerElement->get_Time(&timeSpan));
+    ComPtr<ITimePicker3> timePicker3;
+    RETURN_IF_FAILED(m_timePickerElement.As(&timePicker3));
 
-    UINT64 totalMinutes = timeSpan.Duration / 10000000 / 60;
-    UINT64 hours = totalMinutes / 60;
-    UINT64 minutesPastTheHour = totalMinutes - (hours * 60);
+    ComPtr<IReference<TimeSpan>> timeSpanReference;
+    RETURN_IF_FAILED(timePicker3->get_SelectedTime(&timeSpanReference));
 
-    char buffer[6];
-    sprintf_s(buffer, sizeof(buffer), "%02llu:%02llu", hours, minutesPastTheHour);
+    char buffer[6] = {0};
+    if (timeSpanReference != nullptr)
+    {
+        TimeSpan timeSpan;
+        timeSpanReference->get_Value(&timeSpan);
+
+        UINT64 totalMinutes = timeSpan.Duration / 10000000 / 60;
+        UINT64 hours = totalMinutes / 60;
+        UINT64 minutesPastTheHour = totalMinutes - (hours * 60);
+
+        sprintf_s(buffer, sizeof(buffer), "%02llu:%02llu", hours, minutesPastTheHour);
+    }
 
     RETURN_IF_FAILED(UTF8ToHString(std::string(buffer), serializedUserInput));
 
@@ -389,38 +398,46 @@ HRESULT TimeInputValue::IsValueValid(_Out_ boolean* isInputValid)
     boolean isBaseValid;
     RETURN_IF_FAILED(InputValue::IsValueValid(&isBaseValid));
 
-    TimeSpan currentTime;
-    RETURN_IF_FAILED(m_timePickerElement->get_Time(&currentTime));
-
-    // Validate max and min time
+    // If time is set, validate max and min
     boolean isMaxMinValid = true;
 
-    HString minTimeString;
-    RETURN_IF_FAILED(m_adaptiveTimeInput->get_Min(minTimeString.GetAddressOf()));
-    if (minTimeString.IsValid())
+    ComPtr<ITimePicker3> timePicker3;
+    RETURN_IF_FAILED(m_timePickerElement.As(&timePicker3));
+
+    ComPtr<IReference<TimeSpan>> timeSpanReference;
+    RETURN_IF_FAILED(timePicker3->get_SelectedTime(&timeSpanReference));
+
+    if (isBaseValid && (timeSpanReference != nullptr))
     {
-        std::string minTimeStdString = HStringToUTF8(minTimeString.Get());
-        unsigned int minHours, minMinutes;
-        if (DateTimePreparser::TryParseSimpleTime(minTimeStdString, minHours, minMinutes))
+        TimeSpan currentTime;
+        RETURN_IF_FAILED(timeSpanReference->get_Value(&currentTime));
+
+        HString minTimeString;
+        RETURN_IF_FAILED(m_adaptiveTimeInput->get_Min(minTimeString.GetAddressOf()));
+        if (minTimeString.IsValid())
         {
-            TimeSpan minTime{(INT64)(minHours * 60 + minMinutes) * 10000000 * 60};
-            isMaxMinValid |= currentTime.Duration > minTime.Duration;
+            std::string minTimeStdString = HStringToUTF8(minTimeString.Get());
+            unsigned int minHours, minMinutes;
+            if (DateTimePreparser::TryParseSimpleTime(minTimeStdString, minHours, minMinutes))
+            {
+                TimeSpan minTime{(INT64)(minHours * 60 + minMinutes) * 10000000 * 60};
+                isMaxMinValid &= currentTime.Duration > minTime.Duration;
+            }
+        }
+
+        HString maxTimeString;
+        RETURN_IF_FAILED(m_adaptiveTimeInput->get_Max(maxTimeString.GetAddressOf()));
+        if (maxTimeString.IsValid())
+        {
+            std::string maxTimeStdString = HStringToUTF8(maxTimeString.Get());
+            unsigned int maxHours, maxMinutes;
+            if (DateTimePreparser::TryParseSimpleTime(maxTimeStdString, maxHours, maxMinutes))
+            {
+                TimeSpan maxTime{(INT64)(maxHours * 60 + maxMinutes) * 10000000 * 60};
+                isMaxMinValid &= currentTime.Duration < maxTime.Duration;
+            }
         }
     }
-
-    HString maxTimeString;
-    RETURN_IF_FAILED(m_adaptiveTimeInput->get_Max(maxTimeString.GetAddressOf()));
-    if (maxTimeString.IsValid())
-    {
-        std::string maxTimeStdString = HStringToUTF8(maxTimeString.Get());
-        unsigned int maxHours, maxMinutes;
-        if (DateTimePreparser::TryParseSimpleTime(maxTimeStdString, maxHours, maxMinutes))
-        {
-            TimeSpan maxTime{(INT64)(maxHours * 60 + maxMinutes) * 10000000 * 60};
-            isMaxMinValid |= currentTime.Duration < maxTime.Duration;
-        }
-    }
-
     *isInputValid = isBaseValid && isMaxMinValid;
 
     return S_OK;
@@ -440,6 +457,15 @@ HRESULT TimeInputValue::EnableValueChangedValidation()
 
         m_isTimeChangedValidationEnabled = true;
     }
+    return S_OK;
+}
+
+HRESULT TimeInputValue::EnableFocusLostValidation()
+{
+    // If we're validating immediately on focus lost, also validate the time picker as soon a a selection is made
+    RETURN_IF_FAILED(InputValue::EnableFocusLostValidation());
+    RETURN_IF_FAILED(EnableValueChangedValidation());
+
     return S_OK;
 }
 

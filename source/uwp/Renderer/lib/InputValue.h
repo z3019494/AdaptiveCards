@@ -128,6 +128,7 @@ namespace AdaptiveNamespace
     private:
         virtual HRESULT IsValueValid(_Out_ boolean* isInputValid) override;
         virtual HRESULT EnableValueChangedValidation() override;
+        virtual HRESULT EnableFocusLostValidation() override;
 
         Microsoft::WRL::ComPtr<ABI::AdaptiveNamespace::IAdaptiveTimeInput> m_adaptiveTimeInput;
         Microsoft::WRL::ComPtr<ABI::Windows::UI::Xaml::Controls::ITimePicker> m_timePickerElement;
