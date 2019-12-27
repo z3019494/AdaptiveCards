@@ -57,8 +57,9 @@ HRESULT InputValue::Validate(_Out_ boolean* isInputValid)
     return S_OK;
 }
 
-IFACEMETHODIMP InputValue::SetFocus()
+HRESULT InputValue::SetFocus()
 {
+    // Set focus on the input control
     ComPtr<IControl> inputAsControl;
     RETURN_IF_FAILED(m_uiInputElement.As(&inputAsControl));
 
@@ -209,14 +210,15 @@ HRESULT TextInputValue::IsValueValid(_Out_ boolean* isInputValid)
     HString regex;
     RETURN_IF_FAILED(m_adaptiveTextInput->get_Regex(regex.GetAddressOf()));
 
+    HString currentValue;
+    RETURN_IF_FAILED(get_CurrentValue(currentValue.GetAddressOf()));
+
     boolean isRegexValid = true;
-    if (regex.IsValid())
+    if (regex.IsValid() && currentValue.IsValid())
     {
         std::string stringPattern = HStringToUTF8(regex.Get());
         std::regex pattern(stringPattern);
 
-        HString currentValue;
-        RETURN_IF_FAILED(get_CurrentValue(currentValue.GetAddressOf()));
         std::string currentValueStdString = HStringToUTF8(currentValue.Get());
 
         std::smatch matches;
@@ -263,16 +265,19 @@ HRESULT NumberInputValue::IsValueValid(_Out_ boolean* isInputValid)
         HString currentValue;
         RETURN_IF_FAILED(get_CurrentValue(currentValue.GetAddressOf()));
 
-        int currentInt;
-        try
+        if (currentValue.IsValid())
         {
-            std::string currentValueStdString = HStringToUTF8(currentValue.Get());
-            currentInt = std::stoi(currentValueStdString);
-            minMaxValid = (currentInt < max) && (currentInt > min);
-        }
-        catch (...)
-        {
-            minMaxValid = false;
+            int currentInt;
+            try
+            {
+                std::string currentValueStdString = HStringToUTF8(currentValue.Get());
+                currentInt = std::stoi(currentValueStdString);
+                minMaxValid = (currentInt < max) && (currentInt > min);
+            }
+            catch (...)
+            {
+                minMaxValid = false;
+            }
         }
     }
 
@@ -759,6 +764,41 @@ HRESULT ChoiceSetInputValue::EnableFocusLostValidation()
                                                         return Validate(nullptr);
                                                     }).Get(),
                                                     &focusLostToken));
+    }
+
+    return S_OK;
+}
+
+HRESULT ChoiceSetInputValue::SetFocus()
+{
+    ABI::AdaptiveNamespace::ChoiceSetStyle choiceSetStyle;
+    RETURN_IF_FAILED(m_adaptiveChoiceSetInput->get_ChoiceSetStyle(&choiceSetStyle));
+
+    boolean isMultiSelect;
+    RETURN_IF_FAILED(m_adaptiveChoiceSetInput->get_IsMultiSelect(&isMultiSelect));
+
+    if (choiceSetStyle == ChoiceSetStyle_Compact && !isMultiSelect)
+    {
+        // Compact style can use the base class implementation
+        RETURN_IF_FAILED(InputValue::SetFocus());
+    }
+    else
+    {
+        // For expanded style, put focus on the first choice in the choice set
+        ComPtr<IPanel> panel;
+        RETURN_IF_FAILED(m_uiInputElement.As(&panel));
+
+        ComPtr<IVector<UIElement*>> panelChildren;
+        RETURN_IF_FAILED(panel->get_Children(panelChildren.ReleaseAndGetAddressOf()));
+
+        ComPtr<IUIElement> firstChoice;
+        RETURN_IF_FAILED(panelChildren->GetAt(0, &firstChoice));
+
+        ComPtr<IControl> choiceAsControl;
+        RETURN_IF_FAILED(firstChoice.As(&choiceAsControl));
+
+        boolean isFocused;
+        RETURN_IF_FAILED(choiceAsControl->Focus(FocusState_Programmatic, &isFocused));
     }
 
     return S_OK;

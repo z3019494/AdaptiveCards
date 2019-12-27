@@ -1595,7 +1595,7 @@ AdaptiveNamespaceStart
         Windows.Data.Json.JsonObject AsJson();
         Windows.Foundation.Collections.ValueSet AsValueSet();
 
-		Boolean ValidateInputs();
+        Boolean ValidateInputs();
     };
 
     [

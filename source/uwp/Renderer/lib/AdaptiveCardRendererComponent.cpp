@@ -150,7 +150,7 @@ namespace AdaptiveNamespace
                                                                       m_actionSentimentResourceDictionary.Get(),
                                                                       renderedCard.Get()));
 
-            renderContext->SetInlineValidation(m_inlineValidation);
+            RETURN_IF_FAILED(renderContext->SetInlineValidation(m_inlineValidation));
 
             // This path is used for synchronous Xaml card rendering, so we don't want
             // to manually download the image assets and instead just want xaml to do

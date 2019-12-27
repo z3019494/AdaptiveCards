@@ -173,6 +173,8 @@ namespace AdaptiveNamespace
         IFACEMETHODIMP get_CurrentValue(_Outptr_ HSTRING* serializedUserInput) override;
 
     private:
+        IFACEMETHODIMP SetFocus() override;
+
         virtual HRESULT EnableValueChangedValidation() override;
         virtual HRESULT EnableFocusLostValidation() override;
 
