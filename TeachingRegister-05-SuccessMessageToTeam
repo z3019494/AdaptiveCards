@@ -1,0 +1,130 @@
+{
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "type": "AdaptiveCard",
+    "version": "1.0",
+    "body": [
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "width": "auto",
+                    "items": [
+                        {
+                            "type": "Image",
+                            "altText": "Success",
+                            "url": "https://normanhurstboys.nsw.edu.au/wp-content/uploads/2020/02/tick.png",
+                            "width": "75px",
+                            "selectAction": {
+                                "type": "Action.OpenUrl",
+                                "url": "https://schoolsnsw.sharepoint.com/sites/N1XHSGBP/mathematics/Lists/All%20Program%20Trackers/calendar.aspx",
+                                "id": "10",
+                                "title": ""
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "Column",
+                    "width": "stretch",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "text": "**Teaching Register:**",
+                            "weight": "Bolder",
+                            "size": "Large",
+                            "wrap": true,
+                            "color": "Accent"
+                        },
+                        {
+                            "type": "TextBlock",
+                            "text": "@{triggerBody()?['title']} successfully marked complete",
+                            "size": "Large",
+                            "weight": "Bolder",
+                            "wrap": true,
+                            "spacing": "None",
+                            "color": "Accent"
+                        }
+                    ],
+                    "verticalContentAlignment": "Center"
+                }
+            ]
+        },
+        {
+            "type": "FactSet",
+            "facts": [
+                {
+                    "title": "Topic:",
+                    "value": "@{triggerBody()?['title']}"
+                },
+                {
+                    "title": "Assigned to:",
+                    "value": "@{body('Join')}"
+                },
+                {
+                    "title": "Marked complete by:",
+                    "value": "@{body('Get_user_profile_(V2)')?['displayName']}"
+                },
+                {
+                    "title": "Marked complete on:",
+                    "value": "@{body('Convert_Actual_Date_Time_to_friendly_format')}"
+                }
+            ],
+            "separator": true
+        },
+        {
+            "type": "TextBlock",
+            "text": "Duration",
+            "separator": true,
+            "wrap": true,
+            "weight": "Bolder",
+            "color": "Accent"
+        },
+        {
+            "type": "FactSet",
+            "facts": [
+                {
+                    "title": "Anticipated:",
+                    "value": "@{variables('DaysToCompleteAnticipated')}"
+                },
+                {
+                    "title": "Actual:",
+                    "value": "@{variables('DaysToComplete')}"
+                }
+            ],
+            "spacing": "None"
+        },
+        {
+            "type": "TextBlock",
+            "text": "Verification",
+            "separator": true,
+            "wrap": true,
+            "weight": "Bolder",
+            "color": "Accent"
+        },
+        {
+            "type": "FactSet",
+            "facts": [
+                {
+                    "title": "Checked by:",
+                    "value": "@{items('Apply_to_each_5')?['responder']?['displayName']}"
+                },
+                {
+                    "title": "Checked on:",
+                    "value": "@{body('Convert_time_zone__-_response_time')}"
+                }
+            ],
+            "spacing": "None"
+        }
+    ],
+    "actions": [
+        {
+            "type": "Action.OpenUrl",
+            "title": "See how the faculty is tracking",
+            "url": "https://schoolsnsw.sharepoint.com/sites/N1XHSGBP/mathematics/Lists/All%20Program%20Trackers/calendar.aspx",
+            "style": "positive",
+            "id": "3",
+            "iconUrl": "https://normanhurstboys.nsw.edu.au/wp-content/uploads/2020/02/sharepoint.png"
+        }
+    ]
+}
