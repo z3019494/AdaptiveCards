@@ -1,0 +1,90 @@
+{
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "type": "AdaptiveCard",
+    "version": "1.0",
+    "body": [
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "width": "auto",
+                    "items": [
+                        {
+                            "type": "Image",
+                            "altText": "Alert",
+                            "url": "https://normanhurstboys.nsw.edu.au/wp-content/uploads/2020/02/alert.png",
+                            "width": "75px",
+                            "selectAction": {
+                                "type": "Action.OpenUrl",
+                                "url": "@{variables('FeedbackFormResponsesURL')}",
+                                "id": "10",
+                                "title": ""
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "Column",
+                    "width": "stretch",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "text": "**Teaching Register gentle reminder:**",
+                            "weight": "Bolder",
+                            "size": "Large",
+                            "wrap": true,
+                            "color": "Accent"
+                        },
+                        {
+                            "type": "TextBlock",
+                            "text": "Have you given Teaching Program Feedback for @{triggerBody()?['title']}?",
+                            "color": "Attention",
+                            "weight": "Bolder",
+                            "size": "Large",
+                            "spacing": "None",
+                            "wrap": true
+                        }
+                    ],
+                    "verticalContentAlignment": "Center"
+                }
+            ]
+        },
+        {
+            "type": "FactSet",
+            "facts": [
+                {
+                    "title": "Class:",
+                    "value": "@{triggerBody()?['title']}"
+                },
+                {
+                    "title": "Topic:",
+                    "value": "@{variables('BucketName')}"
+                },
+                {
+                    "title": "Marked complete on:",
+                    "value": "@{body('Convert_Actual_Date_Time_to_friendly_format')}"
+                }
+            ],
+            "separator": true
+        }
+    ],
+    "actions": [
+        {
+            "type": "Action.OpenUrl",
+            "title": "Give Teaching Program Feedback",
+            "url": "@{variables('FeedbackFormResponsesURL')}",
+            "style": "positive",
+            "id": "1",
+            "iconUrl": "https://normanhurstboys.nsw.edu.au/wp-content/uploads/2020/02/forms.png"
+        },
+        {
+            "type": "Action.OpenUrl",
+            "title": "Return to Team channel",
+            "url": "@{variables('YearChannel')}",
+            "id": "2",
+            "style": "positive",
+            "iconUrl": "https://normanhurstboys.nsw.edu.au/wp-content/uploads/2020/02/teams.png"
+        }
+    ]
+}
