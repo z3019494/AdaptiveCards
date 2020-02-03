@@ -1,0 +1,112 @@
+{
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "type": "AdaptiveCard",
+    "version": "1.0",
+    "body": [
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "width": "auto",
+                    "items": [
+                        {
+                            "type": "Image",
+                            "altText": "Error",
+                            "url": "https://normanhurstboys.nsw.edu.au/wp-content/uploads/2020/02/error.png",
+                            "width": "75px",
+                            "selectAction": {
+                                "type": "Action.OpenUrl",
+                                "url": "@{variables('YearChannel')}",
+                                "id": "10",
+                                "title": ""
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "Column",
+                    "width": "stretch",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "text": "**Teaching Register Error:**",
+                            "weight": "Bolder",
+                            "size": "Large",
+                            "wrap": true,
+                            "color": "Attention"
+                        },
+                        {
+                            "type": "TextBlock",
+                            "text": "An error has occurred in marking @{triggerBody()?['title']} complete ",
+                            "spacing": "None",
+                            "size": "Large",
+                            "weight": "Bolder",
+                            "color": "Attention",
+                            "wrap": true
+                        }
+                    ],
+                    "verticalContentAlignment": "Center"
+                }
+            ]
+        },
+        {
+            "type": "TextBlock",
+            "text": "@{triggerBody()?['title']} has been re-marked **In Progress**",
+            "separator": true,
+            "wrap": true,
+            "color": "Accent"
+        },
+        {
+            "type": "FactSet",
+            "facts": [
+                {
+                    "title": "Topic:",
+                    "value": "@{triggerBody()?['title']}"
+                },
+                {
+                    "title": "Attempted to mark complete on:",
+                    "value": "@{body('Convert_Actual_Date_Time_to_friendly_format')}"
+                }
+            ],
+            "separator": true
+        },
+        {
+            "type": "TextBlock",
+            "text": "Reason: ",
+            "color": "Attention",
+            "separator": true,
+            "weight": "Bolder"
+        },
+        {
+            "type": "TextBlock",
+            "text": "@{items('Apply_to_each_4')?['comments']}",
+            "spacing": "None",
+            "size": "Medium",
+            "wrap": true
+        },
+        {
+            "type": "TextBlock",
+            "text": "Please return to the relevant Team channel to rectify the error, and also give Teaching Program Feedback if that hasn't been done so.",
+            "wrap": true
+        }
+    ],
+    "actions": [
+        {
+            "type": "Action.OpenUrl",
+            "title": "Return to the Team channel",
+            "url": "@{variables('YearChannel')}",
+            "id": "1",
+            "style": "positive",
+            "iconUrl": "https://normanhurstboys.nsw.edu.au/wp-content/uploads/2020/02/teams.png"
+        },
+        {
+            "type": "Action.OpenUrl",
+            "title": "Give Teaching Program Feedback",
+            "url": "@{variables('FeedbackFormResponsesURL')}",
+            "style": "positive",
+            "id": "3",
+            "iconUrl": "https://normanhurstboys.nsw.edu.au/wp-content/uploads/2020/02/forms.png"
+        }
+    ]
+}
